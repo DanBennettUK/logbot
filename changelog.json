@@ -1,14 +1,24 @@
 {
-  "2018-12-20":{
+  "1":{
+    "date": "2018",
+    "version": "v1.020",
+    "added":{
+      "1": "Logger was born"
+    },
+    "changed": {},
+    "destroyed":{}
+  },
+  "2":{
+    "date": "2018-12-22",
     "version": "v1.021",
     "added":{
-      "0": "Added logging for guild bans",
+      "1": "Added ban/unban functionality with logging"
     },
     "changed": {
-      "0": "Spelling mistakes"
+      "1": "Various speling mistakes /s"
     },
     "destroyed":{
-      "0": "myself."
+      "1": "myself."
     }
   }
 }

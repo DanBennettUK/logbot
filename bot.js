@@ -4,6 +4,7 @@ const mysql = require('mysql2');
 var fs = require("fs");
 const client = new Discord.Client();
 const config = require("./config.json");
+const changelog = require("./changelog.json");
 
 //Put your MySQL info here
 const connection = mysql.createConnection({
@@ -173,6 +174,24 @@ function setupTables(){
           username VARCHAR(255)     NOT NULL,
           discriminator VARCHAR(4),
           bannedBy VARCHAR(255),
+          reason text,
+          note text,
+          timestamp DATETIME,
+          PRIMARY KEY (userID, timestamp)
+        )
+        CHARACTER SET 'utf8'
+        COLLATE 'utf8_general_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
+  connection.query(
+    `CREATE TABLE IF NOT EXISTS log_guildUnbans
+        (
+          userID VARCHAR(25)       NOT NULL,
+          username VARCHAR(255)     NOT NULL,
+          discriminator VARCHAR(4),
+          unbannedBy VARCHAR(255),
           reason text,
           note text,
           timestamp DATETIME,
@@ -392,7 +411,7 @@ client.on('message', async message => {
     }
   }
 
-  if(command === "lban"){
+  if(command === "ban"){
     var user = parseUserTag(args[0]);
 
     if(user == "err"){ //Check if the user parameter is valid
@@ -404,12 +423,12 @@ client.on('message', async message => {
 
         guild.ban(user, { days: 1, reason: reason }).then(result => {
             client.channels.get(message.channel.id).send({embed: {
-                  color: 3447003,
+                  color: 9911513,
                   author: {
                     name: client.user.username,
                     icon_url: client.user.avatarURL
                   },
-                  title: "[Action] Ban",
+                  title: "[Action] Ban (" + command + ")" ,
                   description: "The user provided has been successfully banned",
                   fields: [{
                       name: "ID",
@@ -448,6 +467,61 @@ client.on('message', async message => {
       }else{
         client.channels.get(message.channel.id).send("The user provided was not found in this guild")
       }
+    }
+  }
+
+  if(command === "unban"){
+    var user = parseUserTag(args[0]);
+
+    if(user == "err"){ //Check if the user parameter is valid
+      client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
+    }else{
+      var tail = args.slice(1);
+      var reason = tail.join(" ").trim();
+
+      guild.unban(user, reason).then(result => {
+          client.channels.get(message.channel.id).send({embed: {
+                color: 9911513,
+                author: {
+                  name: client.user.username,
+                  icon_url: client.user.avatarURL
+                },
+                title: "[Action] Unban (" + command + ")" ,
+                description: "The user provided has been successfully unbanned",
+                fields: [{
+                    name: "ID",
+                    value: result.id
+                  },
+                  {
+                    name: "Username",
+                    value: result.username,
+                    inline: true
+                  },
+                  {
+                    name: "Reason",
+                    value: reason
+                  },
+                  {
+                    name: "Unbanned by",
+                    value: message.author.username
+                  },
+                ],
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
+              }
+          });
+
+          var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+          connection.query(
+            'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+            function(err, results){
+              if(err) throw err;
+            }
+          );
+        })
+        .catch(console.error);
     }
   }
 });
@@ -564,10 +638,6 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
       }
 		);
 	}
-});
-
-client.on('guildBanAdd', function(member) {
-
 });
 
 client.on('error', console.error);
