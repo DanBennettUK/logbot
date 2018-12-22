@@ -1,0 +1,14 @@
+{
+  "2018-12-20":{
+    "version": "v1.021",
+    "added":{
+      "0": "Added logging for guild bans",
+    },
+    "changed": {
+      "0": "Spelling mistakes"
+    },
+    "destroyed":{
+      "0": "myself."
+    }
+  }
+}
