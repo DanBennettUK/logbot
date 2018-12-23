@@ -2,6 +2,10 @@ const Discord = require("discord.js");
 const Store = require('data-store');
 const mysql = require('mysql2');
 var fs = require("fs");
+const editJsonFile = require("edit-json-file");
+const modulesFilePath = './modules.json';
+var modulesFile = editJsonFile(modulesFilePath);
+var modules = require("./modules.json");
 const client = new Discord.Client();
 const config = require("./config.json");
 const changelog = require("./changelog.json");
@@ -204,6 +208,26 @@ function setupTables(){
           if(err) throw err;
         }
   );
+  connection.query(
+    `CREATE TABLE IF NOT EXISTS log_note
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          addedBy VARCHAR(25)       NOT NULL,
+          note text,
+          isDeleted bit,
+          timestamp DATETIME        NOT NULL,
+          updated timestamp         NOT NULL,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (addedBy) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
 
   connection.query(
     `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
@@ -353,12 +377,14 @@ client.on("ready", () => {
 
   updateUserTable("system", null);
 
+
   //updateGuildBansTable("system", null);
 });
 
 client.on('message', async message => {
   if(message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
 
+  //Log every message that is processed, message or command.
 	var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()]
 	connection.query(
 	  'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
@@ -374,193 +400,231 @@ client.on('message', async message => {
   const command =   args.shift().toLowerCase();                   //Result: "ban"
   const guild =     client.guilds.get(config.guildid);
 
-  if(command === "flipacoin"){
-    var outcome = Math.floor(Math.random() * Math.floor(2));
+  if(command === "module"){
+    if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
+      if(!isNaN(parseInt(args[1]))){ //Parses the string as an int, then checks if the result is valid <Int>
+        modulesFile.set(args[0], parseInt(args[1]));
+        modulesFile.save();
 
-    switch(outcome){
-      case 0:
-        guild.channels.get(message.channel.id).send("Heads!");
-        break;
-      case 1:
-        guild.channels.get(message.channel.id).send("Tails!");
-        break;
+        message.channel.send({embed: {
+              color: 10921638,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.avatarURL
+              },
+              title: "[COMMAND] Module update",
+              description: args[0] + " was set to status " + args[1] + "\n \n Please only set the status to either 1 or 0. *He doesn't like anything else!*",
+              timestamp: new Date(),
+              footer: {
+                text: "Marvin's Little Brother | Current version: " + config.version
+              }
+            }
+          }
+        );
+      }else{
+        message.channel.send("Please provide a numeric value, either 1 or 0. `0: off | 1: on`")
+      }
+    }else{
+      message.channel.send("Module not found, please check spelling.");
+    }
+  }
+
+  if(command === "flipacoin"){
+    if(modulesFile.get("COMMAND_FLIPACOIN")){
+      var outcome = Math.floor(Math.random() * Math.floor(2));
+
+      switch(outcome){
+        case 0:
+          guild.channels.get(message.channel.id).send("Heads!");
+          break;
+        case 1:
+          guild.channels.get(message.channel.id).send("Tails!");
+          break;
+      }
+    }else{
+      message.channel.send("That module ("+command+") is disabled");
     }
   }
 
   if(command === "users"){
     if(args.length == 1 && args[0] == "count"){
-      connection.query(
-        'SELECT COUNT(*) AS TotalUsers FROM users',
-        function(err, result){
-          if(err) throw err;
-          if (result) message.channel.send({embed: {
-                color: 3447003,
-                author: {
-                  name: client.user.username,
-                  icon_url: client.user.avatarURL
-                },
-                title: "[COMMAND] User count",
-                description: "The current count of users known to us",
-                fields: [{
-                    name: "Total user count",
-                    value: result[0].TotalUsers
+      if(modulesFile.get("COMMAND_USER_COUNT")){
+        connection.query(
+          'SELECT COUNT(*) AS TotalUsers FROM users',
+          function(err, result){
+            if(err) throw err;
+            if (result) message.channel.send({embed: {
+                  color: 3447003,
+                  author: {
+                    name: client.user.username,
+                    icon_url: client.user.avatarURL
                   },
-                  {
-                    name: "Note",
-                    value: "This list includes users past and present."
+                  title: "[COMMAND] User count",
+                  description: "The current count of users known to us",
+                  fields: [{
+                      name: "Total user count",
+                      value: result[0].TotalUsers
+                    },
+                    {
+                      name: "Note",
+                      value: "This list includes users past and present."
+                    }
+                  ],
+                  timestamp: new Date(),
+                  footer: {
+                    text: "Marvin's Little Brother | Current version: " + config.version
                   }
-                ],
-                timestamp: new Date(),
-                footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
                 }
               }
-            }
-          );
-        }
-      );
+            );
+          }
+        );
+      }else{
+        message.channel.send("That module ("+command+") is disabled");
+      }
     }
-
     if(args.length == 1 && args[0] == "update"){
-      updateUserTable("user", message.channel.id);
+      if(modulesFile.get("COMMAND_USER_UPDATE")){
+        updateUserTable("user", message.channel.id);
+      }else{
+        message.channel.send("That module ("+command+") is disabled");
+      }
     }
   }
 
   if(command === "ban"){
-    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+    if(modulesFile.get("COMMAND_BAN")){
+      if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+        var user = parseUserTag(args[0]);
+
+        if(user == "err"){ //Check if the user parameter is valid
+          client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
+        }else{
+          if(guild.member(user)){ //Check if the user exists in the guild
+            if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0){
+              var tail = args.slice(1);
+              var reason = tail.join(" ").trim();
+
+              if(tail.length > 0){
+                guild.ban(user, { days: 1, reason: reason }).then(result => {
+                    client.channels.get(message.channel.id).send({embed: {
+                          color: 9911513,
+                          author: {
+                            name: client.user.username,
+                            icon_url: client.user.avatarURL
+                          },
+                          title: "[Action] Ban (" + command + ")" ,
+                          description: "The user provided has been successfully banned",
+                          fields: [{
+                              name: "ID",
+                              value: result.id
+                            },
+                            {
+                              name: "Username",
+                              value: result.username,
+                              inline: true
+                            },
+                            {
+                              name: "Reason",
+                              value: reason
+                            },
+                            {
+                              name: "Banned by",
+                              value: message.author.username
+                            },
+                          ],
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+
+                    var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                    connection.query(
+                      'INSERT INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                      function(err, results){
+                        if(err) throw err;
+                      }
+                    );
+                  })
+                  .catch(console.error);
+              }
+              else{
+                guild.channels.get(message.channel.id).send("Please provide a reason for the ban")
+              }
+            }else{
+              guild.channels.get(message.channel.id).send("You can not ban a user with a higher role than yourself");
+            }
+          }else{
+            client.channels.get(message.channel.id).send("The user provided was not found in this guild")
+          }
+        }
+      }else{
+        guild.channels.get(message.channel.id).send("Awww, lil baby! :baby: You're too young to ban people just yet!")
+      }
+    }else{
+      message.channel.send("That module ("+command+") is disabled");
+    }
+  }
+
+  if(command === "unban"){
+    if(modulesFile.get("COMMAND_UNBAN")){
       var user = parseUserTag(args[0]);
 
       if(user == "err"){ //Check if the user parameter is valid
         client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
       }else{
-        if(guild.member(user)){ //Check if the user exists in the guild
-          if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0){
-            var tail = args.slice(1);
-            var reason = tail.join(" ").trim();
+        var tail = args.slice(1);
+        var reason = tail.join(" ").trim();
 
-            if(tail.length > 0){
-              guild.ban(user, { days: 1, reason: reason }).then(result => {
-                  client.channels.get(message.channel.id).send({embed: {
-                        color: 9911513,
-                        author: {
-                          name: client.user.username,
-                          icon_url: client.user.avatarURL
-                        },
-                        title: "[Action] Ban (" + command + ")" ,
-                        description: "The user provided has been successfully banned",
-                        fields: [{
-                            name: "ID",
-                            value: result.id
-                          },
-                          {
-                            name: "Username",
-                            value: result.username,
-                            inline: true
-                          },
-                          {
-                            name: "Reason",
-                            value: reason
-                          },
-                          {
-                            name: "Banned by",
-                            value: message.author.username
-                          },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
-                        }
-                      }
-                  });
+        guild.unban(user, reason).then(result => {
+            client.channels.get(message.channel.id).send({embed: {
+                  color: 9911513,
+                  author: {
+                    name: client.user.username,
+                    icon_url: client.user.avatarURL
+                  },
+                  title: "[Action] Unban (" + command + ")" ,
+                  description: "The user provided has been successfully unbanned",
+                  fields: [{
+                      name: "ID",
+                      value: result.id
+                    },
+                    {
+                      name: "Username",
+                      value: result.username,
+                      inline: true
+                    },
+                    {
+                      name: "Reason",
+                      value: reason
+                    },
+                    {
+                      name: "Unbanned by",
+                      value: message.author.username
+                    },
+                  ],
+                  timestamp: new Date(),
+                  footer: {
+                    text: "Marvin's Little Brother | Current version: " + config.version
+                  }
+                }
+            });
 
-                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
-                  connection.query(
-                    'INSERT INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-                    function(err, results){
-                      if(err) throw err;
-                    }
-                  );
-                })
-                .catch(console.error);
-            }
-            else{
-              guild.channels.get(message.channel.id).send("Please provide a reason for the ban")
-            }
-          }else{
-            guild.channels.get(message.channel.id).send("You can not ban a user with a higher role than yourself");
-          }
-        }else{
-          client.channels.get(message.channel.id).send("The user provided was not found in this guild")
-        }
+            var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+            connection.query(
+              'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+              function(err, results){
+                if(err) throw err;
+              }
+            );
+          })
+          .catch(console.error);
       }
     }else{
-      guild.channels.get(message.channel.id).send("Awww, lil baby! :baby: You're too young to ban people just yet!")
+      message.channel.send("That module ("+command+") is disabled");
     }
-  }
-
-  if(command === "unban"){
-    var user = parseUserTag(args[0]);
-
-    if(user == "err"){ //Check if the user parameter is valid
-      client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
-    }else{
-      var tail = args.slice(1);
-      var reason = tail.join(" ").trim();
-
-      guild.unban(user, reason).then(result => {
-          client.channels.get(message.channel.id).send({embed: {
-                color: 9911513,
-                author: {
-                  name: client.user.username,
-                  icon_url: client.user.avatarURL
-                },
-                title: "[Action] Unban (" + command + ")" ,
-                description: "The user provided has been successfully unbanned",
-                fields: [{
-                    name: "ID",
-                    value: result.id
-                  },
-                  {
-                    name: "Username",
-                    value: result.username,
-                    inline: true
-                  },
-                  {
-                    name: "Reason",
-                    value: reason
-                  },
-                  {
-                    name: "Unbanned by",
-                    value: message.author.username
-                  },
-                ],
-                timestamp: new Date(),
-                footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
-                }
-              }
-          });
-
-          var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
-          connection.query(
-            'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-            function(err, results){
-              if(err) throw err;
-            }
-          );
-        })
-        .catch(console.error);
-    }
-  }
-
-  if(command === "roles") {
-    var roleCollection = guild.roles.array();
-
-    for(i = 0; i < roleCollection.length; i++){
-      guildRoles[roleCollection[i].position] = roleCollection[i].name;
-    }
-
-    console.log(guildRoles);
   }
 
 });

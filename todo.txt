@@ -1,4 +1,6 @@
 user notes
 user warns
 user stats
-super secure permission checking
+
+list of module statuses
+add user tag validation on ban and unban
