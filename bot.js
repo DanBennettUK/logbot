@@ -372,6 +372,19 @@ client.on('message', async message => {
   const command =   args.shift().toLowerCase();                   //Result: "ban"
   const guild =     client.guilds.get(config.guildid);
 
+  if(command === "flipacoin"){
+    var outcome = Math.floor(Math.random() * Math.floor(2));
+
+    switch(outcome){
+      case 0:
+        guild.channels.get(message.channel.id).send("Heads!");
+        break;
+      case 1:
+        guild.channels.get(message.channel.id).send("Tails!");
+        break;
+    }
+  }
+
   if(command === "users"){
     if(args.length == 1 && args[0] == "count"){
       connection.query(
@@ -524,6 +537,7 @@ client.on('message', async message => {
         .catch(console.error);
     }
   }
+
 });
 
 client.on('messageUpdate', function(oldMessage, newMessage) {
