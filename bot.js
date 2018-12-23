@@ -5,6 +5,7 @@ var fs = require("fs");
 const client = new Discord.Client();
 const config = require("./config.json");
 const changelog = require("./changelog.json");
+var guildRoles = {};
 
 //Put your MySQL info here
 const connection = mysql.createConnection({
@@ -31,8 +32,8 @@ function setupTables(){
           updated timestamp         NOT NULL,
           PRIMARY KEY (userID)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -49,8 +50,8 @@ function setupTables(){
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -62,8 +63,8 @@ function setupTables(){
           type VARCHAR(100),
           PRIMARY KEY (id)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -83,8 +84,8 @@ function setupTables(){
           FOREIGN KEY (userID) REFERENCES users(userID),
           FOREIGN KEY (type) REFERENCES messageTypes(id)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -100,8 +101,8 @@ function setupTables(){
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -113,8 +114,8 @@ function setupTables(){
           type VARCHAR(100),
           PRIMARY KEY (id)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -134,8 +135,8 @@ function setupTables(){
           FOREIGN KEY (userID) REFERENCES users(userID),
           FOREIGN KEY (type) REFERENCES voiceTypes(id)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -148,8 +149,8 @@ function setupTables(){
           timestamp DATETIME,
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -161,8 +162,8 @@ function setupTables(){
           timestamp DATETIME,
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -179,8 +180,8 @@ function setupTables(){
           timestamp DATETIME,
           PRIMARY KEY (userID, timestamp)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -197,8 +198,8 @@ function setupTables(){
           timestamp DATETIME,
           PRIMARY KEY (userID, timestamp)
         )
-        CHARACTER SET 'utf8'
-        COLLATE 'utf8_general_ci';`,
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_general_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -234,7 +235,7 @@ function updateUserTable(invoker, channel){
 
   guild.fetchMembers().then(r => {
         r.members.array().forEach(r => {
-          memberArray.push([r.user.id, r.user.username, r.user.avatar, 1, new Date()]);
+          memberArray.push([r.user.id, r.user.username, r.user.avatar, 1, r.joinedAt]);
         });
           connection.query(
             'INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES ?', [memberArray],
@@ -351,6 +352,7 @@ client.on("ready", () => {
   })
 
   updateUserTable("system", null);
+
   //updateGuildBansTable("system", null);
 });
 
@@ -425,61 +427,74 @@ client.on('message', async message => {
   }
 
   if(command === "ban"){
-    var user = parseUserTag(args[0]);
+    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+      var user = parseUserTag(args[0]);
 
-    if(user == "err"){ //Check if the user parameter is valid
-      client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
-    }else{
-      if(guild.member(user)){ //Check if the user exists in the guild
-        var tail = args.slice(1);
-        var reason = tail.join(" ").trim();
-
-        guild.ban(user, { days: 1, reason: reason }).then(result => {
-            client.channels.get(message.channel.id).send({embed: {
-                  color: 9911513,
-                  author: {
-                    name: client.user.username,
-                    icon_url: client.user.avatarURL
-                  },
-                  title: "[Action] Ban (" + command + ")" ,
-                  description: "The user provided has been successfully banned",
-                  fields: [{
-                      name: "ID",
-                      value: result.id
-                    },
-                    {
-                      name: "Username",
-                      value: result.username,
-                      inline: true
-                    },
-                    {
-                      name: "Reason",
-                      value: reason
-                    },
-                    {
-                      name: "Banned by",
-                      value: message.author.username
-                    },
-                  ],
-                  timestamp: new Date(),
-                  footer: {
-                    text: "Marvin's Little Brother | Current version: " + config.version
-                  }
-                }
-            });
-
-            var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
-            connection.query(
-              'INSERT INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-              function(err, results){
-                if(err) throw err;
-              }
-            );
-          })
-          .catch(console.error);
+      if(user == "err"){ //Check if the user parameter is valid
+        client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
       }else{
-        client.channels.get(message.channel.id).send("The user provided was not found in this guild")
+        if(guild.member(user)){ //Check if the user exists in the guild
+          if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0){
+            var tail = args.slice(1);
+            var reason = tail.join(" ").trim();
+
+            if(tail.length > 0){
+              guild.ban(user, { days: 1, reason: reason }).then(result => {
+                  client.channels.get(message.channel.id).send({embed: {
+                        color: 9911513,
+                        author: {
+                          name: client.user.username,
+                          icon_url: client.user.avatarURL
+                        },
+                        title: "[Action] Ban (" + command + ")" ,
+                        description: "The user provided has been successfully banned",
+                        fields: [{
+                            name: "ID",
+                            value: result.id
+                          },
+                          {
+                            name: "Username",
+                            value: result.username,
+                            inline: true
+                          },
+                          {
+                            name: "Reason",
+                            value: reason
+                          },
+                          {
+                            name: "Banned by",
+                            value: message.author.username
+                          },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+
+                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                  connection.query(
+                    'INSERT INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function(err, results){
+                      if(err) throw err;
+                    }
+                  );
+                })
+                .catch(console.error);
+            }
+            else{
+              guild.channels.get(message.channel.id).send("Please provide a reason for the ban")
+            }
+          }else{
+            guild.channels.get(message.channel.id).send("You can not ban a user with a higher role than yourself");
+          }
+        }else{
+          client.channels.get(message.channel.id).send("The user provided was not found in this guild")
+        }
       }
+    }else{
+      guild.channels.get(message.channel.id).send("Awww, lil baby! :baby: You're too young to ban people just yet!")
     }
   }
 
@@ -536,6 +551,16 @@ client.on('message', async message => {
         })
         .catch(console.error);
     }
+  }
+
+  if(command === "roles") {
+    var roleCollection = guild.roles.array();
+
+    for(i = 0; i < roleCollection.length; i++){
+      guildRoles[roleCollection[i].position] = roleCollection[i].name;
+    }
+
+    console.log(guildRoles);
   }
 
 });
@@ -603,10 +628,10 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
 			data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
 		}
 	}else{
-    if(newMember.voiceChannel.id==null){
-      data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
-    }else{
+    if(newMember.voiceChannel.id){
       data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
+    }else{
+      data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
     }
 	}
 	connection.query(
