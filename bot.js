@@ -697,117 +697,145 @@ client.on('message', async message => {
 });
 
 client.on('messageUpdate', function(oldMessage, newMessage) {
-  if(newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
-	var data = [newMessage.author.id, newMessage.id, newMessage.content, oldMessage.content, newMessage.channel.id, 2, new Date()]
-	connection.query(
-	  'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-    function(err, results){
-      if(err) throw err;
-    }
-	);
-})
-
-client.on('messageDelete', function(message) {
-  if(message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
-	var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()]
-	connection.query(
-	  'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-    function(err, results){
-      if(err) throw err;
-    }
-	);
-})
-
-client.on('guildMemberAdd', function(member) {
-  var params = [member.user.id, member.user.username, member.user.avatar, 1, new Date(), new Date(), member.user.id, member.user.id, member.user.username, new Date()]
-  connection.query(
-	  `
-    INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp, updated) VALUES (?,?,?,?,?,?);
-    UPDATE users SET exist = 1 WHERE userID = ?;
-    INSERT INTO log_guildJoin (userID, joinedAs, timestamp) VALUES (?,?,?);
-    `, params,
-    function(err, results){
-      if(err) throw err;
-    }
-	);
-})
-
-client.on('guildMemberRemove', function(member) {
-	var data = [member.user.id, new Date()]
-  var userLeave = [0, new Date(), member.user.id]
-
-	connection.query(
-	  'INSERT INTO log_guildLeave (userID, timestamp) VALUES (?,?)', data,
-    function(err, results){
-      if(err) throw err;
-    }
-	);
-  connection.query(
-    'UPDATE users SET exist = ?, updated = ? WHERE userID = ?', userLeave,
-    function(err, results){
-      if(err) throw err;
-    }
-  );
-})
-
-client.on('voiceStateUpdate', function(oldMember, newMember) {
-	var data = []
-	if(typeof oldMember.voiceChannel != "undefined"){
-		if(typeof newMember.voiceChannel != "undefined"){
-			data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
-		}else{
-			data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
-		}
-	}else{
-    if(newMember.voiceChannel.id){
-      data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
-    }else{
-      data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
-    }
-	}
-	connection.query(
-	  'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
-    function(err, results){
-      if(err) throw err;
-    }
-	);
-})
-
-client.on('userUpdate', function(oldUser, newUser) {
-//Checking for username changes for logging
-	if(oldUser.username!==newUser.username){
-		var data = [newUser.id, newUser.username, oldUser.username, new Date()]
-		connection.query(
-		  'INSERT INTO log_username (userID, newUsername, oldUsername, timestamp) VALUES (?,?,?,?)', data,
-      function(err, results){
-        if(err) throw err;
-      }
-		);
-	}
-
-//Checking for avatar changes to update user table
-  if(oldUser.avatar !== newUser.avatar){
-    var data = [newUser.avatar, new Date(), newUser.id]
+  if(modulesFile.get("EVENT_MESSAGE_UPDATE")){
+    if(newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
+    var data = [newMessage.author.id, newMessage.id, newMessage.content, oldMessage.content, newMessage.channel.id, 2, new Date()]
     connection.query(
-      'UPDATE users SET avatar = ?, updated = ? WHERE userID = ?', data,
+      'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
       function(err, results){
         if(err) throw err;
       }
     );
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
+})
+
+client.on('messageDelete', function(message) {
+  if(modulesFile.get("EVENT_MESSAGE_DELETE")){
+    if(message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
+    var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()]
+    connection.query(
+      'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+      function(err, results){
+        if(err) throw err;
+      }
+    );
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
+})
+
+client.on('guildMemberAdd', function(member) {
+  if(modulesFile.get("EVENT_GUILD_MEMBER_ADD")){
+    var params = [member.user.id, member.user.username, member.user.avatar, 1, new Date(), new Date(), member.user.id, member.user.id, member.user.username, new Date()]
+    connection.query(
+      `
+      INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp, updated) VALUES (?,?,?,?,?,?);
+      UPDATE users SET exist = 1 WHERE userID = ?;
+      INSERT INTO log_guildJoin (userID, joinedAs, timestamp) VALUES (?,?,?);
+      `, params,
+      function(err, results){
+        if(err) throw err;
+      }
+    );
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
+})
+
+client.on('guildMemberRemove', function(member) {
+  if(modulesFile.get("EVENT_GUILD_MEMBER_LEAVE")){
+    var data = [member.user.id, new Date()]
+    var userLeave = [0, new Date(), member.user.id]
+
+    connection.query(
+      'INSERT INTO log_guildLeave (userID, timestamp) VALUES (?,?)', data,
+      function(err, results){
+        if(err) throw err;
+      }
+    );
+    connection.query(
+      'UPDATE users SET exist = ?, updated = ? WHERE userID = ?', userLeave,
+      function(err, results){
+        if(err) throw err;
+      }
+    );
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
+})
+
+client.on('voiceStateUpdate', function(oldMember, newMember) {
+  if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
+    var data = []
+    if(typeof oldMember.voiceChannel != "undefined"){
+      if(typeof newMember.voiceChannel != "undefined"){
+        data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
+      }else{
+        data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
+      }
+    }else{
+      if(newMember.voiceChannel.id){
+        data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
+      }else{
+        data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
+      }
+    }
+    connection.query(
+      'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
+      function(err, results){
+        if(err) throw err;
+      }
+    );
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
+})
+
+client.on('userUpdate', function(oldUser, newUser) {
+  if(modulesFile.get("EVENT_USER_UPDATE")){
+    //Checking for username changes for logging
+    	if(oldUser.username!==newUser.username){
+    		var data = [newUser.id, newUser.username, oldUser.username, new Date()]
+    		connection.query(
+    		  'INSERT INTO log_username (userID, newUsername, oldUsername, timestamp) VALUES (?,?,?,?)', data,
+          function(err, results){
+            if(err) throw err;
+          }
+    		);
+    	}
+
+    //Checking for avatar changes to update user table
+      if(oldUser.avatar !== newUser.avatar){
+        var data = [newUser.avatar, new Date(), newUser.id]
+        connection.query(
+          'UPDATE users SET avatar = ?, updated = ? WHERE userID = ?', data,
+          function(err, results){
+            if(err) throw err;
+          }
+        );
+      }
+  }else{
+    //EVENT IS NOT ONLINE!!
   }
 })
 
 client.on('guildMemberUpdate', function(oldMember, newMember) {
-//Checking for nickname changes for logging
-	if(oldMember.displayName !== newMember.displayName){
-		var data = [newMember.user.id, newMember.user.username, newMember.displayName, oldMember.displayName, new Date()]
-		connection.query(
-		  'INSERT INTO log_nickname (userID, username, newnickname, oldnickname, timestamp) VALUES (?,?,?,?,?)', data,
-      function(err, results){
-        if(err) throw err;
-      }
-		);
-	}
+  if(modulesFile.get("EVENT_GUILD_MEMBER_UPDATE")){
+    //Checking for nickname changes for logging
+    	if(oldMember.displayName !== newMember.displayName){
+    		var data = [newMember.user.id, newMember.user.username, newMember.displayName, oldMember.displayName, new Date()]
+    		connection.query(
+    		  'INSERT INTO log_nickname (userID, username, newnickname, oldnickname, timestamp) VALUES (?,?,?,?,?)', data,
+          function(err, results){
+            if(err) throw err;
+          }
+    		);
+    	}
+  }else{
+    //EVENT IS NOT ONLINE!!
+  }
 });
 
 client.on('error', console.error);
