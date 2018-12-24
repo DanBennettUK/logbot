@@ -1,6 +1,3 @@
 user notes
 user warns
 user stats
-
-list of module statuses
-add user tag validation on ban and unban

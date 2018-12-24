@@ -429,6 +429,48 @@ client.on('message', async message => {
     }
   }
 
+  if(command === "listmodules"){
+    var file = modulesFile.get();
+    var moduleNames = [];
+    var moduleValues = [];
+    var formattedModules = [];
+
+    for(var key in file){
+      moduleNames.push(key);
+      moduleValues.push(file[key]);
+    }
+
+    message.channel.send({embed: {
+          color: 4305821,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.avatarURL
+          },
+          title: "[COMMAND] List Modules",
+          fields: [{
+              name: "Module",
+              value: moduleNames.join("\n"),
+              inline: true
+            },
+            {
+              name: "State",
+              value: moduleValues.join("\n"),
+              inline: true
+            },
+            {
+              name: "Note",
+              value: "`1: on | 0:off` If you would like a module enabling/disabling. Please ask an Admin."
+            },
+          ],
+          timestamp: new Date(),
+          footer: {
+            text: "Marvin's Little Brother | Current version: " + config.version
+          }
+        }
+      }
+    );
+  }
+
   if(command === "flipacoin"){
     if(modulesFile.get("COMMAND_FLIPACOIN")){
       var outcome = Math.floor(Math.random() * Math.floor(2));
@@ -495,7 +537,12 @@ client.on('message', async message => {
   if(command === "ban"){
     if(modulesFile.get("COMMAND_BAN")){
       if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
-        var user = parseUserTag(args[0]);
+        if(args[0]){
+          var user = parseUserTag(args[0]);
+        }else{
+          message.channel.send("Ban who? **YOU!?**. \nFormat:`>ban <UserTag> <Reason>`")
+          return
+        }
 
         if(user == "err"){ //Check if the user parameter is valid
           client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
@@ -570,7 +617,12 @@ client.on('message', async message => {
 
   if(command === "unban"){
     if(modulesFile.get("COMMAND_UNBAN")){
-      var user = parseUserTag(args[0]);
+      if(args[0]){
+        var user = parseUserTag(args[0]);
+      }else{
+        message.channel.send("Unban who?\n Format:`>unban <UserTag> <Reason>`")
+        return
+      }
 
       if(user == "err"){ //Check if the user parameter is valid
         client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
@@ -685,8 +737,8 @@ client.on('guildMemberRemove', function(member) {
 
 client.on('voiceStateUpdate', function(oldMember, newMember) {
 	var data = []
-	if(oldMember.voiceChannel!==undefined){
-		if(newMember.voiceChannel !== undefined){
+	if(typeof oldMember.voiceChannel != "undefined"){
+		if(typeof newMember.voiceChannel != "undefined"){
 			data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
 		}else{
 			data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
