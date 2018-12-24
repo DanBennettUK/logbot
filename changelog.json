@@ -17,8 +17,17 @@
     "changed": {
       "1": "Various speling mistakes /s"
     },
-    "destroyed":{
-      "1": "myself."
-    }
+    "destroyed":{}
+  },
+  "3":{
+    "date": "2018-12-24",
+    "version": "v1.022",
+    "added":{
+      "1": "Modules"
+    },
+    "changed": {
+      "1": "Commands to include more robust permission checking where necessary"
+    },
+    "destroyed":{}
   }
 }

@@ -554,13 +554,13 @@ client.on('message', async message => {
 
               if(tail.length > 0){
                 guild.ban(user, { days: 1, reason: reason }).then(result => {
-                    client.channels.get(message.channel.id).send({embed: {
+                    message.channel.send({embed: {
                           color: 9911513,
                           author: {
                             name: client.user.username,
                             icon_url: client.user.avatarURL
                           },
-                          title: "[Action] Ban (" + command + ")" ,
+                          title: "[Action] Ban" ,
                           description: "The user provided has been successfully banned",
                           fields: [{
                               name: "ID",
@@ -627,52 +627,67 @@ client.on('message', async message => {
       if(user == "err"){ //Check if the user parameter is valid
         client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
       }else{
-        var tail = args.slice(1);
-        var reason = tail.join(" ").trim();
+        if(client.fetchUser(user)){
+          var tail = args.slice(1);
+          var reason = tail.join(" ").trim();
 
-        guild.unban(user, reason).then(result => {
-            client.channels.get(message.channel.id).send({embed: {
-                  color: 9911513,
-                  author: {
-                    name: client.user.username,
-                    icon_url: client.user.avatarURL
-                  },
-                  title: "[Action] Unban (" + command + ")" ,
-                  description: "The user provided has been successfully unbanned",
-                  fields: [{
-                      name: "ID",
-                      value: result.id
-                    },
-                    {
-                      name: "Username",
-                      value: result.username,
-                      inline: true
-                    },
-                    {
-                      name: "Reason",
-                      value: reason
-                    },
-                    {
-                      name: "Unbanned by",
-                      value: message.author.username
-                    },
-                  ],
-                  timestamp: new Date(),
-                  footer: {
-                    text: "Marvin's Little Brother | Current version: " + config.version
+          if(tail.length > 0){
+            guild.unban(user, reason).then(result => {
+                client.channels.get(message.channel.id).send({embed: {
+                      color: 9911513,
+                      author: {
+                        name: client.user.username,
+                        icon_url: client.user.avatarURL
+                      },
+                      title: "[Action] Unban (" + command + ")" ,
+                      description: "The user provided has been successfully unbanned",
+                      fields: [{
+                          name: "ID",
+                          value: result.id
+                        },
+                        {
+                          name: "Username",
+                          value: result.username,
+                          inline: true
+                        },
+                        {
+                          name: "Reason",
+                          value: reason
+                        },
+                        {
+                          name: "Unbanned by",
+                          value: message.author.username
+                        },
+                      ],
+                      timestamp: new Date(),
+                      footer: {
+                        text: "Marvin's Little Brother | Current version: " + config.version
+                      }
+                    }
+                });
+
+                var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                connection.query(
+                  'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                  function(err, results){
+                    if(err) throw err;
                   }
-                }
-            });
-
-            var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
-            connection.query(
-              'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-              function(err, results){
-                if(err) throw err;
+                );
+              })
+            .catch(err => {
+              if(err.message === "Unknown Ban"){
+                message.channel.send("That user doesn't appear to be banned");
+                console.log(err);
+              }else{
+                console.log(err);
               }
-            );
-          })
-          .catch(console.error);
+            });
+          }else{
+            message.channel.send("Please provide a reason for the unban")
+          }
+        }else{
+          message.channel.send("Could not find a Discord user with that tag/ID")
+        }
       }
     }else{
       message.channel.send("That module ("+command+") is disabled");

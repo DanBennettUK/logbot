@@ -1,3 +1,5 @@
 user notes
 user warns
 user stats
+
+add module functionality to events
