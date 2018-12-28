@@ -243,15 +243,27 @@ function setupTables(){
   );
 }
 function parseUserTag(tag){
-  var trimme = tag.trim();
-  var trimmed;
+  /*
+  ######################################################################
+  ##         Here we are able to parse the users' tag from args       ##
+  ##                                                                  ##
+  ##                         Possible formats:                        ##
+  ##                               <@ID>                              ##
+  ##                               <@!ID>                             ##
+  ##                                 ID                               ##
+  ##                                                                  ##
+  ##       All formats will return a raw ID number, unless err.       ##
+  ######################################################################
+  */
+  var trimMe = tag.trim();
 
-  if(/(<@(!)*)+\w+(>)/.test(tag)){  //If trimme matches <@!NUMBER> OR <@NUMBER>
-    trimmed = trimme.replace(/[^0-9.]/gi, '')
+  if(/(<@(!)*)+\w+(>)/.test(tag)){
+    return trimMe.replace(/[^0-9.]/gi, '')
+  }else if(/^[0-9]+$/.test(tag)){
+    return trimMe;
   }else{
     return "err"
   }
-  return trimmed;
 }
 function updateUserTable(invoker, channel){
   var memberArray = [];
@@ -364,9 +376,9 @@ function updateGuildBansTable(invoker, channel){
 }
 
 client.on("ready", () => {
+  setupTables();
   console.log("Bot Active");
 
-  setupTables();
   client.user.setPresence({
     game: {
         name: 'this server',
@@ -376,9 +388,6 @@ client.on("ready", () => {
   })
 
   updateUserTable("system", null);
-
-
-  //updateGuildBansTable("system", null);
 });
 
 client.on('message', async message => {
@@ -401,74 +410,80 @@ client.on('message', async message => {
   const guild =     client.guilds.get(config.guildid);
 
   if(command === "module"){
-    if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
-      if(!isNaN(parseInt(args[1]))){ //Parses the string as an int, then checks if the result is valid <Int>
-        modulesFile.set(args[0], parseInt(args[1]));
-        modulesFile.save();
+    if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+      if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
+        if(!isNaN(parseInt(args[1])) && ([0,1].includes(parseInt(args[1])))){ //Parses the string as an int, then checks if the result is valid <Int> & it's either a 0 or 1
+          modulesFile.set(args[0], parseInt(args[1]));
+          modulesFile.save();
 
-        message.channel.send({embed: {
-              color: 10921638,
-              author: {
-                name: client.user.username,
-                icon_url: client.user.avatarURL
-              },
-              title: "[COMMAND] Module update",
-              description: args[0] + " was set to status " + args[1] + "\n \n Please only set the status to either 1 or 0. *He doesn't like anything else!*",
-              timestamp: new Date(),
-              footer: {
-                text: "Marvin's Little Brother | Current version: " + config.version
+          message.channel.send({embed: {
+                color: 10921638,
+                author: {
+                  name: client.user.username,
+                  icon_url: client.user.avatarURL
+                },
+                title: "[COMMAND] Module update",
+                description: args[0] + " was set to status " + args[1],
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
               }
             }
-          }
-        );
+          );
+        }else{
+          message.channel.send("Please provide a numeric value. **On:** 1 or **Off:** 0")
+        }
       }else{
-        message.channel.send("Please provide a numeric value, either 1 or 0. `0: off | 1: on`")
+        message.channel.send("That module was not found. Consider using >listmodules");
       }
     }else{
-      message.channel.send("Module not found, please check spelling.");
+      message.channel.send("Modules can only be modified by Admins")
     }
   }
 
   if(command === "listmodules"){
-    var file = modulesFile.get();
-    var moduleNames = [];
-    var moduleValues = [];
-    var formattedModules = [];
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      var file = modulesFile.get();
+      var moduleNames = [];
+      var moduleValues = [];
+      var formattedModules = [];
 
-    for(var key in file){
-      moduleNames.push(key);
-      moduleValues.push(file[key]);
-    }
+      for(var key in file){
+        moduleNames.push(key);
+        moduleValues.push(file[key]);
+      }
 
-    message.channel.send({embed: {
-          color: 4305821,
-          author: {
-            name: client.user.username,
-            icon_url: client.user.avatarURL
-          },
-          title: "[COMMAND] List Modules",
-          fields: [{
-              name: "Module",
-              value: moduleNames.join("\n"),
-              inline: true
+      message.channel.send({embed: {
+            color: 4305821,
+            author: {
+              name: client.user.username,
+              icon_url: client.user.avatarURL
             },
-            {
-              name: "State",
-              value: moduleValues.join("\n"),
-              inline: true
-            },
-            {
-              name: "Note",
-              value: "`1: on | 0:off` If you would like a module enabling/disabling. Please ask an Admin."
-            },
-          ],
-          timestamp: new Date(),
-          footer: {
-            text: "Marvin's Little Brother | Current version: " + config.version
+            title: "[COMMAND] List Modules",
+            fields: [{
+                name: "Module",
+                value: moduleNames.join("\n"),
+                inline: true
+              },
+              {
+                name: "State",
+                value: moduleValues.join("\n"),
+                inline: true
+              },
+              {
+                name: "Note",
+                value: "If you would like a module enabling/disabling. Please ask an Admin."
+              },
+            ],
+            timestamp: new Date(),
+            footer: {
+              text: "Marvin's Little Brother | Current version: " + config.version
+            }
           }
         }
-      }
-    );
+      );
+    }
   }
 
   if(command === "flipacoin"){
@@ -477,10 +492,10 @@ client.on('message', async message => {
 
       switch(outcome){
         case 0:
-          guild.channels.get(message.channel.id).send("Heads!");
+          message.channel.send("Heads!");
           break;
         case 1:
-          guild.channels.get(message.channel.id).send("Tails!");
+          message.channel.send("Tails!");
           break;
       }
     }else{
@@ -489,7 +504,7 @@ client.on('message', async message => {
   }
 
   if(command === "users"){
-    if(args.length == 1 && args[0] == "count"){
+    if(args[0] == "count"){
       if(modulesFile.get("COMMAND_USER_COUNT")){
         connection.query(
           'SELECT COUNT(*) AS TotalUsers FROM users',
@@ -525,7 +540,7 @@ client.on('message', async message => {
         message.channel.send("That module ("+command+") is disabled");
       }
     }
-    if(args.length == 1 && args[0] == "update"){
+    if(args[0] == "update"){
       if(modulesFile.get("COMMAND_USER_UPDATE")){
         updateUserTable("user", message.channel.id);
       }else{
@@ -540,12 +555,12 @@ client.on('message', async message => {
         if(args[0]){
           var user = parseUserTag(args[0]);
         }else{
-          message.channel.send("Ban who? **YOU!?**. \nFormat:`>ban <UserTag> <Reason>`")
+          message.channel.send("Ban who? **YOU!?**. Format:`>ban <UserTag> <Reason>`")
           return
         }
 
         if(user == "err"){ //Check if the user parameter is valid
-          client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
+          message.channel.send("An invalid user was provided. Please try again");
         }else{
           if(guild.member(user)){ //Check if the user exists in the guild
             if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0){
@@ -564,7 +579,8 @@ client.on('message', async message => {
                           description: "The user provided has been successfully banned",
                           fields: [{
                               name: "ID",
-                              value: result.id
+                              value: result.id,
+                              inline: true
                             },
                             {
                               name: "Username",
@@ -598,17 +614,17 @@ client.on('message', async message => {
                   .catch(console.error);
               }
               else{
-                guild.channels.get(message.channel.id).send("Please provide a reason for the ban")
+                message.channel.send("Please provide a reason for the ban");
               }
             }else{
-              guild.channels.get(message.channel.id).send("You can not ban a user with a higher role than yourself");
+              message.channel.send("You can not ban a user with a higher role than yourself");
             }
           }else{
-            client.channels.get(message.channel.id).send("The user provided was not found in this guild")
+            message.channel.send("The user provided was not found in this guild");
           }
         }
       }else{
-        guild.channels.get(message.channel.id).send("Awww, lil baby! :baby: You're too young to ban people just yet!")
+        message.channel.send("Awww, lil baby! :baby: You're too young to ban people just yet!")
       }
     }else{
       message.channel.send("That module ("+command+") is disabled");
@@ -617,82 +633,127 @@ client.on('message', async message => {
 
   if(command === "unban"){
     if(modulesFile.get("COMMAND_UNBAN")){
-      if(args[0]){
-        var user = parseUserTag(args[0]);
-      }else{
-        message.channel.send("Unban who?\n Format:`>unban <UserTag> <Reason>`")
-        return
-      }
-
-      if(user == "err"){ //Check if the user parameter is valid
-        client.channels.get(message.channel.id).send(":thinking: An invalid user was provided. Please try again");
-      }else{
-        if(client.fetchUser(user)){
-          var tail = args.slice(1);
-          var reason = tail.join(" ").trim();
-
-          if(tail.length > 0){
-            guild.unban(user, reason).then(result => {
-                client.channels.get(message.channel.id).send({embed: {
-                      color: 9911513,
-                      author: {
-                        name: client.user.username,
-                        icon_url: client.user.avatarURL
-                      },
-                      title: "[Action] Unban (" + command + ")" ,
-                      description: "The user provided has been successfully unbanned",
-                      fields: [{
-                          name: "ID",
-                          value: result.id
-                        },
-                        {
-                          name: "Username",
-                          value: result.username,
-                          inline: true
-                        },
-                        {
-                          name: "Reason",
-                          value: reason
-                        },
-                        {
-                          name: "Unbanned by",
-                          value: message.author.username
-                        },
-                      ],
-                      timestamp: new Date(),
-                      footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
-                      }
-                    }
-                });
-
-                var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
-                connection.query(
-                  'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
-                  function(err, results){
-                    if(err) throw err;
-                  }
-                );
-              })
-            .catch(err => {
-              if(err.message === "Unknown Ban"){
-                message.channel.send("That user doesn't appear to be banned");
-                console.log(err);
-              }else{
-                console.log(err);
-              }
-            });
-          }else{
-            message.channel.send("Please provide a reason for the unban")
-          }
+      if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+        if(args[0]){
+          var user = parseUserTag(args[0]);
         }else{
-          message.channel.send("Could not find a Discord user with that tag/ID")
+          message.channel.send("Unban who?\n Format:`>unban <UserTag> <Reason>`")
+          return
+        }
+
+        if(user == "err"){ //Check if the user parameter is valid
+          message.channel.send(":thinking: An invalid user was provided. Please try again");
+        }else{
+          if(client.fetchUser(user)){
+            var tail = args.slice(1);
+            var reason = tail.join(" ").trim();
+
+            if(tail.length > 0){
+              guild.unban(user, reason).then(result => {
+                  message.channel.send({embed: {
+                        color: 9911513,
+                        author: {
+                          name: client.user.username,
+                          icon_url: client.user.avatarURL
+                        },
+                        title: "[Action] Unban (" + command + ")" ,
+                        description: "The user provided has been successfully unbanned",
+                        fields: [{
+                            name: "ID",
+                            value: result.id,
+                            inline: true
+                          },
+                          {
+                            name: "Username",
+                            value: result.username,
+                            inline: true
+                          },
+                          {
+                            name: "Reason",
+                            value: reason
+                          },
+                          {
+                            name: "Unbanned by",
+                            value: message.author.username
+                          },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+
+                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                  connection.query(
+                    'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function(err, results){
+                      if(err) throw err;
+                    }
+                  );
+                })
+              .catch(err => {
+                if(err.message === "Unknown Ban"){
+                  message.channel.send("That user doesn't appear to be banned");
+                  console.log(err);
+                }else{
+                  console.log(err);
+                }
+              });
+            }else{
+              message.channel.send("Please provide a reason for the unban")
+            }
+          }else{
+            message.channel.send("Could not find a Discord user with that tag/ID")
+          }
+        }
+      }else{
+        message.channel.send("Awww, lil baby! :baby: You're too young to unban people just yet!")
+      }
+    }else{
+      message.channel.send("That module ("+command+") is disabled");
+    }
+  }
+
+  if(command === "note"){
+    if(modulesFile.get("COMMAND_NOTE")){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(args[0]){
+          var user = parseUserTag(args[0]);
+        }else{
+          message.channel.send("Format: `>note [User ID] [Note content]`");
+          return;
+        }
+
+        if(user == "err"){
+          message.channel.send("An invalid user was provided. Please try again");
+        }else{
+          if(guild.member(user)){
+            var tail = args.slice(1);
+            var reason = tail.join(" ").trim();
+
+            if(tail.length > 0){
+              var data = [user, message.author.id, reason, 0, new Date(), new Date()];
+              connection.query(
+                'INSERT INTO log_note (userID, addedBy, note, isDeleted, timestamp, updated) VALUES (?,?,?,?,?,?)', data,
+                function(err, results){
+                  if(err) throw err;
+                }
+              );
+            }else{
+              message.channel.send("The note needs a reason!");
+            }
+          }else{
+            message.channel.send("The user provided was not found in this guild");
+          }
         }
       }
     }else{
       message.channel.send("That module ("+command+") is disabled");
     }
   }
+
+
 
 });
 
@@ -776,7 +837,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
       }
     }else{
-      if(newMember.voiceChannel.id){
+      if(typeof newMember.voiceChannel.id != "undefined"){
         data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
       }else{
         data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
