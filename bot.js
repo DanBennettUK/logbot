@@ -388,6 +388,8 @@ client.on("ready", () => {
   })
 
   updateUserTable("system", null);
+
+  //console.log(client.emojis.find(emoji => emoji.name === "question"));
 });
 
 client.on('message', async message => {
@@ -753,8 +755,26 @@ client.on('message', async message => {
     }
   }
 
+  if(command === "user"){
+    message.channel.send({embed: {
+          color: 14499301,
+          title: "A react collector was made",
+          timestamp: new Date(),
+          footer: {
+            text: "Marvin's Little Brother | Current version: " + config.version
+          }
+        }
+    }).then(message => {
+      message.react("318081582579712000");
 
+      const filter = (user) => user.id === config.ownerid;
+      const collector = message.createReactionCollector(filter, { time: 15000 });
 
+      collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+      collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+
+    }).catch(console.error)
+  }
 });
 
 client.on('messageUpdate', function(oldMessage, newMessage) {
