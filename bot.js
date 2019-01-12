@@ -815,7 +815,7 @@ client.on('guildMemberAdd', function(member) {
       `
       INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp, updated) VALUES (?,?,?,?,?,?);
       UPDATE users SET exist = 1 WHERE userID = ?;
-      INSERT INTO log_guildJoin (userID, joinedAs, timestamp) VALUES (?,?,?);
+      INSERT INTO log_guildjoin (userID, joinedAs, timestamp) VALUES (?,?,?);
       `, params,
       function(err, results){
         if(err) throw err;
@@ -832,7 +832,7 @@ client.on('guildMemberRemove', function(member) {
     var userLeave = [0, new Date(), member.user.id]
 
     connection.query(
-      'INSERT INTO log_guildLeave (userID, timestamp) VALUES (?,?)', data,
+      'INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)', data,
       function(err, results){
         if(err) throw err;
       }
