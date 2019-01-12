@@ -146,7 +146,7 @@ function setupTables(){
         }
   );
   connection.query(
-    `CREATE TABLE IF NOT EXISTS log_guildJoin
+    `CREATE TABLE IF NOT EXISTS log_guildjoin
         (
           userID VARCHAR(25)       NOT NULL,
           joinedAs VARCHAR(255)    NOT NULL,
@@ -160,7 +160,7 @@ function setupTables(){
         }
   );
   connection.query(
-    `CREATE TABLE IF NOT EXISTS log_guildLeave
+    `CREATE TABLE IF NOT EXISTS log_guildleave
         (
           userID VARCHAR(25)       NOT NULL,
           timestamp DATETIME,
@@ -173,7 +173,7 @@ function setupTables(){
         }
   );
   connection.query(
-    `CREATE TABLE IF NOT EXISTS log_guildBans
+    `CREATE TABLE IF NOT EXISTS log_guildbans
         (
           userID VARCHAR(25)       NOT NULL,
           username VARCHAR(255)     NOT NULL,
@@ -764,11 +764,12 @@ client.on('message', async message => {
             text: "Marvin's Little Brother | Current version: " + config.version
           }
         }
-    }).then(message => {
-      message.react("318081582579712000");
+    }).then(collectme => {
+      console.log(config.ownerid);
+      collectme.react("318081582579712000");
 
-      const filter = (user) => user.id === config.ownerid;
-      const collector = message.createReactionCollector(filter, { time: 15000 });
+      const filter = (reaction, user) => reaction.emoji.id === '318081582579712000' && user.id === config.ownerid;
+      const collector = collectme.createReactionCollector(filter, { time: 15000 });
 
       collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
       collector.on('end', collected => console.log(`Collected ${collected.size} items`));
