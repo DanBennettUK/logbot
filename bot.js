@@ -191,7 +191,7 @@ function setupTables(){
         }
   );
   connection.query(
-    `CREATE TABLE IF NOT EXISTS log_guildUnbans
+    `CREATE TABLE IF NOT EXISTS log_guildunbans
         (
           userID VARCHAR(25)       NOT NULL,
           username VARCHAR(255)     NOT NULL,
@@ -329,7 +329,7 @@ function updateGuildBansTable(invoker, channel){
       banArray.push([ban.id, ban.username, ban.discriminator, "SYSTEM", null, null, new Date()]);
     });
     connection.query(
-      'INSERT IGNORE INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES ?', [banArray],
+      'INSERT IGNORE INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES ?', [banArray],
       function(err, results){
         if(err) throw err;
         if(results){
@@ -607,7 +607,7 @@ client.on('message', async message => {
 
                     var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
                     connection.query(
-                      'INSERT INTO log_guildBans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                      'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
                       function(err, results){
                         if(err) throw err;
                       }
@@ -688,7 +688,7 @@ client.on('message', async message => {
 
                   var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
                   connection.query(
-                    'INSERT INTO log_guildUnbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    'INSERT INTO log_guildunbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
                     function(err, results){
                       if(err) throw err;
                     }
@@ -851,17 +851,17 @@ client.on('guildMemberRemove', function(member) {
 client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
     var data = []
-    if(typeof oldMember.voiceChannel != "undefined"){
-      if(typeof newMember.voiceChannel != "undefined"){
+    if(oldMember.voiceChannel){
+      if(newMember.voiceChannel && newMember.voiceChannel.id !== oldMember.voiceChannel.id){
         data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
       }else{
         data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
       }
     }else{
-      if(typeof newMember.voiceChannel.id != "undefined"){
+      if(newMember.voiceChannel){
         data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
       }else{
-        data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()] //Not too sure why it sometimes trips on this. Potentially, when in "connecting" state then leaves?
+        data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()]
       }
     }
     connection.query(
