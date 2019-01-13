@@ -756,22 +756,53 @@ client.on('message', async message => {
   }
 
   if(command === "user"){
+    var userDetails = [];
+    connection.query(
+      'SELECT * FROM users where userID = ?', parseUserTag(args[0]),
+      function(err, results){
+        if(results) userDetails = results[0];
+        if(err) throw err;
+      }
+    );
+    
     message.channel.send({embed: {
           color: 14499301,
-          title: "A react collector was made",
+          title: "Collector made",
           timestamp: new Date(),
           footer: {
             text: "Marvin's Little Brother | Current version: " + config.version
           }
         }
-    }).then(collectme => {
-      console.log(config.ownerid);
-      collectme.react("318081582579712000");
+    }).then(async msg => {
+      await msg.react("👥");
+      await msg.react("👮");
+      await msg.react("✍");
+      await msg.react("❌");
 
-      const filter = (reaction, user) => reaction.emoji.id === '318081582579712000' && user.id === config.ownerid;
-      const collector = collectme.createReactionCollector(filter, { time: 15000 });
+      const filter = (reaction, user) => user.id === config.ownerid;
+      const collector = msg.createReactionCollector(filter, { time: 15000 });
 
-      collector.on('collect', r => console.log(`Collected ${r.emoji.name}`));
+      collector.on('collect', r =>{
+        console.log(r.emoji.identifier);
+
+        if(r.emoji.name == "👮"){
+          msg.edit({embed: {
+                color: 14499301,
+                title: "Warnings tab",
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
+              }
+          });
+        }else if(r.emoji.name == "❌"){
+          msg.delete();
+        }else if(r.emoji.name == "✍"){
+
+        }else if(r.emoji.name == "👥"){
+
+        }
+      });
       collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 
     }).catch(console.error)
@@ -861,7 +892,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
       if(newMember.voiceChannel){
         data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
       }else{
-        data = [newMember.id, 'UNKNOWN', newMember.voiceChannel.name, '', '', 1, new Date()]
+        data = [newMember.id, 'UNKNOWN', 'UNKNOWN', '', '', 1, new Date()]
       }
     }
     connection.query(
