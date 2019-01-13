@@ -507,46 +507,50 @@ client.on('message', async message => {
 
   if(command === "users"){
     if(args[0] == "count"){
-      if(modulesFile.get("COMMAND_USER_COUNT")){
-        connection.query(
-          'SELECT COUNT(*) AS TotalUsers FROM users',
-          function(err, result){
-            if(err) throw err;
-            if (result) message.channel.send({embed: {
-                  color: 3447003,
-                  author: {
-                    name: client.user.username,
-                    icon_url: client.user.avatarURL
-                  },
-                  title: "[COMMAND] User count",
-                  description: "The current count of users known to us",
-                  fields: [{
-                      name: "Total user count",
-                      value: result[0].TotalUsers
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(modulesFile.get("COMMAND_USER_COUNT")){
+          connection.query(
+            'SELECT COUNT(*) AS TotalUsers FROM users',
+            function(err, result){
+              if(err) throw err;
+              if (result) message.channel.send({embed: {
+                    color: 3447003,
+                    author: {
+                      name: client.user.username,
+                      icon_url: client.user.avatarURL
                     },
-                    {
-                      name: "Note",
-                      value: "This list includes users past and present."
+                    title: "[COMMAND] User count",
+                    description: "The current count of users known to us",
+                    fields: [{
+                        name: "Total user count",
+                        value: result[0].TotalUsers
+                      },
+                      {
+                        name: "Note",
+                        value: "This list includes users past and present."
+                      }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                      text: "Marvin's Little Brother | Current version: " + config.version
                     }
-                  ],
-                  timestamp: new Date(),
-                  footer: {
-                    text: "Marvin's Little Brother | Current version: " + config.version
                   }
                 }
-              }
-            );
-          }
-        );
-      }else{
-        message.channel.send("That module ("+command+") is disabled");
-      }
+              );
+            }
+          );
+        }else{
+          message.channel.send("That module ("+command+") is disabled");
+        }
+      }//End of permission checking statement
     }
     if(args[0] == "update"){
-      if(modulesFile.get("COMMAND_USER_UPDATE")){
-        updateUserTable("user", message.channel.id);
-      }else{
-        message.channel.send("That module ("+command+") is disabled");
+      if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+        if(modulesFile.get("COMMAND_USER_UPDATE")){
+          updateUserTable("user", message.channel.id);
+        }else{
+          message.channel.send("That module ("+command+") is disabled");
+        }
       }
     }
   }
@@ -625,9 +629,7 @@ client.on('message', async message => {
             message.channel.send("The user provided was not found in this guild");
           }
         }
-      }else{
-        message.channel.send("Awww, lil baby! :baby: You're too young to ban people just yet!")
-      }
+      }//End of permission checking statement
     }else{
       message.channel.send("That module ("+command+") is disabled");
     }
@@ -709,9 +711,7 @@ client.on('message', async message => {
             message.channel.send("Could not find a Discord user with that tag/ID")
           }
         }
-      }else{
-        message.channel.send("Awww, lil baby! :baby: You're too young to unban people just yet!")
-      }
+      }//End of permission checking statement
     }else{
       message.channel.send("That module ("+command+") is disabled");
     }
@@ -749,7 +749,7 @@ client.on('message', async message => {
             message.channel.send("The user provided was not found in this guild");
           }
         }
-      }
+      }//End of permission checking statement
     }else{
       message.channel.send("That module ("+command+") is disabled");
     }
