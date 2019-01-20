@@ -31,15 +31,18 @@
     "destroyed":{}
   },
   "4":{
-    "date": "2018-01-XX",
+    "date": "2018-01-20",
     "version": "v1.023",
     "added":{
       "1": "Allow the passing of raw user IDs",
       "2": "User notes",
-      "3": "Member roles are throughly checked before executing commands"
+      "3": "User warnings",
+      "4": "Member roles are throughly checked before executing commands",
+      "5": "Clearer errors"
     },
     "changed": {
-      "1": "Added further options to modules"
+      "1": "Added further options to modules",
+      "2": "Inline parameters into messages are now passed in a cleaner manner"
     },
     "destroyed":{}
   }

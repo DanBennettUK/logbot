@@ -932,8 +932,29 @@ client.on('message', async message => {
                   });
 
                   client.users.get(user).createDM().then(async chnl => {
-                    var dmObject = `Hi ${client.users.get(user).username}, \n\nYou have been warned in ${guild.name} with the following reason:\n\n\`${content}\`\n\nIf you would like to dispute this action, please contact Modmail and reference the following ID:\`${identifier}\``
-                    await chnl.send(dmObject).then(dm => {
+                    await chnl.send({embed: {
+                          color: 15059763,
+                          title:`You have been warned in ${guild.name}` ,
+                          description: `Reasons and details about the warning can be found below:`,
+                          fields: [{
+                              name: "Reason",
+                              value: content
+                            },
+                            {
+                              name: "Identifier",
+                              value: `\`${identifier}\``
+                            },
+                            {
+                              name: "Want to dispute?",
+                              value: "This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message. \nThank you."
+                            }
+                          ],
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    }).then(dm => {
                       var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
                       connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function(err, results){if(err) throw err;})
                     });
