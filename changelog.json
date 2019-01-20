@@ -29,5 +29,18 @@
       "1": "Commands to include more robust permission checking where necessary"
     },
     "destroyed":{}
+  },
+  "4":{
+    "date": "2018-01-XX",
+    "version": "v1.023",
+    "added":{
+      "1": "Allow the passing of raw user IDs",
+      "2": "User notes",
+      "3": "Member roles are throughly checked before executing commands"
+    },
+    "changed": {
+      "1": "Added further options to modules"
+    },
+    "destroyed":{}
   }
 }

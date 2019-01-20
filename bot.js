@@ -1,3 +1,15 @@
+/*
+##################################################
+##           Command Process Guideline          ##
+##                                              ##
+##            Check author permissions          ##
+##        Check arg(s) positions/existence      ##
+##         Check parsed user tag validity       ##
+##          Check guild member existence        ##
+##             ?Check following args            ##
+##################################################
+*/
+
 const Discord = require("discord.js");
 const Store = require('data-store');
 const mysql = require('mysql2');
@@ -9,7 +21,7 @@ var modules = require("./modules.json");
 const client = new Discord.Client();
 const config = require("./config.json");
 const changelog = require("./changelog.json");
-var guildRoles = {};
+const cryptoRandomString = require('crypto-random-string');
 
 //Put your MySQL info here
 const connection = mysql.createConnection({
@@ -228,7 +240,47 @@ function setupTables(){
           if(err) throw err;
         }
   );
-
+  connection.query(
+    `CREATE TABLE IF NOT EXISTS log_warn
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          addedBy VARCHAR(25)       NOT NULL,
+          content text,
+          identifier VARCHAR(10),
+          isDeleted bit,
+          timestamp DATETIME        NOT NULL,
+          updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (addedBy) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_0900_ai_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
+  connection.query(
+    `CREATE TABLE IF NOT EXISTS log_outgoingdm
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          content text,
+          type TINYINT,
+          isDeleted bit,
+          identifier VARCHAR(10),
+          timestamp DATETIME        NOT NULL,
+          updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_0900_ai_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
   connection.query(
     `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
         function(err, results){
@@ -284,7 +336,7 @@ function updateUserTable(invoker, channel){
                           color: 3447003,
                           author: {
                             name: client.user.username,
-                            icon_url: client.user.avatarURL
+                            icon_url: client.user.displayAvatarURL
                           },
                           title: "[COMMAND] User update",
                           description: "Users that are not known to the database will be added.",
@@ -339,7 +391,7 @@ function updateGuildBansTable(invoker, channel){
                     color: 3447003,
                     author: {
                       name: client.user.username,
-                      icon_url: client.user.avatarURL
+                      icon_url: client.user.displayAvatarURL
                     },
                     title: "[COMMAND] Bans update",
                     description: "Bans that are not known to us will be added to the database",
@@ -422,7 +474,7 @@ client.on('message', async message => {
                 color: 10921638,
                 author: {
                   name: client.user.username,
-                  icon_url: client.user.avatarURL
+                  icon_url: client.user.displayAvatarURL
                 },
                 title: "[COMMAND] Module update",
                 description: args[0] + " was set to status " + args[1],
@@ -439,9 +491,7 @@ client.on('message', async message => {
       }else{
         message.channel.send("That module was not found. Consider using >listmodules");
       }
-    }else{
-      message.channel.send("Modules can only be modified by Admins")
-    }
+    }//End of permission checking statement
   }
 
   if(command === "listmodules"){
@@ -460,7 +510,7 @@ client.on('message', async message => {
             color: 4305821,
             author: {
               name: client.user.username,
-              icon_url: client.user.avatarURL
+              icon_url: client.user.displayAvatarURL
             },
             title: "[COMMAND] List Modules",
             fields: [{
@@ -485,7 +535,7 @@ client.on('message', async message => {
           }
         }
       );
-    }
+    }//End of permission checking statement
   }
 
   if(command === "flipacoin"){
@@ -517,7 +567,7 @@ client.on('message', async message => {
                     color: 3447003,
                     author: {
                       name: client.user.username,
-                      icon_url: client.user.avatarURL
+                      icon_url: client.user.displayAvatarURL
                     },
                     title: "[COMMAND] User count",
                     description: "The current count of users known to us",
@@ -579,10 +629,10 @@ client.on('message', async message => {
                           color: 9911513,
                           author: {
                             name: client.user.username,
-                            icon_url: client.user.avatarURL
+                            icon_url: client.user.displayAvatarURL
                           },
                           title: "[Action] Ban" ,
-                          description: "The user provided has been successfully banned",
+                          description: `${client.users.get(user).username} been successfully banned`,
                           fields: [{
                               name: "ID",
                               value: result.id,
@@ -658,9 +708,9 @@ client.on('message', async message => {
                         color: 9911513,
                         author: {
                           name: client.user.username,
-                          icon_url: client.user.avatarURL
+                          icon_url: client.user.displayAvatarURL
                         },
-                        title: "[Action] Unban (" + command + ")" ,
+                        title: `[Action] Unban` ,
                         description: "The user provided has been successfully unbanned",
                         fields: [{
                             name: "ID",
@@ -699,7 +749,6 @@ client.on('message', async message => {
               .catch(err => {
                 if(err.message === "Unknown Ban"){
                   message.channel.send("That user doesn't appear to be banned");
-                  console.log(err);
                 }else{
                   console.log(err);
                 }
@@ -713,7 +762,7 @@ client.on('message', async message => {
         }
       }//End of permission checking statement
     }else{
-      message.channel.send("That module ("+command+") is disabled");
+      message.channel.send(`That module (${command}) is disabled`);
     }
   }
 
@@ -732,14 +781,34 @@ client.on('message', async message => {
         }else{
           if(guild.member(user)){
             var tail = args.slice(1);
-            var reason = tail.join(" ").trim();
+            var note = tail.join(" ").trim();
 
             if(tail.length > 0){
-              var data = [user, message.author.id, reason, 0, new Date(), new Date()];
+              var data = [user, message.author.id, note, 0, new Date(), new Date()];
               connection.query(
                 'INSERT INTO log_note (userID, addedBy, note, isDeleted, timestamp, updated) VALUES (?,?,?,?,?,?)', data,
                 function(err, results){
                   if(err) throw err;
+
+                  message.channel.send({embed: {
+                        color: 9911513,
+                        author: {
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        title: "[Action] Note added" ,
+                        description: `A note was added to ${client.users.get(user)} by ${message.author}`,
+                        fields: [{
+                            name: "Content",
+                            value: note
+                          },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
                 }
               );
             }else{
@@ -751,7 +820,7 @@ client.on('message', async message => {
         }
       }//End of permission checking statement
     }else{
-      message.channel.send("That module ("+command+") is disabled");
+      message.channel.send(`That module (${command}) is disabled`);
     }
   }
 
@@ -760,52 +829,128 @@ client.on('message', async message => {
     connection.query(
       'SELECT * FROM users where userID = ?', parseUserTag(args[0]),
       function(err, results){
-        if(results) userDetails = results[0];
-        if(err) throw err;
+        message.channel.send({embed: {
+              color: 14499301,
+              title: results[0].username,
+              timestamp: new Date(),
+              footer: {
+                text: "Marvin's Little Brother | Current version: " + config.version
+              }
+            }
+        }).then(async msg => {
+          await msg.react("👥");
+          await msg.react("👮");
+          await msg.react("✍");
+          await msg.react("❌");
+
+          const filter = (reaction, user) => user.id === config.ownerid;
+          const collector = msg.createReactionCollector(filter, { time: 15000 });
+
+          collector.on('collect', r =>{
+            console.log(r.emoji.identifier);
+
+            if(r.emoji.name == "👮"){
+              msg.edit({embed: {
+                    color: 14499301,
+                    title: "Warnings tab",
+                    timestamp: new Date(),
+                    footer: {
+                      text: "Marvin's Little Brother | Current version: " + config.version
+                    }
+                  }
+              });
+            }else if(r.emoji.name == "❌"){
+              msg.delete();
+            }else if(r.emoji.name == "✍"){
+
+            }else if(r.emoji.name == "👥"){
+              msg.edit({embed: {
+                    color: 14499301,
+                    title: results[0].username + " 2",
+                    timestamp: new Date(),
+                    footer: {
+                      text: "Marvin's Little Brother | Current version: " + config.version
+                    }
+                  }
+              })
+            }
+          });
+          collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+
+        }).catch(console.error)
       }
     );
-    
-    message.channel.send({embed: {
-          color: 14499301,
-          title: "Collector made",
-          timestamp: new Date(),
-          footer: {
-            text: "Marvin's Little Brother | Current version: " + config.version
+  }
+
+  if(command === "warn"){
+    if(modulesFile.get("COMMAND_WARN")){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(args[0]){
+          var user = parseUserTag(args[0]);
+        }else{
+          message.channel.send(`Format: ${config.prefix}warn [User ID] [Warn reason]`);
+          return;
+        }
+
+        if(user == "err"){
+          message.channel.send("An invalid user was provided. Please try again");
+        }else{
+          if(guild.member(user)){
+            var tail = args.slice(1);
+            var content = tail.join(" ").trim();
+
+            if(tail.length > 0){
+              var identifier = cryptoRandomString(10);
+              var data = [user, message.author.id, content, 0, identifier, new Date(), new Date()];
+              connection.query(
+                'INSERT INTO log_warn (userID, addedBy, content, isDeleted, identifier, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
+                function(err, results){
+                  if(err) throw err;
+
+                  message.channel.send({embed: {
+                        color: 9911513,
+                        author: {
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        title: "[Action] Warning added" ,
+                        description: `A warning was added to ${client.users.get(user)} by ${message.author}`,
+                        fields: [{
+                            name: "Reason",
+                            value: content
+                          },
+                          {
+                            name: "Identifier",
+                            value: identifier
+                          },
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+
+                  client.users.get(user).createDM().then(async chnl => {
+                    var dmObject = `Hi ${client.users.get(user).username}, \n\nYou have been warned in ${guild.name} with the following reason:\n\n\`${content}\`\n\nIf you would like to dispute this action, please contact Modmail and reference the following ID:\`${identifier}\``
+                    await chnl.send(dmObject).then(dm => {
+                      var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
+                      connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function(err, results){if(err) throw err;})
+                    });
+                  }).catch(console.error);
+                }
+              );
+            }else{
+              message.channel.send("The warning needs a reason!");
+            }
+          }else{
+            message.channel.send("The user provided was not found in this guild");
           }
         }
-    }).then(async msg => {
-      await msg.react("👥");
-      await msg.react("👮");
-      await msg.react("✍");
-      await msg.react("❌");
-
-      const filter = (reaction, user) => user.id === config.ownerid;
-      const collector = msg.createReactionCollector(filter, { time: 15000 });
-
-      collector.on('collect', r =>{
-        console.log(r.emoji.identifier);
-
-        if(r.emoji.name == "👮"){
-          msg.edit({embed: {
-                color: 14499301,
-                title: "Warnings tab",
-                timestamp: new Date(),
-                footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
-                }
-              }
-          });
-        }else if(r.emoji.name == "❌"){
-          msg.delete();
-        }else if(r.emoji.name == "✍"){
-
-        }else if(r.emoji.name == "👥"){
-
-        }
-      });
-      collector.on('end', collected => console.log(`Collected ${collected.size} items`));
-
-    }).catch(console.error)
+      }//End of permission checking statement
+    }else{
+      message.channel.send(`That module (${command}) is disabled`);
+    }
   }
 });
 
