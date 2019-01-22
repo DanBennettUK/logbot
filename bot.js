@@ -11,17 +11,17 @@
 */
 
 const Discord = require("discord.js");
+const client = new Discord.Client();
 const Store = require('data-store');
 const mysql = require('mysql2');
 var fs = require("fs");
-const editJsonFile = require("edit-json-file");
-const modulesFilePath = './modules.json';
-var modulesFile = editJsonFile(modulesFilePath);
-var modules = require("./modules.json");
-const client = new Discord.Client();
-const config = require("./config.json");
-const changelog = require("./changelog.json");
 const cryptoRandomString = require('crypto-random-string');
+const editJsonFile = require("edit-json-file");
+const changelog = require("./changelog.json");
+const modulesFilePath = './modules.json';
+var modules = require("./modules.json");
+const config = require("./config.json");
+var modulesFile = editJsonFile(modulesFilePath);
 
 //Put your MySQL info here
 const connection = mysql.createConnection({
@@ -227,15 +227,16 @@ function setupTables(){
           userID VARCHAR(25)        NOT NULL,
           addedBy VARCHAR(25)       NOT NULL,
           note text,
+          identifier VARCHAR(10),
           isDeleted bit,
           timestamp DATETIME        NOT NULL,
-          updated timestamp         NOT NULL,
+          updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID),
           FOREIGN KEY (addedBy) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -314,7 +315,9 @@ function parseUserTag(tag){
   }else if(/^[0-9]+$/.test(tag)){
     return trimMe;
   }else{
-    return "err"
+    var usernameResolve = client.users.find(obj => obj.username === tag);
+    var nicknameResolve = client.users.find(obj => obj.nickname === tag);
+    if(usernameResolve){return usernameResolve.id;}else if(nicknameResolve){return nicknameResolve.id;}else{return "err";}
   }
 }
 function updateUserTable(invoker, channel){
@@ -447,7 +450,7 @@ client.on("ready", () => {
 client.on('message', async message => {
   if(message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
 
-  //Log every message that is processed, message or command.
+  //Log every message that is processed; message or command.
 	var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()]
 	connection.query(
 	  'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
@@ -463,6 +466,24 @@ client.on('message', async message => {
   const command =   args.shift().toLowerCase();                   //Result: "ban"
   const guild =     client.guilds.get(config.guildid);
 
+  //fun commands
+  if(command === "flipacoin"){
+    if(modulesFile.get("COMMAND_FLIPACOIN")){
+      var outcome = Math.floor(Math.random() * Math.floor(2));
+
+      switch(outcome){
+        case 0:
+          message.channel.send("Heads!");
+          break;
+        case 1:
+          message.channel.send("Tails!");
+          break;
+      }
+    }else{
+      message.channel.send("That module ("+command+") is disabled");
+    }
+  }
+  //utility commands
   if(command === "module"){
     if(message.member.roles.some(role=>["Admins"].includes(role.name))){
       if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
@@ -536,23 +557,6 @@ client.on('message', async message => {
         }
       );
     }//End of permission checking statement
-  }
-
-  if(command === "flipacoin"){
-    if(modulesFile.get("COMMAND_FLIPACOIN")){
-      var outcome = Math.floor(Math.random() * Math.floor(2));
-
-      switch(outcome){
-        case 0:
-          message.channel.send("Heads!");
-          break;
-        case 1:
-          message.channel.send("Tails!");
-          break;
-      }
-    }else{
-      message.channel.send("That module ("+command+") is disabled");
-    }
   }
 
   if(command === "users"){
@@ -784,9 +788,10 @@ client.on('message', async message => {
             var note = tail.join(" ").trim();
 
             if(tail.length > 0){
-              var data = [user, message.author.id, note, 0, new Date(), new Date()];
+              var identifier = cryptoRandomString(10);
+              var data = [user, message.author.id, note, identifier, 0, new Date(), new Date()];
               connection.query(
-                'INSERT INTO log_note (userID, addedBy, note, isDeleted, timestamp, updated) VALUES (?,?,?,?,?,?)', data,
+                'INSERT INTO log_note (userID, addedBy, note, identifier, isDeleted, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
                 function(err, results){
                   if(err) throw err;
 
@@ -825,61 +830,78 @@ client.on('message', async message => {
   }
 
   if(command === "user"){
-    var userDetails = [];
-    connection.query(
-      'SELECT * FROM users where userID = ?', parseUserTag(args[0]),
-      function(err, results){
-        message.channel.send({embed: {
-              color: 14499301,
-              title: results[0].username,
-              timestamp: new Date(),
-              footer: {
-                text: "Marvin's Little Brother | Current version: " + config.version
+    var userObj = guild.member(client.users.get(parseUserTag(args[0])));
+
+    var nickname;
+    if(userObj.user.displayName){nickname = userObj.user.displayName}else{nickname="No nickname"};
+
+    message.channel.send({embed: {
+          color: 14499301,
+          title: `${userObj.user.username} (${nickname})`,
+          description: `${userObj.user.username} joined the guild on ${userObj.joinedAt}`,
+          thumbnail: {
+            url: userObj.user.displayAvatarURL
+          },
+          fields: [
+            {
+              name:"Created",
+              value:userObj.user.createdAt
+            },
+            {
+              name: "Application",
+              value: userObj.user.presence.game
+            },
+            {
+              name:"Status",
+              value: userObj.user.presence.status
+            }
+          ],
+          timestamp: new Date(),
+          footer: {
+            text: "Marvin's Little Brother | Current version: " + config.version
+          }
+        }
+    }).then(async msg => {
+      await msg.react("👥");
+      await msg.react("👮");
+      await msg.react("✍");
+      await msg.react("❌");
+
+      const filter = (reaction, user) => user.id === config.ownerid;
+      const collector = msg.createReactionCollector(filter, { time: 15000 });
+
+      collector.on('collect', r =>{
+        console.log(r.emoji.identifier);
+
+        if(r.emoji.name == "👮"){
+          msg.edit({embed: {
+                color: 14499301,
+                title: "Warnings tab",
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
               }
-            }
-        }).then(async msg => {
-          await msg.react("👥");
-          await msg.react("👮");
-          await msg.react("✍");
-          await msg.react("❌");
-
-          const filter = (reaction, user) => user.id === config.ownerid;
-          const collector = msg.createReactionCollector(filter, { time: 15000 });
-
-          collector.on('collect', r =>{
-            console.log(r.emoji.identifier);
-
-            if(r.emoji.name == "👮"){
-              msg.edit({embed: {
-                    color: 14499301,
-                    title: "Warnings tab",
-                    timestamp: new Date(),
-                    footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
-                    }
-                  }
-              });
-            }else if(r.emoji.name == "❌"){
-              msg.delete();
-            }else if(r.emoji.name == "✍"){
-
-            }else if(r.emoji.name == "👥"){
-              msg.edit({embed: {
-                    color: 14499301,
-                    title: results[0].username + " 2",
-                    timestamp: new Date(),
-                    footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
-                    }
-                  }
-              })
-            }
           });
-          collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+        }else if(r.emoji.name == "❌"){
+          msg.delete();
+        }else if(r.emoji.name == "✍"){
 
-        }).catch(console.error)
-      }
-    );
+        }else if(r.emoji.name == "👥"){
+          msg.edit({embed: {
+                color: 14499301,
+                title: results[0].username + " 2",
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
+              }
+          })
+        }
+      });
+      collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+
+    }).catch(console.error)
   }
 
   if(command === "warn"){
@@ -973,8 +995,37 @@ client.on('message', async message => {
       message.channel.send(`That module (${command}) is disabled`);
     }
   }
-});
 
+  if(command === "helper"){
+    if(args[0] === "clear"){
+      if(true){//CHECK HELPER PERMS
+        var amount = args[1];
+        var channel = guild.channels.get(args[2].trim());
+        var user = parseUserTag(args[3]);
+        var deleted = 0;
+
+        channel.fetchMessages({limit: 100})
+          .then(async a => {
+            await channel.bulkDelete(a.filter(b => b.author.id == user).first(parseInt(amount)))
+              .then(result => deleted = result.size)
+              .catch(console.error);
+
+            guild.channels.find(chnl => chnl.name === "helpers").send({embed: {
+                  color: 4514375,
+                  title:`[Action] Messages cleared` ,
+                  description: `The latest ${deleted} message(s) by ${client.users.get(user)} were removed from ${channel}\n\nThis action was carried out by ${message.author}\n`,
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
+                }
+            });
+          }).catch(console.error)
+      }
+    }
+  }
+});
+//discord events
 client.on('messageUpdate', function(oldMessage, newMessage) {
   if(modulesFile.get("EVENT_MESSAGE_UPDATE")){
     if(newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
