@@ -283,6 +283,26 @@ function setupTables(){
         }
   );
   connection.query(
+    `CREATE TABLE IF NOT EXISTS log_helperclear
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          clearedBy VARCHAR(25)       NOT NULL,
+          channel VARCHAR(25),
+          amount TINYINT,
+          identifier VARCHAR(10),
+          timestamp DATETIME        NOT NULL,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (clearedBy) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_0900_ai_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
+  connection.query(
     `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
         function(err, results){
           if(err) throw err;
@@ -375,6 +395,17 @@ function updateUserTable(invoker, channel){
       }
   )
 }
+function parseChannelTag(tag){
+  var trimMe = tag.trim();
+
+  if(/(<#(!)*)+\w+(>)/.test(tag)){
+    return trimMe.replace(/[^0-9.]/gi, '')
+  }else if(/^[0-9]+$/.test(tag)){
+    return trimMe;
+  }else{
+    return "err";
+  }
+}
 function updateGuildBansTable(invoker, channel){
   var banArray = [];
   var guild = client.guilds.get(config.guildid);
@@ -428,6 +459,15 @@ function updateGuildBansTable(invoker, channel){
       }
     );
   });
+}
+function syntaxErr(channel, message, command){
+  message.channel.send(`There is a problem in your syntax. If you need help, use ${config.prefix}help ${command}`).
+    then(msg => {
+      setTimeout(async ()=>{
+        await message.delete();
+        await msg.delete();
+      }, 7000)
+    }).catch(console.error);
 }
 
 client.on("ready", () => {
@@ -830,78 +870,158 @@ client.on('message', async message => {
   }
 
   if(command === "user"){
-    var userObj = guild.member(client.users.get(parseUserTag(args[0])));
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      var userID = parseUserTag(args[0]);
+      var userObj = guild.member(client.users.get(userID));
 
-    var nickname;
-    if(userObj.user.displayName){nickname = userObj.user.displayName}else{nickname="No nickname"};
+      var nickname;
+      if(userObj.user.displayName){nickname = userObj.user.displayName}else{nickname="No nickname"};
 
-    message.channel.send({embed: {
-          color: 14499301,
-          title: `${userObj.user.username} (${nickname})`,
-          description: `${userObj.user.username} joined the guild on ${userObj.joinedAt}`,
-          thumbnail: {
-            url: userObj.user.displayAvatarURL
-          },
-          fields: [
-            {
-              name:"Created",
-              value:userObj.user.createdAt
+      var voiceChannel;
+      if(userObj.voiceChannel){voiceChannel = userObj.voiceChannel.name}else{voiceChannel="Not in a voice channel"};
+
+      var app;
+      if(userObj.user.presence.game){app = userObj.user.presence.game.name}else{app="None"};
+
+      message.channel.send({embed: {
+            color: 14499301,
+            author:{
+              name: `${userObj.user.username} (${nickname})`,
+              icon_url: userObj.user.displayAvatarURL
             },
-            {
-              name: "Application",
-              value: userObj.user.presence.game
+            description: `${userObj.user.username} joined the guild on ${userObj.joinedAt}`,
+            thumbnail: {
+              url: userObj.user.displayAvatarURL
             },
-            {
-              name:"Status",
-              value: userObj.user.presence.status
+            fields: [
+              {
+                name:"Created",
+                value:userObj.user.createdAt
+              },
+              {
+                name:"Status",
+                value: `${(userObj.user.presence.status).toUpperCase()}`,
+                inline: true
+              },
+              {
+                name:"Application",
+                value:`${app}`,
+                inline: true
+              },
+              {
+                name:"Voice channel",
+                value:`${voiceChannel}`
+              }
+            ],
+            timestamp: new Date(),
+            footer: {
+              text: "Marvin's Little Brother | Current version: " + config.version
             }
-          ],
-          timestamp: new Date(),
-          footer: {
-            text: "Marvin's Little Brother | Current version: " + config.version
           }
-        }
-    }).then(async msg => {
-      await msg.react("👥");
-      await msg.react("👮");
-      await msg.react("✍");
-      await msg.react("❌");
+      }).then(async msg => {
+        await msg.react("👥");
+        await msg.react("👮");
+        await msg.react("✍");
+        await msg.react("❌");
 
-      const filter = (reaction, user) => user.id === config.ownerid;
-      const collector = msg.createReactionCollector(filter, { time: 15000 });
+        const filter = (reaction, user) => user.bot == false;
+        const collector = msg.createReactionCollector(filter);
 
-      collector.on('collect', r =>{
-        console.log(r.emoji.identifier);
+        collector.on('collect', async r =>{
+          if(r.emoji.name == "👮"){
+            await r.remove(r.users.last());
 
-        if(r.emoji.name == "👮"){
-          msg.edit({embed: {
-                color: 14499301,
-                title: "Warnings tab",
-                timestamp: new Date(),
-                footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
-                }
+            connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+              if(err) throw err;
+              var warnings = [];
+              for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                await warnings.push(`❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
               }
-          });
-        }else if(r.emoji.name == "❌"){
-          msg.delete();
-        }else if(r.emoji.name == "✍"){
 
-        }else if(r.emoji.name == "👥"){
-          msg.edit({embed: {
-                color: 14499301,
-                title: results[0].username + " 2",
-                timestamp: new Date(),
-                footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
-                }
+              msg.edit({embed: {
+                    color: 14499301,
+                    author:{
+                      name: `${userObj.user.username} (${nickname})`,
+                      icon_url: userObj.user.displayAvatarURL
+                    },
+                    description: warnings.join(" "),
+                    timestamp: new Date(),
+                    footer: {
+                      text: "Marvin's Little Brother | Current version: " + config.version
+                    }
+                  }
+              });
+            });
+          }else if(r.emoji.name == "❌"){
+            msg.delete();
+            message.delete();
+          }else if(r.emoji.name == "✍"){
+            await r.remove(r.users.last());
+            connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+              if(err) throw err;
+              var notes = [];
+              for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                await notes.push(`📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
               }
-          })
-        }
-      });
-      collector.on('end', collected => console.log(`Collected ${collected.size} items`));
 
-    }).catch(console.error)
+              msg.edit({embed: {
+                    color: 14499301,
+                    author:{
+                      name: `${userObj.user.username} (${nickname})`,
+                      icon_url: userObj.user.displayAvatarURL
+                    },
+                    description: notes.join(" "),
+                    timestamp: new Date(),
+                    footer: {
+                      text: "Marvin's Little Brother | Current version: " + config.version
+                    }
+                  }
+              });
+            });
+          }else if(r.emoji.name == "👥"){
+            await r.remove(r.users.last());
+            msg.edit({embed: {
+                  color: 14499301,
+                  title: `${userObj.user.username} (${nickname})`,
+                  description: `${userObj.user.username} joined the guild on ${userObj.joinedAt}`,
+                  thumbnail: {
+                    url: userObj.user.displayAvatarURL
+                  },
+                  fields: [
+                    {
+                      name:"Created",
+                      value:userObj.user.createdAt
+                    },
+                    {
+                      name:"Status",
+                      value: userObj.user.presence.status,
+                      inline: true
+                    },
+                    {
+                      name:"Application",
+                      value:`${app}`,
+                      inline: true
+                    },
+                    {
+                      name:"Voice channel",
+                      value:`${voiceChannel}`
+                    }
+                  ],
+                  timestamp: new Date(),
+                  footer: {
+                    text: "Marvin's Little Brother | Current version: " + config.version
+                  }
+                }
+            });
+          }else{return;}
+        });
+        //collector.on('end');
+      }).catch(console.error)
+    }else{
+      return;
+    }
   }
 
   if(command === "warn"){
@@ -924,8 +1044,7 @@ client.on('message', async message => {
             if(tail.length > 0){
               var identifier = cryptoRandomString(10);
               var data = [user, message.author.id, content, 0, identifier, new Date(), new Date()];
-              connection.query(
-                'INSERT INTO log_warn (userID, addedBy, content, isDeleted, identifier, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
+              connection.query('INSERT INTO log_warn (userID, addedBy, content, isDeleted, identifier, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
                 function(err, results){
                   if(err) throw err;
 
@@ -998,29 +1117,59 @@ client.on('message', async message => {
 
   if(command === "helper"){
     if(args[0] === "clear"){
-      if(true){//CHECK HELPER PERMS
-        var amount = args[1];
-        var channel = guild.channels.get(args[2].trim());
-        var user = parseUserTag(args[3]);
-        var deleted = 0;
+      if(modulesFile.get("COMMAND_HELPER_CLEAR")){
+        if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+          if(args.length >= 4){
+            var amount = args[1];
+            var channelid = parseChannelTag(args[2]);
+            var userid = parseUserTag(args[3])
 
-        channel.fetchMessages({limit: 100})
-          .then(async a => {
-            await channel.bulkDelete(a.filter(b => b.author.id == user).first(parseInt(amount)))
-              .then(result => deleted = result.size)
-              .catch(console.error);
+            var channel = guild.channels.get(channelid);
+            var user = client.users.get(userid);
+            var deleted = 0;
 
-            guild.channels.find(chnl => chnl.name === "helpers").send({embed: {
-                  color: 4514375,
-                  title:`[Action] Messages cleared` ,
-                  description: `The latest ${deleted} message(s) by ${client.users.get(user)} were removed from ${channel}\n\nThis action was carried out by ${message.author}\n`,
-                  timestamp: new Date(),
-                  footer: {
-                    text: `Marvin's Little Brother | Current version: ${config.version}`
+            if(user && guild.member(user)){
+              channel.fetchMessages({limit: 100})
+                .then(async a => {
+                  await channel.bulkDelete(a.filter(b => b.author.id == user.id).first(parseInt(amount)))
+                    .then(result => deleted = result.size)
+                    .catch(console.error);
+
+                  if(deleted > 0){
+                    var identifier = cryptoRandomString(10);
+                    guild.channels.find(chnl => chnl.name === "helpers").send({embed: {
+                          color: 4514375,
+                          title:`[Action] Messages cleared` ,
+                          description: `The latest ${deleted} message(s) written by ${user} were removed from ${channel}\n\nThis action was carried out by ${message.author}\n`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: `${identifier} | Marvin's Little Brother | Current version: ${config.version}`
+                         }
+                       }
+                    });
+                    var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
+                    connection.query('INSERT INTO log_helperclear(userID, clearedBy, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data, function(err, results){
+                      if(err) throw err;
+                    });
+                  }else{
+                    message.channel.send("The command executed successfully but no messages were removed. Ensure the correct channel was used.")
+                      .then(msg => {
+                        setTimeout(()=>{
+                          msg.delete();
+                        }, 5000);
+                      }).catch(console.error)
+
                   }
-                }
-            });
-          }).catch(console.error)
+               }).catch(console.error)
+            }else{
+              message.channel.send("The user provided was not found in this guild");
+            }
+         }else{
+           syntaxErr(channel, message, command);
+         }
+       }
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
       }
     }
   }
