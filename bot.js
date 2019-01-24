@@ -460,7 +460,7 @@ function updateGuildBansTable(invoker, channel){
     );
   });
 }
-function syntaxErr(channel, message, command){
+function syntaxErr(message, command){
   message.channel.send(`There is a problem in your syntax. If you need help, use ${config.prefix}help ${command}`).
     then(msg => {
       setTimeout(async ()=>{
@@ -468,6 +468,13 @@ function syntaxErr(channel, message, command){
         await msg.delete();
       }, 7000)
     }).catch(console.error);
+}
+function isNull(value, def){
+  if(!value || (value === undefined || value === null)){
+    return def;
+  }else{
+    return value;
+  }
 }
 
 client.on("ready", () => {
@@ -869,6 +876,27 @@ client.on('message', async message => {
     }
   }
 
+  if(command === "cnote"){
+    if(args[0].length == 10){
+      connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
+        if(err) throw err;
+        if(results.affectedRows == 1){
+          message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`)
+        }else{
+          message.channel.send(`A note with that ID could not be found`)
+            .then(msg => {
+              setTimeout(async ()=>{
+                await msg.delete();
+                await message.delete();
+              }, 6000)
+            }).catch(console.error)
+        }
+      });
+    }else{
+      syntaxErr(message, "cnote");
+    }
+  }
+
   if(command === "user"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       var userID = parseUserTag(args[0]);
@@ -936,7 +964,7 @@ client.on('message', async message => {
               var warnings = [];
               for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
-                await warnings.push(`❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
+                await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
               }
 
               msg.edit({embed: {
@@ -963,7 +991,7 @@ client.on('message', async message => {
               var notes = [];
               for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
-                await notes.push(`📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
+                await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
               }
 
               msg.edit({embed: {
@@ -1030,7 +1058,7 @@ client.on('message', async message => {
         if(args[0]){
           var user = parseUserTag(args[0]);
         }else{
-          message.channel.send(`Format: ${config.prefix}warn [User ID] [Warn reason]`);
+          syntaxErr(message, "warn");
           return;
         }
 
@@ -1112,6 +1140,27 @@ client.on('message', async message => {
       }//End of permission checking statement
     }else{
       message.channel.send(`That module (${command}) is disabled`);
+    }
+  }
+
+  if(command === "cwarn"){
+    if(args[0].length == 10){
+      connection.query('UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
+        if(err) throw err;
+        if(results.affectedRows == 1){
+          message.channel.send(`☑ Warning with id \`${args[0].trim()}\` was successfully cleared.`)
+        }else{
+          message.channel.send(`A warning with that ID could not be found`)
+            .then(msg => {
+              setTimeout(async ()=>{
+                await msg.delete();
+                await message.delete();
+              }, 6000)
+            }).catch(console.error)
+        }
+      });
+    }else{
+      syntaxErr(message, "cwarn");
     }
   }
 
