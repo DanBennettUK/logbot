@@ -461,7 +461,7 @@ function updateGuildBansTable(invoker, channel){
   });
 }
 function syntaxErr(message, command){
-  message.channel.send(`There is a problem in your syntax. If you need help, use ${config.prefix}help ${command}`).
+  message.channel.send(`There is a problem in your syntax. If you need help, use ${config.prefix}help ${command} \n\n *😫 pst, the help command isn't a thing yet, sorry!*`).
     then(msg => {
       setTimeout(async ()=>{
         await message.delete();
@@ -1222,6 +1222,69 @@ client.on('message', async message => {
       }
     }
   }
+
+  if(command === "voicelog"){
+    if(modulesFile.get("COMMAND_VOICELOG")){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(args[0]){
+          var user = parseUserTag(args[0]);
+        }else{
+          syntaxErr(message, "voicelog");
+          return;
+        }
+
+        if(user == "err"){
+          message.channel.send("An invalid user was provided. Please try again");
+        }else{
+          connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 15', user, async function(err, rows, results){
+            if(err) throw err;
+
+            var times = [];
+            var current = [];
+            var timestamps = [];
+            var msg = ["Channel          |                           Timestamp                           | Duration (H:M:S)",
+                       "------------------------------------------------------------------------------------------------"];
+            for (var i = 0; i < rows.length; i++) {
+              var row = rows[i];
+
+              if(rows[i+1]){
+                if(row.type !== 3){
+                  var next = rows[i+1];
+                  var time1 = row.timestamp;
+                  var time2 = next.timestamp;
+
+                  var diff = time1.getTime() - time2.getTime();
+
+                  var msec = diff;
+                  var hh = Math.floor(msec / 1000 / 60 / 60);
+                  msec -= hh * 1000 * 60 * 60;
+                  var mm = Math.floor(msec / 1000 / 60);
+                  msec -= mm * 1000 * 60;
+                  var ss = Math.floor(msec / 1000);
+                  msec -= ss * 1000;
+
+                  times.push(`${hh}:${mm}:${ss}`);
+                  current.push(row.newChannel);
+                  timestamps.push(row.timestamp);
+                }
+              }
+            }
+            times.reverse();
+            current.reverse();
+            timestamps.reverse();
+
+            for(var i = 0; i < times.length; i++){
+              msg.push(`${current[i]}    |     ${timestamps[i]}     | ${times[i]}`)
+            }
+            var joinedMessage = msg.join('\n')
+            message.channel.send(`\`\`\`${joinedMessage}\`\`\``);
+          });
+        }
+      }//END OF PERMISSION CHECK
+    }else{
+      //DISABLED MODULE
+    }
+  }
 });
 //discord events
 client.on('messageUpdate', function(oldMessage, newMessage) {
@@ -1298,7 +1361,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
     var data = []
     if(oldMember.voiceChannel){
-      if(newMember.voiceChannel && newMember.voiceChannel.id !== oldMember.voiceChannel.id){
+      if(newMember.voiceChannel && (newMember.voiceChannel.id !== oldMember.voiceChannel.id)){
         data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
       }else{
         data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
