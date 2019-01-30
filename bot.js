@@ -1360,9 +1360,29 @@ client.on('guildMemberRemove', function(member) {
 client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
     var data = []
-    if(oldMember.voiceChannel){
-      if(newMember.voiceChannel && (newMember.voiceChannel.id !== oldMember.voiceChannel.id)){
-        data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
+    // if(oldMember.voiceChannel){
+    //   if(newMember.voiceChannel && (newMember.voiceChannel.id !== oldMember.voiceChannel.id)){
+    //     data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
+    //   }else if(newMember.voiceChannel.id !== oldMember.voiceChannel.id && newMember.mute !== mute){
+    //     data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
+    //   }else{
+    //     console.log("Mute");
+    //   }
+    // }else{
+    //   if(newMember.voiceChannel){
+    //     data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()]
+    //   }else{
+    //     data = [newMember.id, 'UNKNOWN', 'UNKNOWN', '', '', 1, new Date()]
+    //   }
+    // }
+
+    if(oldMember.voiceChannel){ //Were in a channel to begin with
+      if(newMember.voiceChannel){
+        if(oldMember.voiceChannel.id !== newMember.voiceChannel.id){
+          data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
+        }else{
+          return;
+        }
       }else{
         data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()]
       }
@@ -1373,12 +1393,15 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         data = [newMember.id, 'UNKNOWN', 'UNKNOWN', '', '', 1, new Date()]
       }
     }
-    connection.query(
-      'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
-      function(err, results){
-        if(err) throw err;
-      }
-    );
+    console.log(data);
+    if(data.length > 0){
+      connection.query(
+        'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
+        function(err, results){
+          if(err) throw err;
+        }
+      );
+    }
   }else{
     //EVENT IS NOT ONLINE!!
   }
