@@ -14,6 +14,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const Store = require('data-store');
 const mysql = require('mysql2');
+var moment = require('moment');
 var fs = require("fs");
 const cryptoRandomString = require('crypto-random-string');
 const editJsonFile = require("edit-json-file");
@@ -1236,24 +1237,24 @@ client.on('message', async message => {
         if(user == "err"){
           message.channel.send("An invalid user was provided. Please try again");
         }else{
-          connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 15', user, async function(err, rows, results){
+          connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 25', user, async function(err, rows, results){
             if(err) throw err;
 
             var times = [];
             var current = [];
             var timestamps = [];
-            var msg = ["Channel          |                           Timestamp                           | Duration (H:M:S)",
+            var msg = ["Channel        |                     Timestamp                     | Duration (H:M:S)",
                        "------------------------------------------------------------------------------------------------"];
-            for (var i = 0; i < rows.length; i++) {
+            for (var i = rows.length - 1; i >= 0; i--) {
               var row = rows[i];
 
-              if(rows[i+1]){
+              if(rows[i-1]){
                 if(row.type !== 3){
-                  var next = rows[i+1];
+                  var next = rows[i-1];
                   var time1 = row.timestamp;
                   var time2 = next.timestamp;
 
-                  var diff = time1.getTime() - time2.getTime();
+                  var diff = time2.getTime() - time1.getTime();
 
                   var msec = diff;
                   var hh = Math.floor(msec / 1000 / 60 / 60);
@@ -1265,7 +1266,7 @@ client.on('message', async message => {
 
                   times.push(`${hh}:${mm}:${ss}`);
                   current.push(row.newChannel);
-                  timestamps.push(row.timestamp);
+                  timestamps.push(`${row.timestamp.toUTCString()} (${moment(time1).startOf('day').fromNow()})`);
                 }
               }
             }
@@ -1273,8 +1274,19 @@ client.on('message', async message => {
             current.reverse();
             timestamps.reverse();
 
+            var longest = 0;
+            for(var i = 0; i < current.length; i++){
+              if(current[i].length > longest){
+                longest = current[i].length;
+              }
+            }
+            for(var j = 0; j < current.length; j++){
+              var howManyToAdd = longest - current[j].length;
+              current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
+            }
+
             for(var i = 0; i < times.length; i++){
-              msg.push(`${current[i]}    |     ${timestamps[i]}     | ${times[i]}`)
+              msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`)
             }
             var joinedMessage = msg.join('\n')
             message.channel.send(`\`\`\`${joinedMessage}\`\`\``);
@@ -1393,7 +1405,6 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         data = [newMember.id, 'UNKNOWN', 'UNKNOWN', '', '', 1, new Date()]
       }
     }
-    console.log(data);
     if(data.length > 0){
       connection.query(
         'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
