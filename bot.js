@@ -10,19 +10,27 @@
 ##################################################
 */
 
-const Discord = require("discord.js");
-const client = new Discord.Client();
-const Store = require('data-store');
-const mysql = require('mysql2');
-var moment = require('moment');
-var fs = require("fs");
-const cryptoRandomString = require('crypto-random-string');
-const editJsonFile = require("edit-json-file");
-const changelog = require("./changelog.json");
-const modulesFilePath = './modules.json';
-var modules = require("./modules.json");
-const config = require("./config.json");
-var modulesFile = editJsonFile(modulesFilePath);
+const Discord             = require("discord.js");
+const client              = new Discord.Client();
+const Store               = require('data-store');
+const mysql               = require('mysql2');
+var moment                = require('moment');
+var _                     = require('underscore');
+var fs                    = require("fs");
+const cryptoRandomString  = require('crypto-random-string');
+var stringSimilarity      = require('string-similarity');
+const editJsonFile        = require("edit-json-file");
+const changelog           = require("./changelog.json");
+const modulesFilePath     = './modules.json';
+var modules               = require("./modules.json");
+const config              = require("./config.json");
+var modulesFile           = editJsonFile(modulesFilePath);
+
+var bannedUsers           = require("./banned_users.json");
+var bannedUsersFile       = editJsonFile("./banned_users.json");
+var bannedUsersArray      = [];
+
+
 
 //Put your MySQL info here
 const connection = mysql.createConnection({
@@ -194,6 +202,7 @@ function setupTables(){
           bannedBy VARCHAR(255),
           reason text,
           note text,
+          identifier VARCHAR(10),
           timestamp DATETIME,
           PRIMARY KEY (userID, timestamp)
         )
@@ -212,6 +221,7 @@ function setupTables(){
           unbannedBy VARCHAR(255),
           reason text,
           note text,
+          identifier VARCHAR(10),
           timestamp DATETIME,
           PRIMARY KEY (userID, timestamp)
         )
@@ -483,16 +493,16 @@ client.on("ready", () => {
   console.log("Bot Active");
 
   client.user.setPresence({
-    game: {
-        name: 'this server',
-        type: 'WATCHING'
-    },
-    status: 'dnd'
+    status: 'away'
   })
 
   updateUserTable("system", null);
 
-  //console.log(client.emojis.find(emoji => emoji.name === "question"));
+  var file = bannedUsersFile.get();
+  for(var key in file){
+    bannedUsersArray.push(file[key]);
+  }
+
 });
 
 client.on('message', async message => {
@@ -676,8 +686,9 @@ client.on('message', async message => {
               var reason = tail.join(" ").trim();
 
               if(tail.length > 0){
-                guild.ban(user, { days: 1, reason: reason }).then(result => {
-                    message.channel.send({embed: {
+                guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                  var identifier = cryptoRandomString(10);
+                    await message.channel.send({embed: {
                           color: 9911513,
                           author: {
                             name: client.user.username,
@@ -711,13 +722,19 @@ client.on('message', async message => {
                         }
                     });
 
-                    var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                    var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
                     connection.query(
-                      'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                      'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
                       function(err, results){
                         if(err) throw err;
                       }
                     );
+
+                    //Adding the user to our banned users JSON
+                      //var banndUsers = bannedUsersFile.get();
+                      //var next = 1 + _.size(banndUsers);
+                    bannedUsersFile.set(identifier, result.username);
+                    bannedUsersFile.save();
                   })
                   .catch(console.error);
               }
@@ -756,6 +773,7 @@ client.on('message', async message => {
 
             if(tail.length > 0){
               guild.unban(user, reason).then(result => {
+                var identifier = cryptoRandomString(10);
                   message.channel.send({embed: {
                         color: 9911513,
                         author: {
@@ -790,13 +808,20 @@ client.on('message', async message => {
                       }
                   });
 
-                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, new Date()];
+                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
                   connection.query(
-                    'INSERT INTO log_guildunbans (userID, username, discriminator, unbannedBy, reason, note, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    'INSERT INTO log_guildunbans (userID, username, discriminator, unbannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
                     function(err, results){
                       if(err) throw err;
                     }
                   );
+                  connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', result.id, function(err, rows, results){
+                    if(err) throw err;
+
+                    //var file = bannedUsersFile.get();
+                    bannedUsersFile.set(rows[0].identifier, '')
+                    bannedUsersFile.save();
+                  });
                 })
               .catch(err => {
                 if(err.message === "Unknown Ban"){
@@ -1225,78 +1250,94 @@ client.on('message', async message => {
   }
 
   if(command === "voicelog"){
-    if(modulesFile.get("COMMAND_VOICELOG")){
-      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        if(args[0]){
-          var user = parseUserTag(args[0]);
-        }else{
-          syntaxErr(message, "voicelog");
-          return;
-        }
+      if(modulesFile.get("COMMAND_VOICELOG")){
+        if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+          if(args[0]){
+            var user = parseUserTag(args[0]);
+          }else{
+            syntaxErr(message, "voicelog");
+            return;
+          }
 
-        if(user == "err"){
-          message.channel.send("An invalid user was provided. Please try again");
-        }else{
-          connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 25', user, async function(err, rows, results){
-            if(err) throw err;
+          if(user == "err"){
+            message.channel.send("An invalid user was provided. Please try again");
+          }else{
+            connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 25', user, async function(err, rows, results){
+              if(err) throw err;
 
-            var times = [];
-            var current = [];
-            var timestamps = [];
-            var msg = ["Channel        |                     Timestamp                     | Duration (H:M:S)",
-                       "------------------------------------------------------------------------------------------------"];
-            for (var i = rows.length - 1; i >= 0; i--) {
-              var row = rows[i];
+              var times = [];
+              var current = [];
+              var timestamps = [];
+              var msg = ["Channel        |                     Timestamp                     | Duration (H:M:S)",
+                         "------------------------------------------------------------------------------------------------"];
+              for (var i = rows.length - 1; i >= 0; i--) {
+                var row = rows[i];
 
-              if(rows[i-1]){
-                if(row.type !== 3){
-                  var next = rows[i-1];
-                  var time1 = row.timestamp;
-                  var time2 = next.timestamp;
+                if(rows[i-1]){
+                  if(row.type !== 3){
+                    var next = rows[i-1];
+                    var time1 = row.timestamp;
+                    var time2 = next.timestamp;
 
-                  var diff = time2.getTime() - time1.getTime();
+                    var diff = time2.getTime() - time1.getTime();
 
-                  var msec = diff;
-                  var hh = Math.floor(msec / 1000 / 60 / 60);
-                  msec -= hh * 1000 * 60 * 60;
-                  var mm = Math.floor(msec / 1000 / 60);
-                  msec -= mm * 1000 * 60;
-                  var ss = Math.floor(msec / 1000);
-                  msec -= ss * 1000;
+                    var msec = diff;
+                    var hh = Math.floor(msec / 1000 / 60 / 60);
+                    msec -= hh * 1000 * 60 * 60;
+                    var mm = Math.floor(msec / 1000 / 60);
+                    msec -= mm * 1000 * 60;
+                    var ss = Math.floor(msec / 1000);
+                    msec -= ss * 1000;
 
-                  times.push(`${hh}:${mm}:${ss}`);
-                  current.push(row.newChannel);
-                  timestamps.push(`${row.timestamp.toUTCString()} (${moment(time1).startOf('day').fromNow()})`);
+                    times.push(`${hh}:${mm}:${ss}`);
+                    current.push(row.newChannel);
+                    timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
+                  }
+                }else if(!rows[i-1] && ([1,2].indexOf(row.type) > -1)){
+                  current.push(row.newChannel)
+                  times.push("Active");
+                  timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
+                }else{
                 }
               }
-            }
-            times.reverse();
-            current.reverse();
-            timestamps.reverse();
+              times.reverse();
+              current.reverse();
+              timestamps.reverse();
 
-            var longest = 0;
-            for(var i = 0; i < current.length; i++){
-              if(current[i].length > longest){
-                longest = current[i].length;
+              var longest = 0;
+              for(var i = 0; i < current.length; i++){
+                if(current[i].length > longest){
+                  longest = current[i].length;
+                }
               }
-            }
-            for(var j = 0; j < current.length; j++){
-              var howManyToAdd = longest - current[j].length;
-              current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
-            }
+              for(var j = 0; j < current.length; j++){
+                var howManyToAdd = longest - current[j].length;
+                current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
+              }
 
-            for(var i = 0; i < times.length; i++){
-              msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`)
-            }
-            var joinedMessage = msg.join('\n')
-            message.channel.send(`\`\`\`${joinedMessage}\`\`\``);
-          });
-        }
-      }//END OF PERMISSION CHECK
-    }else{
-      //DISABLED MODULE
+              var longestTime = 0;
+              for(var i = 0; i < timestamps.length; i++){
+                if(current[i].length > longestTime){
+                  longestTime = timestamps[i].length;
+                }
+              }
+              for(var j = 0; j < timestamps.length; j++){
+                var howManyToAdd = longestTime - timestamps[j].length;
+                timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
+              }
+
+              for(var i = 0; i < times.length; i++){
+                msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`)
+              }
+              var joinedMessage = msg.join('\n')
+              message.channel.send(`🎙 Viewing the voice logs of ${client.users.get(user)} \`\`\`${joinedMessage}\`\`\``);
+            });
+          }
+        }//END OF PERMISSION CHECK
+      }else{
+        //DISABLED MODULE
+      }
     }
-  }
 });
 //discord events
 client.on('messageUpdate', function(oldMessage, newMessage) {
@@ -1344,6 +1385,18 @@ client.on('guildMemberAdd', function(member) {
     );
   }else{
     //EVENT IS NOT ONLINE!!
+  }
+
+  if(modulesFile.get("EVENT_BANNDUSER_DETEC")){
+    var guild       = client.guilds.get(config.guildid);
+    var banndUsers  = bannedUsersFile.get();
+    var usernames   = _.values(banndUsers);
+
+    var match = stringSimilarity.findBestMatch(member.user.username, usernames);
+
+    if(match.bestMatch.rating > 0.6){
+      guild.channels.find(val => val.name === 'server-log').send(`❗ A potential ban evasion was detected. User ${member.user} matched **${match.bestMatch.target}** with a similarity of ~${match.bestMatch.rating}`);
+    }
   }
 })
 
@@ -1461,6 +1514,20 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
   }else{
     //EVENT IS NOT ONLINE!!
   }
+});
+
+client.on('guildBanAdd', function(guild, user){
+  var identifier = cryptoRandomString(10);
+  bannedUsersFile.set(identifier, user.username)
+  bannedUsersFile.save();
+
+  var data = [user.id, user.username, user.discriminator, '001', null, "THIS WAS A SYSTEM BAN", identifier, new Date()];
+  connection.query(
+    'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
+    function(err, results){
+      if(err) throw err;
+    }
+  );
 });
 
 client.on('error', console.error);
