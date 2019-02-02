@@ -16,3 +16,4 @@ Thumbs.db
 *.log
 *.sql
 *.sqlite
+banned_users.json
