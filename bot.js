@@ -333,7 +333,7 @@ function parseUserTag(tag){
 
   if(/(<@(!)*)+\w+(>)/.test(tag)){
     return trimMe.replace(/[^0-9.]/gi, '')
-  }else if(/[\w\d\\\/\_\|\#]+$/.test(tag)){
+  }else if(/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)){
     var split = tag.split("#");
     var usernameResolve = client.users.find(obj => obj.username === split[0]);
 
@@ -516,7 +516,7 @@ client.on("ready", () => {
   console.log("Bot Active");
 
   client.user.setPresence({
-    status: 'away'
+    status: 'idle'
   })
 
   updateUserTable("system", null);
@@ -1404,7 +1404,7 @@ client.on('message', async message => {
           if(user == "err"){
             message.channel.send("An invalid user was provided. Please try again");
           }else{
-            connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 25', user, async function(err, rows, results){
+            connection.query('select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 22', user, async function(err, rows, results){
               if(err) throw err;
 
               var times = [];
