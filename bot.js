@@ -700,61 +700,90 @@ client.on('message', async message => {
                 var reason = tail.join(" ").trim();
 
                 if(tail.length > 0){
-                  guild.ban(user, { days: 1, reason: reason }).then(async result => {
-                    var identifier = cryptoRandomString(10);
-                      await message.channel.send({embed: {
-                            color: 9911513,
-                            author: {
-                              name: client.user.username,
-                              icon_url: client.user.displayAvatarURL
+                  var identifier = cryptoRandomString(10);
+                  client.users.get(user).createDM().then(async chnl => {
+                    await chnl.send({embed: {
+                          color: 16154127,
+                          title:`You have been banned from ${guild.name}` ,
+                          description: `Reasons and details about the ban can be found below:`,
+                          fields: [{
+                              name: "Reason",
+                              value: reason
                             },
-                            title: "[Action] Ban" ,
-                            description: `${client.users.get(user).username} been successfully banned`,
-                            fields: [{
-                                name: "ID",
-                                value: result.id,
-                                inline: true
-                              },
-                              {
-                                name: "Username/Discrim",
-                                value: `${result.username}#${result.discriminator}`,
-                                inline: true
-                              },
-                              {
-                                name: "Reason",
-                                value: reason
-                              },
-                              {
-                                name: "Banned by",
-                                value: message.author.username
-                              },
-                              {
-                                name: "Identifier",
-                                value: identifier
-                              },
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                              text: "Marvin's Little Brother | Current version: " + config.version
+                            {
+                              name: "Identifier",
+                              value: `\`${identifier}\``
+                            },
+                            {
+                              name: "Want to dispute?",
+                              value: "This ban can be disputed reasonably by contacting us via our subreddit modmail (r/PUBATTLEGROUNDS). Please quote your identifier, which can be found above, in your initial message. Thank you."
                             }
+                          ],
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
                           }
-                      });
-
-                      var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
-                      connection.query(
-                        'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
-                        function(err, results){
-                          if(err) throw err;
                         }
-                      );
+                    }).then(dm => {
+                      var data = [user, `Title: ${dm.embeds[0].title}`, 2, 0, identifier, new Date(), new Date()];
+                      connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function(err, results){if(err) throw err;})
 
-                      //Adding the user to our banned users JSON
-                        //var banndUsers = bannedUsersFile.get();
-                        //var next = 1 + _.size(banndUsers);
-                      bannedUsersFile.set(identifier, result.username);
-                      bannedUsersFile.save();
-                    })
-                    .catch(console.error);
+                      guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                          await message.channel.send({embed: {
+                                color: 16154127,
+                                author: {
+                                  name: client.user.username,
+                                  icon_url: client.user.displayAvatarURL
+                                },
+                                title: "[Action] Ban" ,
+                                description: `${client.users.get(user)} has been successfully banned`,
+                                fields: [{
+                                    name: "User ID",
+                                    value: result.id,
+                                    inline: true
+                                  },
+                                  {
+                                    name: "Username/Discrim",
+                                    value: `${result.username}#${result.discriminator}`,
+                                    inline: true
+                                  },
+                                  {
+                                    name: "Reason",
+                                    value: reason
+                                  },
+                                  {
+                                    name: "Banned by",
+                                    value: message.author.username
+                                  },
+                                  {
+                                    name: "Identifier",
+                                    value: identifier
+                                  },
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                  text: "Marvin's Little Brother | Current version: " + config.version
+                                }
+                              }
+                          });
+
+                          var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
+                          connection.query(
+                            'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
+                            function(err, results){
+                              if(err) throw err;
+                            }
+                          );
+
+                          //Adding the user to our banned users JSON
+                            //var banndUsers = bannedUsersFile.get();
+                            //var next = 1 + _.size(banndUsers);
+                          bannedUsersFile.set(identifier, result.username);
+                          bannedUsersFile.save();
+                        })
+                        .catch(console.error);
+                    });
+                  }).catch(console.error);
                 }
                 else{
                   message.channel.send("Please provide a reason for the ban");
@@ -1131,20 +1160,36 @@ client.on('message', async message => {
                   var row = rows[i];
                   await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
                 }
-
-                msg.edit({embed: {
-                      color: 14499301,
-                      author:{
-                        name: client.user.username,
-                        icon_url: client.user.displayAvatarURL
-                      },
-                      description: warnings.join(" "),
-                      timestamp: new Date(),
-                      footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
+                if(!_.isEmpty(warnings)){
+                  msg.edit({embed: {
+                        color: 14499301,
+                        author:{
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        description: warnings.join(" "),
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
                       }
-                    }
-                });
+                  });
+                }else{
+                  msg.edit({embed: {
+                        color: 14499301,
+                        author:{
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        description: `There are no recored warnings for this user`,
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+                }
+
               });
             }else if(r.emoji.name == "❌"){
               msg.delete();
@@ -1158,20 +1203,35 @@ client.on('message', async message => {
                   var row = rows[i];
                   await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
                 }
-
-                msg.edit({embed: {
-                      color: 14499301,
-                      author:{
-                        name: client.user.username,
-                        icon_url: client.user.displayAvatarURL
-                      },
-                      description: notes.join(" "),
-                      timestamp: new Date(),
-                      footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
+                if(!_.isEmpty(notes)){
+                  msg.edit({embed: {
+                        color: 14499301,
+                        author:{
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        description: notes.join(" "),
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
                       }
-                    }
-                });
+                  });
+                }else{
+                  msg.edit({embed: {
+                        color: 14499301,
+                        author:{
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        description: `There are no recored notes for this user`,
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+                }
               });
             }else if(r.emoji.name == "👥"){
               await r.remove(r.users.last());
@@ -1382,7 +1442,7 @@ client.on('message', async message => {
               message.channel.send("The user provided was not found in this guild");
             }
          }else{
-           syntaxErr(channel, message, command);
+           syntaxErr(message, "helper_clear");
          }
        }
       }else{
@@ -1477,9 +1537,41 @@ client.on('message', async message => {
           }
         }//END OF PERMISSION CHECK
       }else{
-        //DISABLED MODULE
+        message.channel.send(`That module (${command}) is disabled`);
       }
     }
+
+  if(command === "disconnect"){
+    if(modulesFile.get("COMMAND_DISCONNECT")){
+      if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+        var user = parseUserTag(args[0]);
+        var guildUser = guild.member(user);
+
+        if(user !== "err" && guildUser){
+          client.channels.get("333691731461537812").clone("-", false, false, `Disconnecting ${guildUser.username}`).then(async channel => {
+            guildUser.setVoiceChannel(channel).then(async member => {
+              await channel.delete();
+              message.channel.send(`${guildUser} was successfully removed from their voice channel.`)
+            }).catch(console.error)
+          }).catch(console.error)
+        }else{
+          message.channel.send("The user provided was not found.")
+        }
+      }
+    }else{
+      message.channel.send(`That module (${command}) is disabled`);
+    }
+  }
+
+  if(command === "resolve"){
+    if(modulesFile.get("COMMAND_RESOLVE")){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+
+      }
+    }else{
+      message.channel.send(`That module (${command}) is disabled`);
+    }
+  }
 });
 //discord events
 client.on('messageUpdate', function(oldMessage, newMessage) {
