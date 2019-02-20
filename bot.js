@@ -569,11 +569,7 @@ client.on('message', async message => {
 
           message.channel.send({embed: {
                 color: 10921638,
-                author: {
-                  name: client.user.username,
-                  icon_url: client.user.displayAvatarURL
-                },
-                title: "[COMMAND] Module update",
+                title: "🔶 A module was updated",
                 description: args[0] + " was set to status " + args[1],
                 timestamp: new Date(),
                 footer: {
@@ -686,8 +682,8 @@ client.on('message', async message => {
   }
 
   if(command === "ban"){
-    if(modulesFile.get("COMMAND_BAN")){
-      if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+      if(modulesFile.get("COMMAND_BAN")){
         if(args[0]){
           var user = parseUserTag(args[0]);
 
@@ -799,15 +795,15 @@ client.on('message', async message => {
           syntaxErr(message, "ban")
           return;
         }
-      }//End of permission checking statement
-    }else{
-      message.channel.send("That module ("+command+") is disabled");
+      }else{
+        message.channel.send("That module ("+command+") is disabled");
+      }
     }
   }
 
   if(command === "unban"){
-    if(modulesFile.get("COMMAND_UNBAN")){
-      if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+      if(modulesFile.get("COMMAND_UNBAN")){
         if(args[0]){
           var user = parseUserTag(args[0]);
         }else{
@@ -892,15 +888,15 @@ client.on('message', async message => {
             message.channel.send("Could not find a Discord user with that tag/ID")
           }
         }
-      }//End of permission checking statement
-    }else{
-      message.channel.send(`That module (${command}) is disabled`);
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
+      }
     }
   }
 
   if(command === "note"){
-    if(modulesFile.get("COMMAND_NOTE")){
-      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      if(modulesFile.get("COMMAND_NOTE")){
         if(args[0]){
           var user = parseUserTag(args[0]);
         }else{
@@ -947,225 +943,115 @@ client.on('message', async message => {
             message.channel.send("The note needs a reason!");
           }
         }
-      }//End of permission checking statement
-    }else{
-      message.channel.send(`That module (${command}) is disabled`);
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
+      }
     }
   }
 
   if(command === "cnote"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-      if(args[0].length == 10){
-        connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
-          if(err) throw err;
-          if(results.affectedRows == 1){
-            message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`)
-          }else{
-            message.channel.send(`A note with that ID could not be found`)
-              .then(msg => {
-                setTimeout(async ()=>{
-                  await msg.delete();
-                  await message.delete();
-                }, 6000)
-              }).catch(console.error)
-          }
-        });
+      if(modulesFile.get("COMMAND_CNOTE")){
+        if(args[0].length == 10){
+          connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
+            if(err) throw err;
+            if(results.affectedRows == 1){
+              message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`)
+            }else{
+              message.channel.send(`A note with that ID could not be found`)
+                .then(msg => {
+                  setTimeout(async ()=>{
+                    await msg.delete();
+                    await message.delete();
+                  }, 6000)
+                }).catch(console.error)
+            }
+          });
+        }else{
+          syntaxErr(message, "cnote");
+        }
       }else{
-        syntaxErr(message, "cnote");
+        message.channel.send(`That module (${command}) is disabled`);
       }
     }
   }
 
   if(command === "user"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-      var userID = parseUserTag(args[0]);
-      var userObject = guild.member(client.users.get(userID));
+      if(modulesFile.get("COMMAND_USER")){
+        var userID = parseUserTag(args[0]);
+        var userObject = guild.member(client.users.get(userID));
 
-      if(userObject){
-        var nickname;
-        var voiceChannel;
-        var app;
+        if(userObject){
+          var nickname;
+          var voiceChannel;
+          var app;
 
-        if(userObject.user.displayName){nickname = userObject.user.displayName}else{nickname="No nickname"};
-        if(userObject.voiceChannel){voiceChannel = userObject.voiceChannel.name}else{voiceChannel="Not in a voice channel"};
-        if(userObject.user.presence.game){app = userObject.user.presence.game.name}else{app="None"};
+          if(userObject.user.displayName){nickname = userObject.user.displayName}else{nickname="No nickname"};
+          if(userObject.voiceChannel){voiceChannel = userObject.voiceChannel.name}else{voiceChannel="Not in a voice channel"};
+          if(userObject.user.presence.game){app = userObject.user.presence.game.name}else{app="None"};
 
-        message.channel.send({embed: {
-              color: 14499301,
-              author:{
-                name: `${userObject.user.username} (${nickname})`,
-                icon_url: userObject.user.displayAvatarURL
-              },
-              description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
-              thumbnail: {
-                url: userObject.user.displayAvatarURL
-              },
-              fields: [
-                {
-                  name:"Created",
-                  value:userObject.user.createdAt
+          message.channel.send({embed: {
+                color: 14499301,
+                author:{
+                  name: `${userObject.user.username} (${nickname})`,
+                  icon_url: userObject.user.displayAvatarURL
                 },
-                {
-                  name:"Status",
-                  value: `${(userObject.user.presence.status).toUpperCase()}`,
-                  inline: true
+                description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
+                thumbnail: {
+                  url: userObject.user.displayAvatarURL
                 },
-                {
-                  name:"Application",
-                  value:`${app}`,
-                  inline: true
-                },
-                {
-                  name:"Voice channel",
-                  value:`${voiceChannel}`
-                }
-              ],
-              timestamp: new Date(),
-              footer: {
-                text: "Marvin's Little Brother | Current version: " + config.version
-              }
-            }
-        }).then(async msg => {
-          await msg.react("👥");
-          await msg.react("👮");
-          await msg.react("✍");
-          await msg.react("❌");
-
-          const filter = (reaction, user) => user.bot == false;
-          const collector = msg.createReactionCollector(filter);
-
-          collector.on('collect', async r =>{
-            if(r.emoji.name == "👮"){
-              await r.remove(r.users.last());
-
-              connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
-                if(err) throw err;
-                var warnings = [];
-                for (var i = 0; i < rows.length; i++) {
-                  var row = rows[i];
-                  await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
-                }
-
-                msg.edit({embed: {
-                      color: 14499301,
-                      author:{
-                        name: `${userObject.user.username} (${nickname})`,
-                        icon_url: userObject.user.displayAvatarURL
-                      },
-                      description: warnings.join(" "),
-                      timestamp: new Date(),
-                      footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
-                      }
-                    }
-                });
-              });
-            }else if(r.emoji.name == "❌"){
-              msg.delete();
-              message.delete();
-            }else if(r.emoji.name == "✍"){
-              await r.remove(r.users.last());
-              connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
-                if(err) throw err;
-                var notes = [];
-                for (var i = 0; i < rows.length; i++) {
-                  var row = rows[i];
-                  await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
-                }
-
-                msg.edit({embed: {
-                      color: 14499301,
-                      author:{
-                        name: `${userObject.user.username} (${nickname})`,
-                        icon_url: userObject.user.displayAvatarURL
-                      },
-                      description: notes.join(" "),
-                      timestamp: new Date(),
-                      footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
-                      }
-                    }
-                });
-              });
-            }else if(r.emoji.name == "👥"){
-              await r.remove(r.users.last());
-              msg.edit({embed: {
-                    color: 14499301,
-                    title: `${userObject.user.username} (${nickname})`,
-                    description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
-                    thumbnail: {
-                      url: userObject.user.displayAvatarURL
-                    },
-                    fields: [
-                      {
-                        name:"Created",
-                        value:userObject.user.createdAt
-                      },
-                      {
-                        name:"Status",
-                        value: userObject.user.presence.status,
-                        inline: true
-                      },
-                      {
-                        name:"Application",
-                        value:`${app}`,
-                        inline: true
-                      },
-                      {
-                        name:"Voice channel",
-                        value:`${voiceChannel}`
-                      }
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
-                    }
+                fields: [
+                  {
+                    name:"Created",
+                    value:userObject.user.createdAt
+                  },
+                  {
+                    name:"Status",
+                    value: `${(userObject.user.presence.status).toUpperCase()}`,
+                    inline: true
+                  },
+                  {
+                    name:"Application",
+                    value:`${app}`,
+                    inline: true
+                  },
+                  {
+                    name:"Voice channel",
+                    value:`${voiceChannel}`
                   }
-              });
-            }else{return;}
-          });
-          //collector.on('end');
-        }).catch(console.error)
-      }else{
-        message.channel.send({embed: {
-              color: 14499301,
-              author:{
-                name: client.user.username,
-                icon_url: client.user.displayAvatarURL
-              },
-              title: `${userID}`,
-              description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
-              timestamp: new Date(),
-              footer: {
-                text: "Marvin's Little Brother | Current version: " + config.version
-              }
-            }
-        }).then(async msg => {
-          await msg.react("👥");
-          await msg.react("👮");
-          await msg.react("✍");
-          await msg.react("❌");
-
-          const filter = (reaction, user) => user.bot == false;
-          const collector = msg.createReactionCollector(filter);
-
-          collector.on('collect', async r =>{
-            if(r.emoji.name == "👮"){
-              await r.remove(r.users.last());
-
-              connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
-                if(err) throw err;
-                var warnings = [];
-                for (var i = 0; i < rows.length; i++) {
-                  var row = rows[i];
-                  await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
+                ],
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
                 }
-                if(!_.isEmpty(warnings)){
+              }
+          }).then(async msg => {
+            await msg.react("👥");
+            await msg.react("👮");
+            await msg.react("✍");
+            await msg.react("❌");
+
+            const filter = (reaction, user) => user.bot == false;
+            const collector = msg.createReactionCollector(filter);
+
+            collector.on('collect', async r =>{
+              if(r.emoji.name == "👮"){
+                await r.remove(r.users.last());
+
+                connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var warnings = [];
+                  for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
+                  }
+
                   msg.edit({embed: {
                         color: 14499301,
                         author:{
-                          name: client.user.username,
-                          icon_url: client.user.displayAvatarURL
+                          name: `Warniongs${userObject.user.username} (${nickname})`,
+                          icon_url: userObject.user.displayAvatarURL
                         },
                         description: warnings.join(" "),
                         timestamp: new Date(),
@@ -1174,41 +1060,25 @@ client.on('message', async message => {
                         }
                       }
                   });
-                }else{
-                  msg.edit({embed: {
-                        color: 14499301,
-                        author:{
-                          name: client.user.username,
-                          icon_url: client.user.displayAvatarURL
-                        },
-                        description: `There are no recored warnings for this user`,
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
-                        }
-                      }
-                  });
-                }
+                });
+              }else if(r.emoji.name == "❌"){
+                msg.delete();
+                message.delete();
+              }else if(r.emoji.name == "✍"){
+                await r.remove(r.users.last());
+                connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var notes = [];
+                  for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
+                  }
 
-              });
-            }else if(r.emoji.name == "❌"){
-              msg.delete();
-              message.delete();
-            }else if(r.emoji.name == "✍"){
-              await r.remove(r.users.last());
-              connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
-                if(err) throw err;
-                var notes = [];
-                for (var i = 0; i < rows.length; i++) {
-                  var row = rows[i];
-                  await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
-                }
-                if(!_.isEmpty(notes)){
                   msg.edit({embed: {
                         color: 14499301,
                         author:{
-                          name: client.user.username,
-                          icon_url: client.user.displayAvatarURL
+                          name: `${userObject.user.username} (${nickname})`,
+                          icon_url: userObject.user.displayAvatarURL
                         },
                         description: notes.join(" "),
                         timestamp: new Date(),
@@ -1217,70 +1087,202 @@ client.on('message', async message => {
                         }
                       }
                   });
-                }else{
-                  msg.edit({embed: {
-                        color: 14499301,
-                        author:{
-                          name: client.user.username,
-                          icon_url: client.user.displayAvatarURL
+                });
+              }else if(r.emoji.name == "👥"){
+                await r.remove(r.users.last());
+                msg.edit({embed: {
+                      color: 14499301,
+                      title: `${userObject.user.username} (${nickname})`,
+                      description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
+                      thumbnail: {
+                        url: userObject.user.displayAvatarURL
+                      },
+                      fields: [
+                        {
+                          name:"Created",
+                          value:userObject.user.createdAt
                         },
-                        description: `There are no recored notes for this user`,
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                        {
+                          name:"Status",
+                          value: userObject.user.presence.status,
+                          inline: true
+                        },
+                        {
+                          name:"Application",
+                          value:`${app}`,
+                          inline: true
+                        },
+                        {
+                          name:"Voice channel",
+                          value:`${voiceChannel}`
                         }
+                      ],
+                      timestamp: new Date(),
+                      footer: {
+                        text: "Marvin's Little Brother | Current version: " + config.version
                       }
-                  });
-                }
-              });
-            }else if(r.emoji.name == "👥"){
-              await r.remove(r.users.last());
-              msg.edit({embed: {
-                    color: 14499301,
-                    title: `${userObject.user.username} (${nickname})`,
-                    description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
-                    thumbnail: {
-                      url: userObject.user.displayAvatarURL
-                    },
-                    fields: [
-                      {
-                        name:"Created",
-                        value:userObject.user.createdAt
-                      },
-                      {
-                        name:"Status",
-                        value: userObject.user.presence.status,
-                        inline: true
-                      },
-                      {
-                        name:"Application",
-                        value:`${app}`,
-                        inline: true
-                      },
-                      {
-                        name:"Voice channel",
-                        value:`${voiceChannel}`
-                      }
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
                     }
+                });
+              }else{return;}
+            });
+            //collector.on('end');
+          }).catch(console.error)
+        }else{
+          message.channel.send({embed: {
+                color: 14499301,
+                author:{
+                  name: client.user.username,
+                  icon_url: client.user.displayAvatarURL
+                },
+                title: `${userID}`,
+                description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
+                timestamp: new Date(),
+                footer: {
+                  text: "Marvin's Little Brother | Current version: " + config.version
+                }
+              }
+          }).then(async msg => {
+            await msg.react("👥");
+            await msg.react("👮");
+            await msg.react("✍");
+            await msg.react("❌");
+
+            const filter = (reaction, user) => user.bot == false;
+            const collector = msg.createReactionCollector(filter);
+
+            collector.on('collect', async r =>{
+              if(r.emoji.name == "👮"){
+                await r.remove(r.users.last());
+
+                connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var warnings = [];
+                  for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
                   }
-              });
-            }else{return;}
-          });
-          //collector.on('end');
-        }).catch(console.error)
+                  if(!_.isEmpty(warnings)){
+                    msg.edit({embed: {
+                          color: 14499301,
+                          author:{
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                          },
+                          description: warnings.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }else{
+                    msg.edit({embed: {
+                          color: 14499301,
+                          author:{
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                          },
+                          description: `There are no recored warnings for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
+
+                });
+              }else if(r.emoji.name == "❌"){
+                msg.delete();
+                message.delete();
+              }else if(r.emoji.name == "✍"){
+                await r.remove(r.users.last());
+                connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var notes = [];
+                  for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
+                  }
+                  if(!_.isEmpty(notes)){
+                    msg.edit({embed: {
+                          color: 14499301,
+                          author:{
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                          },
+                          description: notes.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }else{
+                    msg.edit({embed: {
+                          color: 14499301,
+                          author:{
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                          },
+                          description: `There are no recored notes for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
+                });
+              }else if(r.emoji.name == "👥"){
+                await r.remove(r.users.last());
+                msg.edit({embed: {
+                      color: 14499301,
+                      title: `${userObject.user.username} (${nickname})`,
+                      description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
+                      thumbnail: {
+                        url: userObject.user.displayAvatarURL
+                      },
+                      fields: [
+                        {
+                          name:"Created",
+                          value:userObject.user.createdAt
+                        },
+                        {
+                          name:"Status",
+                          value: userObject.user.presence.status,
+                          inline: true
+                        },
+                        {
+                          name:"Application",
+                          value:`${app}`,
+                          inline: true
+                        },
+                        {
+                          name:"Voice channel",
+                          value:`${voiceChannel}`
+                        }
+                      ],
+                      timestamp: new Date(),
+                      footer: {
+                        text: "Marvin's Little Brother | Current version: " + config.version
+                      }
+                    }
+                });
+              }else{return;}
+            });
+            //collector.on('end');
+          }).catch(console.error)
+        }
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
       }
-    }else{
-      return;
     }
   }
 
   if(command === "warn"){
-    if(modulesFile.get("COMMAND_WARN")){
-      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      if(modulesFile.get("COMMAND_WARN")){
         if(args[0]){
           var user = parseUserTag(args[0]);
         }else{
@@ -1363,39 +1365,43 @@ client.on('message', async message => {
             message.channel.send("The user provided was not found in this guild");
           }
         }
-      }//End of permission checking statement
-    }else{
-      message.channel.send(`That module (${command}) is disabled`);
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
+      }
     }
   }
 
   if(command === "cwarn"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-      if(args[0].length == 10){
-        connection.query('UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
-          if(err) throw err;
-          if(results.affectedRows == 1){
-            message.channel.send(`☑ Warning with id \`${args[0].trim()}\` was successfully cleared.`)
-          }else{
-            message.channel.send(`A warning with that ID could not be found`)
-              .then(msg => {
-                setTimeout(async ()=>{
-                  await msg.delete();
-                  await message.delete();
-                }, 6000)
-              }).catch(console.error)
-          }
-        });
+      if(modulesFile.get("COMMAND_CWARN")){
+        if(args[0].length == 10){
+          connection.query('UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
+            if(err) throw err;
+            if(results.affectedRows == 1){
+              message.channel.send(`☑ Warning with id \`${args[0].trim()}\` was successfully cleared.`)
+            }else{
+              message.channel.send(`A warning with that ID could not be found`)
+                .then(msg => {
+                  setTimeout(async ()=>{
+                    await msg.delete();
+                    await message.delete();
+                  }, 6000)
+                }).catch(console.error)
+            }
+          });
+        }else{
+          syntaxErr(message, "cwarn");
+        }
       }else{
-        syntaxErr(message, "cwarn");
+        message.channel.send(`That module (${command}) is disabled`);
       }
     }
   }
 
   if(command === "helper"){
     if(args[0] === "clear"){
-      if(modulesFile.get("COMMAND_HELPER_CLEAR")){
-        if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+        if(modulesFile.get("COMMAND_HELPER_CLEAR")){
           if(args.length >= 4){
             var amount = args[1];
             var channelid = parseChannelTag(args[2]);
@@ -1441,19 +1447,19 @@ client.on('message', async message => {
             }else{
               message.channel.send("The user provided was not found in this guild");
             }
-         }else{
+          }else{
            syntaxErr(message, "helper_clear");
-         }
-       }
-      }else{
-        message.channel.send(`That module (${command}) is disabled`);
+          }
+        }else{
+          message.channel.send(`That module (${command}) is disabled`);
+        }
       }
     }
   }
 
   if(command === "voicelog"){
-      if(modulesFile.get("COMMAND_VOICELOG")){
-        if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(modulesFile.get("COMMAND_VOICELOG")){
           if(args[0]){
             var user = parseUserTag(args[0]);
           }else{
@@ -1535,15 +1541,15 @@ client.on('message', async message => {
               message.channel.send(`🎙 Viewing the voice logs of ${client.users.get(user)} \`\`\`${joinedMessage}\`\`\``);
             });
           }
-        }//END OF PERMISSION CHECK
-      }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        }else{
+          message.channel.send(`That module (${command}) is disabled`);
+        }
       }
     }
 
   if(command === "disconnect"){
-    if(modulesFile.get("COMMAND_DISCONNECT")){
-      if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+    if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+      if(modulesFile.get("COMMAND_DISCONNECT")){
         var user = parseUserTag(args[0]);
         var guildUser = guild.member(user);
 
@@ -1557,21 +1563,12 @@ client.on('message', async message => {
         }else{
           message.channel.send("The user provided was not found.")
         }
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
       }
-    }else{
-      message.channel.send(`That module (${command}) is disabled`);
     }
   }
 
-  if(command === "resolve"){
-    if(modulesFile.get("COMMAND_RESOLVE")){
-      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-
-      }
-    }else{
-      message.channel.send(`That module (${command}) is disabled`);
-    }
-  }
 });
 //discord events
 client.on('messageUpdate', function(oldMessage, newMessage) {
