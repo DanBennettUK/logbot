@@ -29,6 +29,9 @@ var modulesFile           = editJsonFile(modulesFilePath);
 var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
 
+var badWords              = require("./badWords.json");
+var badWordsFile          = editJsonFile("./badWords.json");
+
 const connection = mysql.createConnection({
   host: config.host,
   user: config.user,
@@ -310,6 +313,23 @@ function setupTables(){
         }
   );
   connection.query(
+    `CREATE TABLE IF NOT EXISTS log_messageremovals
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          channel VARCHAR(25),
+          content text,
+          timestamp DATETIME        NOT NULL,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_0900_ai_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
+  connection.query(
     `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
         function(err, results){
           if(err) throw err;
@@ -492,24 +512,29 @@ function isNull(value, def){
     return value;
   }
 }
-// function timedMessage(content, time, message, chnl, del){
-//   /*
-//   content - Message to send
-//   time - Time in ms before removing the message
-//   message - <Message> from which the command was called
-//   channel - channel to send the message to
-//   del - <Bool> Delete the original message after @time
-//   */
-//   if(_.isNull(chnl)) var chnl = message.channel
-//
-//   chnl.channel.send(content)
-//     .then(msg => {
-//       setTimeout(async ()=>{
-//         await msg.delete();
-//         if(del) message.delete();
-//       }, time)
-//     }).catch(console.error)
-// }
+function checkMessageContent(message){
+  var wholeMessage = message.content.replace(/[^\w\s]/gi, '').trim().split(" ");
+
+  var wordArray = _.values(badWordsFile.get());
+  var triggerword;
+
+  if(wordArray.some(word => wholeMessage.includes(word))){
+    message.delete()
+      .then(() =>{
+        message.channel.send(`${message.author} watch your language`)
+          .then(msg => {
+            setTimeout(async() =>{
+              await msg.delete();
+            },5000);
+          }).catch(console.error);
+
+        var data = [message.author.id, message.channel.id, message.content, new Date()];
+        connection.query('INSERT INTO log_messageremovals (userID, channel, content, timestamp) VALUES (?,?,?,?)', data, function(err, results){
+          if(err) throw err;
+        });
+      }).catch(console.error);
+  }
+}
 
 client.on("ready", () => {
   setupTables();
@@ -524,9 +549,10 @@ client.on("ready", () => {
 
 client.on('message', async message => {
   if(message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
+  if(_.indexOf(["dm", "group"], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
 
   //Log every message that is processed; message or command.
-	var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()]
+	var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()];
 	connection.query(
 	  'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
     function(err, results){
@@ -534,8 +560,9 @@ client.on('message', async message => {
     }
 	);
 
+  checkMessageContent(message);
+
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
-  if(_.indexOf(["dm", "group"], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
 
 
   const args =      message.content.slice(1).trim().split(" ");   //Result: ["<TAG>", "Bad", "person!"]

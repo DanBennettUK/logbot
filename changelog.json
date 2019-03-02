@@ -31,7 +31,7 @@
     "destroyed":{}
   },
   "4":{
-    "date": "2018-01-20",
+    "date": "2019-01-20",
     "version": "v1.023",
     "added":{
       "1": "Allow the passing of raw user IDs",
@@ -44,6 +44,21 @@
       "1": "Added further options to modules",
       "2": "Inline parameters into messages are now passed in a cleaner manner"
     },
+    "destroyed":{}
+  },
+  "5":{
+    "date": "2019-03-02",
+    "version": "v1.024",
+    "added":{
+      "1": "User cards",
+      "2": "User searching, additional to id parsing",
+      "3": "Channel searching, addition to id parsing",
+      "4": "Helper command: Clear",
+      "5": "Voice logs, woo!",
+      "6": "Ban evasion detection",
+      "7": "Added Disconnect command"
+    },
+    "changed": {},
     "destroyed":{}
   }
 }
