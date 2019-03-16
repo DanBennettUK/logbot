@@ -29,8 +29,9 @@ var modulesFile           = editJsonFile(modulesFilePath);
 var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
 
-var badWords              = require("./badWords.json");
-var badWordsFile          = editJsonFile("./badWords.json");
+var mutedFile             = editJsonFile("./muted.json");
+
+var badWordList;
 
 const connection = mysql.createConnection({
   host: config.host,
@@ -367,6 +368,7 @@ function parseUserTag(tag){
   }else{
     var usernameResolve = client.users.find(obj => obj.username === tag);
     var nicknameResolve = client.users.find(obj => obj.nickname === tag);
+
     if(usernameResolve){return usernameResolve.id;}else if(nicknameResolve){return nicknameResolve.id;}else{return "err";}
   }
 }
@@ -513,12 +515,9 @@ function isNull(value, def){
   }
 }
 function checkMessageContent(message){
-  var wholeMessage = message.content.replace(/[^\w\s]/gi, '').trim().split(" ");
+  var wholeMessage = message.content;
 
-  var wordArray = _.values(badWordsFile.get());
-  var triggerword;
-
-  if(wordArray.some(word => wholeMessage.includes(word))){
+  if(badWordList.some(word => wholeMessage.includes(word))){
     message.delete()
       .then(() =>{
         message.channel.send(`${message.author} watch your language`)
@@ -537,6 +536,9 @@ function checkMessageContent(message){
 }
 
 client.on("ready", () => {
+
+  badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
+
   setupTables();
   console.log("Bot Active");
 
@@ -560,7 +562,7 @@ client.on('message', async message => {
     }
 	);
 
-  checkMessageContent(message);
+  if(modulesFile.get("EVENT_CHECKMESSAGECONTENT")){checkMessageContent(message);}
 
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
 
@@ -1587,6 +1589,74 @@ client.on('message', async message => {
               message.channel.send(`${guildUser} was successfully removed from their voice channel.`)
             }).catch(console.error)
           }).catch(console.error)
+        }else{
+          message.channel.send("The user provided was not found.")
+        }
+      }else{
+        message.channel.send(`That module (${command}) is disabled`);
+      }
+    }
+  }
+
+  if(command === "badwords"){
+    if(args[0] === "add"){
+      var string = (_.rest(args, 1)).join(" ");
+
+      fs.appendFile('badWords.txt', ', '+string, (err) => {
+        if (err) throw err;
+        badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
+        console.log(badWordList);
+        message.channel.send(`\`${string}\` added`);
+      });
+
+    }
+    if(args[0] === "list"){
+      message.channel.send((fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")));
+    }
+  }
+
+  if(command === "mute"){
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      if(modulesFile.get("COMMAND_MUTE")){
+        var user = parseUserTag(args[0]);
+        var guildUser = guild.member(user);
+
+        if(user !== "err" && guildUser){
+          if(mutedFile.get(user)){
+            var existingMute = mutedFile.get(user);
+            message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000)}`);
+          }else{
+            var length;
+            var int = args[1].replace(/[a-zA-Z]$/g, "");
+
+            if(parseInt(int)){
+              switch((args[1].toLowerCase()).charAt(args[1].length - 1)){
+                case "d":
+                  length = Date.now() + (int * 24 * 60 * 60);
+                  console.log(new Date(length));
+                  break;
+                case "h":
+                  length = Date.now() + (int * 60 * 60);
+                  console.log(new Date(length));
+                  break;
+                case "m":
+                  length = Date.now() + (int * 60);
+                  console.log(new Date(length));
+                  break;
+                case "s":
+                  length = Date.now() + int;
+                  console.log(new Date(length));
+                  break;
+                default:
+                  length = Date.now() + (int * 60 * 60);
+                  console.log(new Date(length));
+                  break;
+              }
+            }else{
+              message.channel.send(`Hm, that length doesn't seem right? ${int}`)
+              return;
+            }
+          }
         }else{
           message.channel.send("The user provided was not found.")
         }
