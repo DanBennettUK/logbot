@@ -12,6 +12,7 @@
 
 const Discord             = require("discord.js");
 const client              = new Discord.Client();
+var guild;
 const Store               = require('data-store');
 const mysql               = require('mysql2');
 var moment                = require('moment');
@@ -30,6 +31,8 @@ var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
 
 var mutedFile             = editJsonFile("./muted.json");
+var reminderFile            = editJsonFile("./reminders.json");
+
 
 var badWordList;
 
@@ -331,6 +334,26 @@ function setupTables(){
         }
   );
   connection.query(
+    `CREATE TABLE IF NOT EXISTS log_mutes
+        (
+          id int                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25)        NOT NULL,
+          addedBy VARCHAR(25)       NOT NULL,
+          length MEDIUMINT,
+          reason text,
+          identifier VARCHAR(10),
+          isDeleted bit,
+          timestamp DATETIME        NOT NULL,
+          PRIMARY KEY (id),
+          FOREIGN KEY (userID) REFERENCES users(userID)
+        )
+        CHARACTER SET 'utf8mb4'
+        COLLATE 'utf8mb4_0900_ai_ci';`,
+        function(err, results){
+          if(err) throw err;
+        }
+  );
+  connection.query(
     `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
         function(err, results){
           if(err) throw err;
@@ -534,6 +557,49 @@ function checkMessageContent(message){
       }).catch(console.error);
   }
 }
+function checkExpiredMutes(){
+  let mutes = mutedFile.read();
+
+  for(var i in mutes){
+    if(mutes[i].end < (Math.floor(Date.now() / 1000))){
+      var actionee = guild.member(i);
+      var mutedRole = guild.roles.find(val => val.name === "Muted");
+
+      if(actionee){
+        actionee.removeRole(mutedRole)
+          .then(member => {
+            guild.channels.find(val => val.name === "server-log-test").send(`${member} has been unmuted`);
+            mutedFile.unset(i);
+            mutedFile.save();
+          })
+          .catch(console.error);
+      }else{
+        console.log(`Actionee could not be found ${i}`);
+        mutedFile.unset(i);
+        mutedFile.save();
+      }
+    }
+  }
+}
+function checkReminders(){
+  let reminders = reminderFile.read();
+
+  for(var i in reminders){
+    if(reminders[i].end < (Math.floor(Date.now() / 1000))){
+      var member = guild.member(reminders[i].who);
+      if(member){
+        member.createDM().then(async chnl => {
+          await chnl.send(`Hey ${member}, it's been ${reminders[i].length} since you set a reminder - \n\n ${reminders[i].reminder}`);
+          reminderFile.unset(i);
+          reminderFile.save();
+        }).catch(console.error)
+      }else{
+        reminderFile.unset(i);
+        reminderFile.save();
+      }
+    }
+  }
+}
 
 client.on("ready", () => {
 
@@ -546,7 +612,12 @@ client.on("ready", () => {
     status: 'idle'
   })
 
-  updateUserTable("system", null);
+  updateUserTable("system", null)
+  ;
+  guild = client.guilds.get(config.guildid);
+
+  setInterval(checkExpiredMutes, 10000);
+  setInterval(checkReminders, 30000);
 });
 
 client.on('message', async message => {
@@ -569,7 +640,6 @@ client.on('message', async message => {
 
   const args =      message.content.slice(1).trim().split(" ");   //Result: ["<TAG>", "Bad", "person!"]
   const command =   args.shift().toLowerCase();                   //Result: "ban"
-  const guild =     client.guilds.get(config.guildid);
 
   //fun commands
   if(command === "flipacoin"){
@@ -918,7 +988,7 @@ client.on('message', async message => {
           }
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -973,7 +1043,7 @@ client.on('message', async message => {
           }
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -1000,7 +1070,7 @@ client.on('message', async message => {
           syntaxErr(message, "cnote");
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -1058,6 +1128,7 @@ client.on('message', async message => {
           }).then(async msg => {
             await msg.react("👥");
             await msg.react("👮");
+            await msg.react("🔈");
             await msg.react("✍");
             await msg.react("❌");
 
@@ -1068,21 +1139,57 @@ client.on('message', async message => {
               if(r.emoji.name == "👮"){
                 await r.remove(r.users.last());
 
-                connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
                   if(err) throw err;
                   var warnings = [];
-                  for (var i = 0; i < rows.length; i++) {
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
                     var row = rows[i];
-                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
+                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`);
+                    if(i == max - 1 && extra > 0){warnings.push(`...${extra} more`)}
                   }
 
                   msg.edit({embed: {
                         color: 14499301,
                         author:{
-                          name: `Warniongs${userObject.user.username} (${nickname})`,
+                          name: `Warnings for ${userObject.user.username} (${nickname})`,
                           icon_url: userObject.user.displayAvatarURL
                         },
                         description: warnings.join(" "),
+                        timestamp: new Date(),
+                        footer: {
+                          text: "Marvin's Little Brother | Current version: " + config.version
+                        }
+                      }
+                  });
+                });
+              }else if(r.emoji.name == "🔈"){
+                await r.remove(r.users.last());
+
+                connection.query('select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var mutes = [];
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
+                    var row = rows[i];
+                    await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.addedBy)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.reason}\`\`\`\n\n`);
+                    if(i == max - 1 && extra > 0){mutes.push(`...${extra} more`)}
+                  }
+                  await msg.edit({embed: {
+                        color: 14499301,
+                        author:{
+                          name: `Mutes for ${userObject.user.username} (${nickname})`,
+                          icon_url: userObject.user.displayAvatarURL
+                        },
+                        description: mutes.join(" "),
                         timestamp: new Date(),
                         footer: {
                           text: "Marvin's Little Brother | Current version: " + config.version
@@ -1095,7 +1202,7 @@ client.on('message', async message => {
                 message.delete();
               }else if(r.emoji.name == "✍"){
                 await r.remove(r.users.last());
-                connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                connection.query('select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
                   if(err) throw err;
                   var notes = [];
                   for (var i = 0; i < rows.length; i++) {
@@ -1304,7 +1411,7 @@ client.on('message', async message => {
           }).catch(console.error)
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -1372,7 +1479,7 @@ client.on('message', async message => {
                             },
                             {
                               name: "Want to dispute?",
-                              value: "This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message. \nThank you."
+                              value: "This warning can be disputed reasonably by contacting ModMail. Please quote your identifier which can be found above in your initial message. \nThank you."
                             }
                           ],
                           timestamp: new Date(),
@@ -1395,7 +1502,7 @@ client.on('message', async message => {
           }
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -1422,7 +1529,7 @@ client.on('message', async message => {
           syntaxErr(message, "cwarn");
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
@@ -1480,7 +1587,7 @@ client.on('message', async message => {
            syntaxErr(message, "helper_clear");
           }
         }else{
-          message.channel.send(`That module (${command}) is disabled`);
+          message.channel.send(`That module (${command}) is disabled.`);
         }
       }
     }
@@ -1571,7 +1678,7 @@ client.on('message', async message => {
             });
           }
         }else{
-          message.channel.send(`That module (${command}) is disabled`);
+          message.channel.send(`That module (${command}) is disabled.`);
         }
       }
     }
@@ -1593,25 +1700,28 @@ client.on('message', async message => {
           message.channel.send("The user provided was not found.")
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
     }
   }
 
   if(command === "badwords"){
     if(args[0] === "add"){
-      var string = (_.rest(args, 1)).join(" ");
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        var string = (_.rest(args, 1)).join(" ");
 
-      fs.appendFile('badWords.txt', ', '+string, (err) => {
-        if (err) throw err;
-        badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
-        console.log(badWordList);
-        message.channel.send(`\`${string}\` added`);
-      });
-
+        fs.appendFile('badWords.txt', ', '+string, (err) => {
+          if (err) throw err;
+          badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
+          console.log(badWordList);
+          message.channel.send(`\`${string}\` added`);
+        });
+      }
     }
     if(args[0] === "list"){
-      message.channel.send((fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")));
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        message.channel.send((fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")));
+      }
     }
   }
 
@@ -1626,31 +1736,113 @@ client.on('message', async message => {
             var existingMute = mutedFile.get(user);
             message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000)}`);
           }else{
-            var length;
+            var end;
+            var seconds;
             var int = args[1].replace(/[a-zA-Z]$/g, "");
 
             if(parseInt(int)){
               switch((args[1].toLowerCase()).charAt(args[1].length - 1)){
                 case "d":
-                  length = Date.now() + (int * 24 * 60 * 60);
-                  console.log(new Date(length));
+                  end = ((Math.floor(Date.now() / 1000)) + (int * 24 * 60 * 60));
+                  seconds = (int * 24 * 60 * 60);
                   break;
                 case "h":
-                  length = Date.now() + (int * 60 * 60);
-                  console.log(new Date(length));
+                  end = ((Math.floor(Date.now() / 1000)) + (int * 60 * 60));
+                  seconds = (int * 60 * 60);
                   break;
                 case "m":
-                  length = Date.now() + (int * 60);
-                  console.log(new Date(length));
-                  break;
-                case "s":
-                  length = Date.now() + int;
-                  console.log(new Date(length));
+                  end = ((Math.floor(Date.now() / 1000)) + (int * 60));
+                  seconds = (int * 60);
                   break;
                 default:
-                  length = Date.now() + (int * 60 * 60);
-                  console.log(new Date(length));
+                  end = ((Math.floor(Date.now() / 1000)) + (int * 60 * 60));
+                  seconds = (int * 60 * 60);
                   break;
+              }
+
+              var reason = _.rest(args, 2).join(" ");
+
+              if(reason.length > 0){
+                mutedFile.set(`${user}.end`, end);
+                mutedFile.set(`${user}.actioner`, message.author.id);
+                mutedFile.set(`${user}.actionee`, user);
+                mutedFile.set(`${user}.reason`, reason);
+                mutedFile.save();
+
+                var mutedRole = guild.roles.find(val => val.name === "Muted");
+                var identifier = cryptoRandomString(10);
+
+                guild.member(user).addRole(mutedRole)
+                  .then(member => {
+                    message.channel.send({embed: {
+                          color: 9911513,
+                          author: {
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                          },
+                          title: "[Action] User Muted" ,
+                          description: `${member} was muted by ${message.author} for ${args[1]}`,
+                          fields: [{
+                              name: "Reason",
+                              value: reason
+                            },
+                            {
+                              name: "Identifier",
+                              value: identifier
+                            },
+                          ],
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                    var data = [user, message.author.id, seconds, reason, 0, identifier, new Date()];
+                    connection.query('INSERT INTO log_mutes(userID, addedBy, length, reason, isDeleted, identifier, timestamp) VALUES(?,?,?,?,?,?,?)', data, function(err, results){
+                      if (err) throw err;
+                    });
+
+                    member.createDM().then(async chnl => {
+                      await chnl.send({embed: {
+                            color: 15059763,
+                            title:`You have been muted in ${guild.name}` ,
+                            description: `Reasons and details about the mute can be found below:`,
+                            fields: [{
+                                name: "Reason",
+                                value: reason,
+                                inline: true
+                              },
+                              {
+                                name: "Length",
+                                value: args[1],
+                                inline: true
+                              },
+                              {
+                                name: "Identifier",
+                                value: `\`${identifier}\``
+                              },
+                              {
+                                name: "Want to dispute?",
+                                value: "This mute can be disputed reasonably by contacting ModMail. Please quote your identifier which can be found above in your initial message. \nThank you."
+                              }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                              text: "Marvin's Little Brother | Current version: " + config.version
+                            }
+                          }
+                      }).then(dm => {
+                        if(dm.embeds[0].type === "rich"){
+                          var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                        }else{
+                          var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
+                        }
+                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function(err, results){if(err) throw err;})
+                      });
+                    }).catch(console.error);
+                  }).catch(console.error)
+              }else{
+                message.channel.send("Please provide a reason for the mute.")
               }
             }else{
               message.channel.send(`Hm, that length doesn't seem right? ${int}`)
@@ -1661,8 +1853,54 @@ client.on('message', async message => {
           message.channel.send("The user provided was not found.")
         }
       }else{
-        message.channel.send(`That module (${command}) is disabled`);
+        message.channel.send(`That module (${command}) is disabled.`);
       }
+    }
+  }
+
+  if(command === "remindme"){
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      if(modulesFile.get("COMMAND_REMINDME")){
+        //>remindme 1d Check that user!
+        var user = message.author.id;
+        var end;
+        var int = args[0].replace(/[a-zA-Z]$/g, "");
+
+        if(parseInt(int)){
+          switch((args[0].toLowerCase()).charAt(args[0].length - 1)){
+            case "d":
+              end = ((Math.floor(Date.now() / 1000)) + (int * 24 * 60 * 60));
+              seconds = (int * 24 * 60 * 60);
+              break;
+            case "h":
+              end = ((Math.floor(Date.now() / 1000)) + (int * 60 * 60));
+              seconds = (int * 60 * 60);
+              break;
+            case "m":
+              end = ((Math.floor(Date.now() / 1000)) + (int * 60));
+              seconds = (int * 60);
+              break;
+            default:
+              end = ((Math.floor(Date.now() / 1000)) + (int * 60 * 60));
+              seconds = (int * 60 * 60);
+              break;
+          }
+
+          var reminder = _.rest(args, 1).join(" ");
+
+          if(reminder.length > 0){
+            reminderFile.set(`${user}${end}.who`, message.author.id)
+            reminderFile.set(`${user}${end}.end`, end);
+            reminderFile.set(`${user}${end}.reminder`, reminder)
+            reminderFile.set(`${user}${end}.length`, args[0])
+            reminderFile.save();
+
+            message.channel.send(`I will remind you in ${args[0]} to - ${reminder}`);
+          }else{
+            message.channel.send("Please provide a reminder note.")
+          }
+      }
+    }
     }
   }
 
