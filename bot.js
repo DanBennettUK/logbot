@@ -199,18 +199,20 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_guildbans
         (
-          userID VARCHAR(25)       NOT NULL,
-          username VARCHAR(255)     NOT NULL,
-          discriminator VARCHAR(4),
-          bannedBy VARCHAR(255),
-          reason text,
-          note text,
+          ID INT                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
+          description TEXT,
           identifier VARCHAR(10),
+          isDeleted BIT,
           timestamp DATETIME,
-          PRIMARY KEY (userID, timestamp)
+          updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (ID),
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -218,18 +220,20 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_guildunbans
         (
-          userID VARCHAR(25)       NOT NULL,
-          username VARCHAR(255)     NOT NULL,
-          discriminator VARCHAR(4),
-          unbannedBy VARCHAR(255),
-          reason text,
-          note text,
+          ID INT                     NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
+          description text,
           identifier VARCHAR(10),
+          isDeleted BIT,
           timestamp DATETIME,
-          PRIMARY KEY (userID, timestamp)
+          updated DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (ID),
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -237,17 +241,17 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_note
         (
-          id int                    NOT NULL AUTO_INCREMENT,
-          userID VARCHAR(25)        NOT NULL,
-          addedBy VARCHAR(25)       NOT NULL,
-          note text,
+          ID INT                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
+          description TEXT,
           identifier VARCHAR(10),
-          isDeleted bit,
+          isDeleted BIT,
           timestamp DATETIME        NOT NULL,
-          updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (addedBy) REFERENCES users(userID)
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -258,17 +262,17 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_warn
         (
-          id int                    NOT NULL AUTO_INCREMENT,
-          userID VARCHAR(25)        NOT NULL,
-          addedBy VARCHAR(25)       NOT NULL,
-          content text,
+          ID INT                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
+          description TEXT,
           identifier VARCHAR(10),
-          isDeleted bit,
-          timestamp DATETIME        NOT NULL,
-          updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          isDeleted BIT,
+          timestamp DATETIME,
+          updated DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (addedBy) REFERENCES users(userID)
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -300,15 +304,15 @@ function setupTables(){
     `CREATE TABLE IF NOT EXISTS log_helperclear
         (
           id int                    NOT NULL AUTO_INCREMENT,
-          userID VARCHAR(25)        NOT NULL,
-          clearedBy VARCHAR(25)       NOT NULL,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
           channel VARCHAR(25),
-          amount TINYINT,
+          amount SMALLINT,
           identifier VARCHAR(10),
-          timestamp DATETIME        NOT NULL,
+          timestamp DATETIME,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (clearedBy) REFERENCES users(userID)
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -319,11 +323,11 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_messageremovals
         (
-          id int                    NOT NULL AUTO_INCREMENT,
-          userID VARCHAR(25)        NOT NULL,
+          ID INT                    NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
           channel VARCHAR(25),
-          content text,
-          timestamp DATETIME        NOT NULL,
+          message TEXT,
+          timestamp DATETIME,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
@@ -336,16 +340,18 @@ function setupTables(){
   connection.query(
     `CREATE TABLE IF NOT EXISTS log_mutes
         (
-          id int                    NOT NULL AUTO_INCREMENT,
-          userID VARCHAR(25)        NOT NULL,
-          addedBy VARCHAR(25)       NOT NULL,
+          ID INT                  NOT NULL AUTO_INCREMENT,
+          userID VARCHAR(25),
+          actioner VARCHAR(25),
+          description TEXT,
           length MEDIUMINT,
-          reason text,
           identifier VARCHAR(10),
-          isDeleted bit,
-          timestamp DATETIME        NOT NULL,
+          isDeleted BIT,
+          timestamp DATETIME,
+          updated DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          FOREIGN KEY (userID) REFERENCES users(userID),
+          FOREIGN KEY (actioner) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -538,23 +544,25 @@ function isNull(value, def){
   }
 }
 function checkMessageContent(message){
-  var wholeMessage = message.content;
+  if(message.member.roles.some(role=>["Moderators, Subreddit Mods"].includes(role.name))){
+    var wholeMessage = (message.content).split(" ");
 
-  if(badWordList.some(word => wholeMessage.includes(word))){
-    message.delete()
-      .then(() =>{
-        message.channel.send(`${message.author} watch your language`)
-          .then(msg => {
-            setTimeout(async() =>{
-              await msg.delete();
-            },5000);
-          }).catch(console.error);
+    if(badWordList.some(word => wholeMessage.includes(word))){
+      message.delete()
+        .then(() =>{
+          message.channel.send(`${message.author} watch your language`)
+            .then(msg => {
+              setTimeout(async() =>{
+                await msg.delete();
+              },5000);
+            }).catch(console.error);
 
-        var data = [message.author.id, message.channel.id, message.content, new Date()];
-        connection.query('INSERT INTO log_messageremovals (userID, channel, content, timestamp) VALUES (?,?,?,?)', data, function(err, results){
-          if(err) throw err;
-        });
-      }).catch(console.error);
+          var data = [message.author.id, message.channel.id, message.content, new Date()];
+          connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
+            if(err) throw err;
+          });
+        }).catch(console.error);
+    }
   }
 }
 function checkExpiredMutes(){
@@ -800,7 +808,7 @@ client.on('message', async message => {
                     await chnl.send({embed: {
                           color: 16154127,
                           title:`You have been banned from ${guild.name}` ,
-                          description: `Reasons and details about the ban can be found below:`,
+                          description: `Details about the ban can be found below:`,
                           fields: [{
                               name: "Reason",
                               value: reason
@@ -862,17 +870,15 @@ client.on('message', async message => {
                               }
                           });
 
-                          var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
+                          var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                           connection.query(
-                            'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
+                            'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                             function(err, results){
                               if(err) throw err;
                             }
                           );
 
                           //Adding the user to our banned users JSON
-                            //var banndUsers = bannedUsersFile.get();
-                            //var next = 1 + _.size(banndUsers);
                           bannedUsersFile.set(identifier, result.username);
                           bannedUsersFile.save();
                         })
@@ -958,9 +964,9 @@ client.on('message', async message => {
                       }
                   });
 
-                  var data = [result.id, result.username, result.discriminator, message.author.id, reason, null, identifier, new Date()];
+                  var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                   connection.query(
-                    'INSERT INTO log_guildunbans (userID, username, discriminator, unbannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
+                    'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                     function(err, results){
                       if(err) throw err;
                     }
@@ -1011,9 +1017,9 @@ client.on('message', async message => {
 
           if(tail.length > 0){
             var identifier = cryptoRandomString(10);
-            var data = [user, message.author.id, note, identifier, 0, new Date(), new Date()];
+            var data = [user, message.author.id, note, identifier, 0, new Date()];
             connection.query(
-              'INSERT INTO log_note (userID, addedBy, note, identifier, isDeleted, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
+              'INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
               function(err, results){
                 if(err) throw err;
 
@@ -1149,7 +1155,7 @@ client.on('message', async message => {
 
                   for (var i = 0; i < max; i++) {
                     var row = rows[i];
-                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`);
+                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
                     if(i == max - 1 && extra > 0){warnings.push(`...${extra} more`)}
                   }
 
@@ -1180,7 +1186,7 @@ client.on('message', async message => {
 
                   for (var i = 0; i < max; i++) {
                     var row = rows[i];
-                    await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.addedBy)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.reason}\`\`\`\n\n`);
+                    await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                     if(i == max - 1 && extra > 0){mutes.push(`...${extra} more`)}
                   }
                   await msg.edit({embed: {
@@ -1207,7 +1213,7 @@ client.on('message', async message => {
                   var notes = [];
                   for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
-                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
+                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
                   }
 
                   msg.edit({embed: {
@@ -1435,8 +1441,8 @@ client.on('message', async message => {
 
             if(tail.length > 0){
               var identifier = cryptoRandomString(10);
-              var data = [user, message.author.id, content, 0, identifier, new Date(), new Date()];
-              connection.query('INSERT INTO log_warn (userID, addedBy, content, isDeleted, identifier, timestamp, updated) VALUES (?,?,?,?,?,?,?)', data,
+              var data = [user, message.author.id, content, identifier, 0, new Date()];
+              connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                 function(err, results){
                   if(err) throw err;
 
@@ -1468,7 +1474,7 @@ client.on('message', async message => {
                     await chnl.send({embed: {
                           color: 15059763,
                           title:`You have been warned in ${guild.name}` ,
-                          description: `Reasons and details about the warning can be found below:`,
+                          description: `Details about the warning can be found below:`,
                           fields: [{
                               name: "Reason",
                               value: content
@@ -1479,7 +1485,7 @@ client.on('message', async message => {
                             },
                             {
                               name: "Want to dispute?",
-                              value: "This warning can be disputed reasonably by contacting ModMail. Please quote your identifier which can be found above in your initial message. \nThank you."
+                              value: "This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you."
                             }
                           ],
                           timestamp: new Date(),
@@ -1567,7 +1573,7 @@ client.on('message', async message => {
                        }
                     });
                     var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
-                    connection.query('INSERT INTO log_helperclear(userID, clearedBy, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data, function(err, results){
+                    connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data, function(err, results){
                       if(err) throw err;
                     });
                   }else{
@@ -1797,8 +1803,8 @@ client.on('message', async message => {
                           }
                         }
                     });
-                    var data = [user, message.author.id, seconds, reason, 0, identifier, new Date()];
-                    connection.query('INSERT INTO log_mutes(userID, addedBy, length, reason, isDeleted, identifier, timestamp) VALUES(?,?,?,?,?,?,?)', data, function(err, results){
+                    var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
+                    connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data, function(err, results){
                       if (err) throw err;
                     });
 
@@ -1806,7 +1812,7 @@ client.on('message', async message => {
                       await chnl.send({embed: {
                             color: 15059763,
                             title:`You have been muted in ${guild.name}` ,
-                            description: `Reasons and details about the mute can be found below:`,
+                            description: `Details regarding the mute can be found below:`,
                             fields: [{
                                 name: "Reason",
                                 value: reason,
@@ -1823,7 +1829,7 @@ client.on('message', async message => {
                               },
                               {
                                 name: "Want to dispute?",
-                                value: "This mute can be disputed reasonably by contacting ModMail. Please quote your identifier which can be found above in your initial message. \nThank you."
+                                value: "This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you."
                               }
                             ],
                             timestamp: new Date(),
@@ -2071,9 +2077,9 @@ client.on('guildBanAdd', function(guild, user){
   bannedUsersFile.set(identifier, user.username)
   bannedUsersFile.save();
 
-  var data = [user.id, user.username, user.discriminator, '001', null, "THIS WAS A SYSTEM BAN", identifier, new Date()];
+  var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
   connection.query(
-    'INSERT INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, identifier, timestamp) VALUES (?,?,?,?,?,?,?,?)', data,
+    'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
     function(err, results){
       if(err) throw err;
     }
