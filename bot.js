@@ -71,15 +71,14 @@ function setupTables(){
         (
           id int                    NOT NULL AUTO_INCREMENT,
           userID VARCHAR(25)        NOT NULL,
-          username VARCHAR(255)     NOT NULL,
-          newNickname VARCHAR(255),
-          oldNickname VARCHAR(255),
-          timestamp DATETIME       NOT NULL,
+          new VARCHAR(255),
+          old VARCHAR(255),
+          timestamp DATETIME        NOT NULL,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -123,14 +122,14 @@ function setupTables(){
         (
           id int                    NOT NULL AUTO_INCREMENT,
           userID VARCHAR(25)        NOT NULL,
-          newUsername VARCHAR(255)  NOT NULL,
-          oldUsername VARCHAR(255),
-          timestamp DATETIME       NOT NULL,
+          new VARCHAR(255),
+          old VARCHAR(255),
+          timestamp DATETIME        NOT NULL,
           PRIMARY KEY (id),
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -173,12 +172,11 @@ function setupTables(){
     `CREATE TABLE IF NOT EXISTS log_guildjoin
         (
           userID VARCHAR(25)       NOT NULL,
-          joinedAs VARCHAR(255)    NOT NULL,
           timestamp DATETIME,
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -191,7 +189,7 @@ function setupTables(){
           FOREIGN KEY (userID) REFERENCES users(userID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_general_ci';`,
+        COLLATE 'utf8mb4_0900_ai_ci';`,
         function(err, results){
           if(err) throw err;
         }
@@ -614,14 +612,13 @@ client.on("ready", () => {
   badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
 
   setupTables();
-  console.log("Bot Active");
+  console.log(`[${new Date()}] Bot Active.`);
 
   client.user.setPresence({
     status: 'idle'
   })
 
-  updateUserTable("system", null)
-  ;
+  updateUserTable("system", null);
   guild = client.guilds.get(config.guildid);
 
   setInterval(checkExpiredMutes, 10000);
@@ -646,7 +643,7 @@ client.on('message', async message => {
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
 
 
-  const args =      message.content.slice(1).trim().split(" ");   //Result: ["<TAG>", "Bad", "person!"]
+  const args =      message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
   const command =   args.shift().toLowerCase();                   //Result: "ban"
 
   //fun commands
@@ -1937,26 +1934,22 @@ client.on('messageDelete', function(message) {
         if(err) throw err;
       }
     );
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 })
 
 client.on('guildMemberAdd', function(member) {
   if(modulesFile.get("EVENT_GUILD_MEMBER_ADD")){
-    var params = [member.user.id, member.user.username, member.user.avatar, 1, new Date(), new Date(), member.user.id, member.user.id, member.user.username, new Date()]
+    var params = [member.user.id, member.user.username, member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()]
     connection.query(
       `
-      INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp, updated) VALUES (?,?,?,?,?,?);
+      INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
       UPDATE users SET exist = 1 WHERE userID = ?;
-      INSERT INTO log_guildjoin (userID, joinedAs, timestamp) VALUES (?,?,?);
+      INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);
       `, params,
       function(err, results){
         if(err) throw err;
       }
     );
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 
   if(modulesFile.get("EVENT_BANNDUSER_DETEC")){
@@ -1975,7 +1968,7 @@ client.on('guildMemberAdd', function(member) {
 client.on('guildMemberRemove', function(member) {
   if(modulesFile.get("EVENT_GUILD_MEMBER_LEAVE")){
     var data = [member.user.id, new Date()]
-    var userLeave = [0, new Date(), member.user.id]
+    var userLeave = [0, member.user.id]
 
     connection.query(
       'INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)', data,
@@ -1984,13 +1977,11 @@ client.on('guildMemberRemove', function(member) {
       }
     );
     connection.query(
-      'UPDATE users SET exist = ?, updated = ? WHERE userID = ?', userLeave,
+      'UPDATE users SET exist = ? WHERE userID = ?', userLeave,
       function(err, results){
         if(err) throw err;
       }
     );
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 })
 
@@ -2022,18 +2013,16 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         }
       );
     }
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 })
 
 client.on('userUpdate', function(oldUser, newUser) {
   if(modulesFile.get("EVENT_USER_UPDATE")){
     //Checking for username changes for logging
-    	if(oldUser.username!==newUser.username){
+    	if(oldUser.username !== newUser.username){
     		var data = [newUser.id, newUser.username, oldUser.username, new Date()]
     		connection.query(
-    		  'INSERT INTO log_username (userID, newUsername, oldUsername, timestamp) VALUES (?,?,?,?)', data,
+    		  'INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)', data,
           function(err, results){
             if(err) throw err;
           }
@@ -2050,8 +2039,6 @@ client.on('userUpdate', function(oldUser, newUser) {
           }
         );
       }
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 })
 
@@ -2059,16 +2046,14 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_MEMBER_UPDATE")){
     //Checking for nickname changes for logging
     	if(oldMember.displayName !== newMember.displayName){
-    		var data = [newMember.user.id, newMember.user.username, newMember.displayName, oldMember.displayName, new Date()]
+    		var data = [newMember.user.id, newMember.displayName, oldMember.displayName, new Date()]
     		connection.query(
-    		  'INSERT INTO log_nickname (userID, username, newnickname, oldnickname, timestamp) VALUES (?,?,?,?,?)', data,
+    		  'INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)', data,
           function(err, results){
             if(err) throw err;
           }
     		);
     	}
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 });
 
