@@ -431,7 +431,7 @@ function updateUserTable(invoker, channel){
                 switch(invoker){
                   case "user":
                     client.channels.get(channel).send({embed: {
-                          color: 3447003,
+                          color: config.color_success,
                           author: {
                             name: client.user.username,
                             icon_url: client.user.displayAvatarURL
@@ -486,7 +486,7 @@ function updateGuildBansTable(invoker, channel){
           switch(invoker){
             case "user":
               client.channels.get(channel).send({embed: {
-                    color: 3447003,
+                    color: config.color_success,
                     author: {
                       name: client.user.username,
                       icon_url: client.user.displayAvatarURL
@@ -660,7 +660,7 @@ client.on('message', async message => {
           break;
       }
     }else{
-      message.channel.send("That module ("+command+") is disabled");
+      message.channel.send(`That module (${command}) is disabled.`);;
     }
   }
   //utility commands
@@ -672,7 +672,7 @@ client.on('message', async message => {
           modulesFile.save();
 
           message.channel.send({embed: {
-                color: 10921638,
+                color: config.color_info,
                 title: "🔶 A module was updated",
                 description: args[0] + " was set to status " + args[1],
                 timestamp: new Date(),
@@ -704,7 +704,7 @@ client.on('message', async message => {
       var moduleValues = _.values(file);
 
       message.channel.send({embed: {
-            color: 4305821,
+            color: config.color_info,
             author: {
               name: client.user.username,
               icon_url: client.user.displayAvatarURL
@@ -744,7 +744,7 @@ client.on('message', async message => {
             function(err, result){
               if(err) throw err;
               if (result) message.channel.send({embed: {
-                    color: 3447003,
+                    color: config.color_info,
                     author: {
                       name: client.user.username,
                       icon_url: client.user.displayAvatarURL
@@ -770,7 +770,7 @@ client.on('message', async message => {
             }
           );
         }else{
-          message.channel.send("That module ("+command+") is disabled");
+          message.channel.send(`That module (${command}) is disabled.`);;
         }
       }//End of permission checking statement
     }
@@ -779,7 +779,7 @@ client.on('message', async message => {
         if(modulesFile.get("COMMAND_USER_UPDATE")){
           updateUserTable("user", message.channel.id);
         }else{
-          message.channel.send("That module ("+command+") is disabled");
+          message.channel.send(`That module (${command}) is disabled.`);;
         }
       }
     }
@@ -803,7 +803,7 @@ client.on('message', async message => {
                   var identifier = cryptoRandomString(10);
                   client.users.get(user).createDM().then(async chnl => {
                     await chnl.send({embed: {
-                          color: 16154127,
+                          color: config.color_warning,
                           title:`You have been banned from ${guild.name}` ,
                           description: `Details about the ban can be found below:`,
                           fields: [{
@@ -830,7 +830,7 @@ client.on('message', async message => {
 
                       guild.ban(user, { days: 1, reason: reason }).then(async result => {
                           await message.channel.send({embed: {
-                                color: 16154127,
+                                color: config.color_success,
                                 author: {
                                   name: client.user.username,
                                   icon_url: client.user.displayAvatarURL
@@ -898,7 +898,7 @@ client.on('message', async message => {
           return;
         }
       }else{
-        message.channel.send("That module ("+command+") is disabled");
+        message.channel.send(`That module (${command}) is disabled.`);;
       }
     }
   }
@@ -924,7 +924,7 @@ client.on('message', async message => {
               guild.unban(user, reason).then(result => {
                 var identifier = cryptoRandomString(10);
                   message.channel.send({embed: {
-                        color: 9911513,
+                        color: config.color_success,
                         author: {
                           name: client.user.username,
                           icon_url: client.user.displayAvatarURL
@@ -1021,7 +1021,7 @@ client.on('message', async message => {
                 if(err) throw err;
 
                 message.channel.send({embed: {
-                      color: 9911513,
+                      color: config.color_success,
                       author: {
                         name: client.user.username,
                         icon_url: client.user.displayAvatarURL
@@ -1082,7 +1082,8 @@ client.on('message', async message => {
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_USER")){
         var userID = parseUserTag(args[0]);
-        var userObject = guild.member(client.users.get(userID));
+        var globalUser = client.users.get(userID);
+        var userObject = guild.member(globalUser);
 
         if(userObject){
           var nickname;
@@ -1094,7 +1095,7 @@ client.on('message', async message => {
           if(userObject.user.presence.game){app = userObject.user.presence.game.name}else{app="None"};
 
           message.channel.send({embed: {
-                color: 14499301,
+                color: config.color_info,
                 author:{
                   name: `${userObject.user.username} (${nickname})`,
                   icon_url: userObject.user.displayAvatarURL
@@ -1133,6 +1134,7 @@ client.on('message', async message => {
             await msg.react("👮");
             await msg.react("🔈");
             await msg.react("✍");
+            await msg.react("📥");
             await msg.react("❌");
 
             const filter = (reaction, user) => user.bot == false;
@@ -1155,20 +1157,35 @@ client.on('message', async message => {
                     await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
                     if(i == max - 1 && extra > 0){warnings.push(`...${extra} more`)}
                   }
-
-                  msg.edit({embed: {
-                        color: 14499301,
-                        author:{
-                          name: `Warnings for ${userObject.user.username} (${nickname})`,
-                          icon_url: userObject.user.displayAvatarURL
-                        },
-                        description: warnings.join(" "),
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                  if(!_.isEmpty(warnings)){
+                    await msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `Warnings for ${userObject.user.username} (${nickname})`,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: warnings.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
                         }
-                      }
-                  });
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: userObject.user.username,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: `There are no recored warnings for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
                 });
               }else if(r.emoji.name == "🔈"){
                 await r.remove(r.users.last());
@@ -1186,19 +1203,35 @@ client.on('message', async message => {
                     await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                     if(i == max - 1 && extra > 0){mutes.push(`...${extra} more`)}
                   }
-                  await msg.edit({embed: {
-                        color: 14499301,
-                        author:{
-                          name: `Mutes for ${userObject.user.username} (${nickname})`,
-                          icon_url: userObject.user.displayAvatarURL
-                        },
-                        description: mutes.join(" "),
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                  if(!_.isEmpty(mutes)){
+                    await msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `Mutes for ${userObject.user.username} (${nickname})`,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: mutes.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
                         }
-                      }
-                  });
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: userObject.user.username,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: `There are no recored mutes for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
                 });
               }else if(r.emoji.name == "❌"){
                 msg.delete();
@@ -1212,25 +1245,40 @@ client.on('message', async message => {
                     var row = rows[i];
                     await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
                   }
-
-                  msg.edit({embed: {
-                        color: 14499301,
-                        author:{
-                          name: `${userObject.user.username} (${nickname})`,
-                          icon_url: userObject.user.displayAvatarURL
-                        },
-                        description: notes.join(" "),
-                        timestamp: new Date(),
-                        footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                  if(!_.isEmpty(notes)){
+                    msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `${userObject.user.username} (${nickname})`,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: notes.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
                         }
-                      }
-                  });
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: userObject.user.username,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: `There are no recored notes for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
                 });
               }else if(r.emoji.name == "👥"){
                 await r.remove(r.users.last());
                 msg.edit({embed: {
-                      color: 14499301,
+                      color: config.color_info,
                       title: `${userObject.user.username} (${nickname})`,
                       description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
                       thumbnail: {
@@ -1262,19 +1310,77 @@ client.on('message', async message => {
                       }
                     }
                 });
+              }else if(r.emoji.name == "📥"){
+                await r.remove(r.users.last());
+                connection.query(`
+                  select Status, timestamp
+                  from(select *, 'join' as Status from log_guildjoin where userid = ?
+                  union
+                  select * , 'leave' as Status from log_guildleave where userid = ?
+                  ) a
+                  order by timestamp desc`, [userID, userID], async function(err, rows, results){
+                  if(err) throw err;
+                  var history = [];
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
+                    var row = rows[i];
+                    switch(row.Status){
+                      case "join":
+                        history.push(`📥 ${userObject.user.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                        break;
+                      case "leave":
+                        history.push(`📤 ${userObject.user.username} left at \`${new Date(row.timestamp)}\`\n\n`);
+                        break;
+                    }
+                    if(i == max - 1 && extra > 0){history.push(`...${extra} more`)}
+                  }
+                  if(!_.isEmpty(history)){
+                    await msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `Join/Leave history for ${userObject.user.username} (${nickname})`,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: history.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: userObject.user.username,
+                            icon_url: userObject.user.displayAvatarURL
+                          },
+                          description: `There are no join/leave records for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
+                });
               }else{return;}
             });
             //collector.on('end');
           }).catch(console.error)
         }else{
           message.channel.send({embed: {
-                color: 14499301,
+                color: config.color_caution,
                 author:{
-                  name: client.user.username,
-                  icon_url: client.user.displayAvatarURL
+                  name: globalUser.username,
+                  icon_url: globalUser.displayAvatarURL
                 },
                 title: `${userID}`,
-                description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
+                description: `The user you provided is not currently camping in this guild\n`,
                 timestamp: new Date(),
                 footer: {
                   text: "Marvin's Little Brother | Current version: " + config.version
@@ -1283,7 +1389,9 @@ client.on('message', async message => {
           }).then(async msg => {
             await msg.react("👥");
             await msg.react("👮");
+            await msg.react("🔈");
             await msg.react("✍");
+            await msg.react("📥");
             await msg.react("❌");
 
             const filter = (reaction, user) => user.bot == false;
@@ -1298,14 +1406,14 @@ client.on('message', async message => {
                   var warnings = [];
                   for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
-                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.content}\`\`\`\n\n`)
+                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
                   }
                   if(!_.isEmpty(warnings)){
                     msg.edit({embed: {
-                          color: 14499301,
+                          color: config.color_info,
                           author:{
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
                           },
                           description: warnings.join(" "),
                           timestamp: new Date(),
@@ -1316,10 +1424,10 @@ client.on('message', async message => {
                     });
                   }else{
                     msg.edit({embed: {
-                          color: 14499301,
+                          color: config.color_caution,
                           author:{
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
                           },
                           description: `There are no recored warnings for this user`,
                           timestamp: new Date(),
@@ -1331,6 +1439,52 @@ client.on('message', async message => {
                   }
 
                 });
+              }else if(r.emoji.name == "🔈"){
+                await r.remove(r.users.last());
+
+                connection.query('select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                  if(err) throw err;
+                  var mutes = [];
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
+                    var row = rows[i];
+                    await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                    if(i == max - 1 && extra > 0){mutes.push(`...${extra} more`)}
+                  }
+                  if(!_.isEmpty(mutes)){
+                    await msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `Mutes for ${globalUser.username}`,
+                            icon_url: globalUser.displayAvatarURL
+                          },
+                          description: mutes.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
+                          },
+                          description: `There are no recored mutes for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
+                });
               }else if(r.emoji.name == "❌"){
                 msg.delete();
                 message.delete();
@@ -1341,14 +1495,14 @@ client.on('message', async message => {
                   var notes = [];
                   for (var i = 0; i < rows.length; i++) {
                     var row = rows[i];
-                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.addedBy)} on ${row.timestamp} \n \`\`\`${row.note}\`\`\`\n\n`)
+                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
                   }
                   if(!_.isEmpty(notes)){
                     msg.edit({embed: {
-                          color: 14499301,
+                          color: config.color_info,
                           author:{
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
                           },
                           description: notes.join(" "),
                           timestamp: new Date(),
@@ -1359,10 +1513,10 @@ client.on('message', async message => {
                     });
                   }else{
                     msg.edit({embed: {
-                          color: 14499301,
+                          color: config.color_caution,
                           author:{
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
                           },
                           description: `There are no recored notes for this user`,
                           timestamp: new Date(),
@@ -1376,37 +1530,76 @@ client.on('message', async message => {
               }else if(r.emoji.name == "👥"){
                 await r.remove(r.users.last());
                 msg.edit({embed: {
-                      color: 14499301,
-                      title: `${userObject.user.username} (${nickname})`,
-                      description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
-                      thumbnail: {
-                        url: userObject.user.displayAvatarURL
+                      color: config.color_caution,
+                      author:{
+                        name: globalUser.username,
+                        icon_url: globalUser.displayAvatarURL
                       },
-                      fields: [
-                        {
-                          name:"Created",
-                          value:userObject.user.createdAt
-                        },
-                        {
-                          name:"Status",
-                          value: userObject.user.presence.status,
-                          inline: true
-                        },
-                        {
-                          name:"Application",
-                          value:`${app}`,
-                          inline: true
-                        },
-                        {
-                          name:"Voice channel",
-                          value:`${voiceChannel}`
-                        }
-                      ],
+                      title: `${userID}`,
+                      description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
                       timestamp: new Date(),
                       footer: {
                         text: "Marvin's Little Brother | Current version: " + config.version
                       }
                     }
+                });
+              }else if(r.emoji.name == "📥"){
+                await r.remove(r.users.last());
+                connection.query(`
+                  select Status, timestamp
+                  from(select *, 'join' as Status from log_guildjoin where userid = ?
+                  union
+                  select * , 'leave' as Status from log_guildleave where userid = ?
+                  ) a
+                  order by timestamp desc`, [userID, userID], async function(err, rows, results){
+                  if(err) throw err;
+                  var history = [];
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
+                    var row = rows[i];
+                    switch(row.Status){
+                      case "join":
+                        history.push(`📥 ${globalUser.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                        break;
+                      case "leave":
+                        history.push(`📤 ${globalUser.username} left at \`${new Date(row.timestamp)}\`\n\n`);
+                        break;
+                    }
+                    if(i == max - 1 && extra > 0){history.push(`...${extra} more`)}
+                  }
+                  if(!_.isEmpty(history)){
+                    await msg.edit({embed: {
+                          color: config.color_info,
+                          author:{
+                            name: `Join/Leave history for ${globalUser.username}`,
+                            icon_url: globalUser.displayAvatarURL
+                          },
+                          description: history.join(" "),
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }else{
+                    await msg.edit({embed: {
+                          color: config.color_caution,
+                          author:{
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
+                          },
+                          description: `There are no join/leave records for this user`,
+                          timestamp: new Date(),
+                          footer: {
+                            text: "Marvin's Little Brother | Current version: " + config.version
+                          }
+                        }
+                    });
+                  }
                 });
               }else{return;}
             });
@@ -1444,7 +1637,7 @@ client.on('message', async message => {
                   if(err) throw err;
 
                   message.channel.send({embed: {
-                        color: 9911513,
+                        color: config.color_success,
                         author: {
                           name: client.user.username,
                           icon_url: client.user.displayAvatarURL
@@ -1469,7 +1662,7 @@ client.on('message', async message => {
 
                   client.users.get(user).createDM().then(async chnl => {
                     await chnl.send({embed: {
-                          color: 15059763,
+                          color: config.color_caution,
                           title:`You have been warned in ${guild.name}` ,
                           description: `Details about the warning can be found below:`,
                           fields: [{
@@ -1560,7 +1753,7 @@ client.on('message', async message => {
                   if(deleted > 0){
                     var identifier = cryptoRandomString(10);
                     guild.channels.find(chnl => chnl.name === "helpers").send({embed: {
-                          color: 4514375,
+                          color: config.color_success,
                           title:`[Action] Messages cleared` ,
                           description: `The latest ${deleted} message(s) written by ${user} were removed from ${channel}\n\nThis action was carried out by ${message.author}\n`,
                           timestamp: new Date(),
@@ -1778,7 +1971,7 @@ client.on('message', async message => {
                 guild.member(user).addRole(mutedRole)
                   .then(member => {
                     message.channel.send({embed: {
-                          color: 9911513,
+                          color: config.color_success,
                           author: {
                             name: client.user.username,
                             icon_url: client.user.displayAvatarURL
@@ -1807,7 +2000,7 @@ client.on('message', async message => {
 
                     member.createDM().then(async chnl => {
                       await chnl.send({embed: {
-                            color: 15059763,
+                            color: config.color_caution,
                             title:`You have been muted in ${guild.name}` ,
                             description: `Details regarding the mute can be found below:`,
                             fields: [{
