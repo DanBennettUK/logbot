@@ -21,6 +21,7 @@ var fs                    = require("fs");
 const cryptoRandomString  = require('crypto-random-string');
 var stringSimilarity      = require('string-similarity');
 const editJsonFile        = require("edit-json-file");
+const bfj                 = require('bfj');
 const changelog           = require("./changelog.json");
 const modulesFilePath     = './modules.json';
 var modules               = require("./modules.json");
@@ -31,7 +32,8 @@ var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
 
 var mutedFile             = editJsonFile("./muted.json");
-var reminderFile            = editJsonFile("./reminders.json");
+var reminderFile          = editJsonFile("./reminders.json");
+var usercardsFile          = editJsonFile("./usercards.json");
 
 
 var badWordList;
@@ -606,9 +608,100 @@ function checkReminders(){
     }
   }
 }
+function importWarnings(){
+  var warnings = usercardsFile.get();
+  var insert = [];
+
+  for(var i = 0; i < warnings.length; i++){
+    if(warnings[i].Records.length > 0){
+      var userID = warnings[i].DiscordId.$numberLong
+      var actioner;
+      for(var a = 0; a < warnings[i].Records.length; a++){
+        if(warnings[i].Records[a]._t[1] == "WarnRecord"){
+          insert.push([userID, warnings[i].Records[a].AddedByUserId.$numberLong, warnings[i].Records[a].Reason, cryptoRandomString(10), 0, warnings[i].Records[a].ActionTaken.$date, new Date()]);
+        }
+      }
+    }
+  }
+
+  connection.query(
+    'INSERT IGNORE INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?', [insert],
+    function(err, results){
+      if(err) throw err;
+      if(results){
+        console.log("Success!");
+      }
+    }
+  );
+}
+function importMutes(){
+  var mutes = usercardsFile.get();
+  var insert = [];
+
+  for(var i = 0; i < mutes.length; i++){
+    if(mutes[i].Records.length > 0){
+      var userID = mutes[i].DiscordId.$numberLong
+      var actioner;
+      for(var a = 0; a < mutes[i].Records.length; a++){
+        if(mutes[i].Records[a]._t[1] == "MuteRecord"){
+          var split;
+          var seconds = 0;
+          split = mutes[i].Records[a].Duration.split(":");
+
+          for(var b = 0; b < 3; b++){
+            let int;
+            if(split[b]=="00"){int = 0}else{int = parseInt(split[b])}
+            if(b == 0){
+              seconds += (int * 60 * 60);
+            }else if(b == 1){
+              seconds += (int * 60);
+            }else if(b == 2){
+              seconds += int;
+            }else{
+              return;
+            }
+          }
+          insert.push([userID, mutes[i].Records[a].AddedByUserId.$numberLong, mutes[i].Records[a].Reason, seconds, cryptoRandomString(10), 0, mutes[i].Records[a].ActionTaken.$date, new Date()]);
+        }
+      }
+    }
+  }
+
+  connection.query(
+    'INSERT IGNORE INTO log_mutes (userID, actioner, description, length, identifier, isDeleted, timestamp, updated) VALUES ?', [insert],
+    function(err, results){
+      if(err) throw err;
+      if(results){
+        console.log("Success!");
+      }
+    }
+  );
+}
+function importNotes(){
+  var notes = usercardsFile.get();
+  var insert = [];
+
+  for(var i = 0; i < notes.length; i++){
+    if(notes[i].Notes.length > 0){
+      var userID = notes[i].DiscordId.$numberLong;
+      for(var a = 0; a < notes[i].Notes.length; a++){
+        insert.push([userID, notes[i].Notes[a].AddedByUserId.$numberLong, notes[i].Notes[a].Message, cryptoRandomString(10), 0, notes[i].Notes[a].ActionTaken.$date, new Date()]);
+      }
+    }
+  }
+
+  connection.query(
+    'INSERT IGNORE INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?', [insert],
+    function(err, results){
+      if(err) throw err;
+      if(results){
+        console.log("Success!");
+      }
+    }
+  );
+}
 
 client.on("ready", () => {
-
   badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
 
   setupTables();
@@ -617,6 +710,10 @@ client.on("ready", () => {
   client.user.setPresence({
     status: 'idle'
   })
+
+  //importWarnings();
+  //importMutes();
+  //importNotes();
 
   updateUserTable("system", null);
   guild = client.guilds.get(config.guildid);
