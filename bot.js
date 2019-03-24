@@ -576,7 +576,7 @@ function checkExpiredMutes(){
       if(actionee){
         actionee.removeRole(mutedRole)
           .then(member => {
-            guild.channels.find(val => val.name === "server-log-test").send(`${member} has been unmuted`);
+            guild.channels.find(val => val.name === "server-log").send(`${member} has been unmuted`);
             mutedFile.unset(i);
             mutedFile.save();
           })
@@ -615,7 +615,6 @@ function importWarnings(){
   for(var i = 0; i < warnings.length; i++){
     if(warnings[i].Records.length > 0){
       var userID = warnings[i].DiscordId.$numberLong
-      var actioner;
       for(var a = 0; a < warnings[i].Records.length; a++){
         if(warnings[i].Records[a]._t[1] == "WarnRecord"){
           insert.push([userID, warnings[i].Records[a].AddedByUserId.$numberLong, warnings[i].Records[a].Reason, cryptoRandomString(10), 0, warnings[i].Records[a].ActionTaken.$date, new Date()]);
@@ -641,7 +640,6 @@ function importMutes(){
   for(var i = 0; i < mutes.length; i++){
     if(mutes[i].Records.length > 0){
       var userID = mutes[i].DiscordId.$numberLong
-      var actioner;
       for(var a = 0; a < mutes[i].Records.length; a++){
         if(mutes[i].Records[a]._t[1] == "MuteRecord"){
           var split;
@@ -700,6 +698,56 @@ function importNotes(){
     }
   );
 }
+function importBans(){
+  var bans = usercardsFile.get();
+  var insert = [];
+
+  for(var i = 0; i < bans.length; i++){
+    if(bans[i].Records.length > 0){
+      var userID = bans[i].DiscordId.$numberLong
+      for(var a = 0; a < bans[i].Records.length; a++){
+        if(bans[i].Records[a]._t[1] == "BanRecord"){
+          insert.push([userID, bans[i].Records[a].AddedByUserId.$numberLong, bans[i].Records[a].Reason, cryptoRandomString(10), 0, bans[i].Records[a].ActionTaken.$date, new Date()]);
+        }
+      }
+    }
+  }
+
+  connection.query(
+    'INSERT IGNORE INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?', [insert],
+    function(err, results){
+      if(err) throw err;
+      if(results){
+        console.log("Success!");
+      }
+    }
+  );
+}
+function importUnbans(){
+  var unbans = usercardsFile.get();
+  var insert = [];
+
+  for(var i = 0; i < unbans.length; i++){
+    if(unbans[i].Records.length > 0){
+      var userID = unbans[i].DiscordId.$numberLong
+      for(var a = 0; a < unbans[i].Records.length; a++){
+        if(unbans[i].Records[a]._t[1] == "UnbanRecord"){
+          insert.push([userID, unbans[i].Records[a].AddedByUserId.$numberLong, unbans[i].Records[a].Reason, cryptoRandomString(10), 0, unbans[i].Records[a].ActionTaken.$date, new Date()]);
+        }
+      }
+    }
+  }
+
+  connection.query(
+    'INSERT IGNORE INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?', [insert],
+    function(err, results){
+      if(err) throw err;
+      if(results){
+        console.log("Success!");
+      }
+    }
+  );
+}
 
 client.on("ready", () => {
   badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
@@ -714,6 +762,8 @@ client.on("ready", () => {
   //importWarnings();
   //importMutes();
   //importNotes();
+  //importBans();
+  //importUnbans();
 
   updateUserTable("system", null);
   guild = client.guilds.get(config.guildid);
@@ -1275,7 +1325,7 @@ client.on('message', async message => {
                             name: userObject.user.username,
                             icon_url: userObject.user.displayAvatarURL
                           },
-                          description: `There are no recored warnings for this user`,
+                          description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1321,7 +1371,7 @@ client.on('message', async message => {
                             name: userObject.user.username,
                             icon_url: userObject.user.displayAvatarURL
                           },
-                          description: `There are no recored mutes for this user`,
+                          description: `There are no recorded mutes for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1363,7 +1413,7 @@ client.on('message', async message => {
                             name: userObject.user.username,
                             icon_url: userObject.user.displayAvatarURL
                           },
-                          description: `There are no recored notes for this user`,
+                          description: `There are no recorded notes for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1526,7 +1576,7 @@ client.on('message', async message => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                           },
-                          description: `There are no recored warnings for this user`,
+                          description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1573,7 +1623,7 @@ client.on('message', async message => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                           },
-                          description: `There are no recored mutes for this user`,
+                          description: `There are no recorded mutes for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1615,7 +1665,7 @@ client.on('message', async message => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                           },
-                          description: `There are no recored notes for this user`,
+                          description: `There are no recorded notes for this user`,
                           timestamp: new Date(),
                           footer: {
                             text: "Marvin's Little Brother | Current version: " + config.version
@@ -1977,13 +2027,13 @@ client.on('message', async message => {
     }
 
   if(command === "disconnect"){
-    if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
       if(modulesFile.get("COMMAND_DISCONNECT")){
         var user = parseUserTag(args[0]);
         var guildUser = guild.member(user);
 
         if(user !== "err" && guildUser){
-          client.channels.get("333691731461537812").clone("-", false, false, `Disconnecting ${guildUser.username}`).then(async channel => {
+          client.channels.get("558360321459486726").clone("-", false, false, `Disconnecting ${guildUser.username}`).then(async channel => {
             guildUser.setVoiceChannel(channel).then(async member => {
               await channel.delete();
               message.channel.send(`${guildUser} was successfully removed from their voice channel.`)
@@ -2154,7 +2204,6 @@ client.on('message', async message => {
   if(command === "remindme"){
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(modulesFile.get("COMMAND_REMINDME")){
-        //>remindme 1d Check that user!
         var user = message.author.id;
         var end;
         var int = args[0].replace(/[a-zA-Z]$/g, "");
@@ -2362,6 +2411,8 @@ client.on('guildBanAdd', function(guild, user){
 });
 
 client.on('error', console.error);
+
+client.on('warn', warn => {console.log(warn);});
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
