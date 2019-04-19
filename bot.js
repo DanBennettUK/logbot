@@ -33,7 +33,8 @@ var bannedUsersFile       = editJsonFile("./banned_users.json");
 
 var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
-var usercardsFile          = editJsonFile("./usercards.json");
+var usercardsFile         = editJsonFile("./usercards.json");
+var customCommands         = editJsonFile("./customCommands.json");
 
 
 var badWordList;
@@ -456,7 +457,7 @@ function updateUserTable(invoker, channel){
                           ],
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                       }
@@ -512,7 +513,7 @@ function updateGuildBansTable(invoker, channel){
                     ],
                     timestamp: new Date(),
                     footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
+                      text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                   }
                 }
@@ -528,7 +529,7 @@ function updateGuildBansTable(invoker, channel){
   });
 }
 function syntaxErr(message, command){
-  message.channel.send(`There is a problem in your syntax. If you need help, use ${config.prefix}help ${command} \n\n *😫 pst, the help command isn't a thing yet, sorry!*`).
+  message.channel.send(`There is a problem in your syntax.`).
     then(msg => {
       setTimeout(async ()=>{
         await message.delete();
@@ -590,19 +591,21 @@ function checkExpiredMutes(){
   }
 }
 function checkReminders(){
-  let reminders = reminderFile.read();
+  var reminders = reminderFile.read();
+  var reminderKeys = _.keys(reminders)
 
-  for(var i in reminders){
-    if(reminders[i].end < (Math.floor(Date.now() / 1000))){
-      var member = guild.member(reminders[i].who);
+  for(var a = 0; a < reminderKeys.length; a++){
+    let key = reminderKeys[a]
+    if(reminders[key].end < (Math.floor(Date.now() / 1000))){
+      var member = guild.member(reminders[key].who);
       if(member){
         member.createDM().then(async chnl => {
-          await chnl.send(`Hey ${member}, it's been ${reminders[i].length} since you set a reminder - \n\n ${reminders[i].reminder}`);
-          reminderFile.unset(i);
+          await chnl.send(`Hey ${member}, it's been ${reminders[key].length} since you set a reminder - \n\n ${reminders[key].reminder}`);
+          reminderFile.unset(key);
           reminderFile.save();
         }).catch(console.error)
       }else{
-        reminderFile.unset(i);
+        reminderFile.unset(key);
         reminderFile.save();
       }
     }
@@ -769,7 +772,7 @@ client.on("ready", () => {
   guild = client.guilds.get(config.guildid);
 
   setInterval(checkExpiredMutes, 10000);
-  setInterval(checkReminders, 30000);
+  setInterval(checkReminders, 15000);
 });
 
 client.on('message', async message => {
@@ -792,6 +795,14 @@ client.on('message', async message => {
 
   const args =      message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
   const command =   args.shift().toLowerCase();                   //Result: "ban"
+
+  if(modulesFile.get("COMMAND_CUSTOMCOMMANDS")){
+    if(_.keys(customCommands.read()).includes(command)){
+      message.channel.send(`${customCommands.get(command)}`);
+    }
+  }else{
+    message.channel.send(`That module (custom commands) is disabled.`);;
+  }
 
   //fun commands
   if(command === "flipacoin"){
@@ -824,7 +835,7 @@ client.on('message', async message => {
                 description: args[0] + " was set to status " + args[1],
                 timestamp: new Date(),
                 footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
+                  text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
               }
             }
@@ -874,7 +885,7 @@ client.on('message', async message => {
             ],
             timestamp: new Date(),
             footer: {
-              text: "Marvin's Little Brother | Current version: " + config.version
+              text: `Marvin's Little Brother | Current version: ${config.version}`
             }
           }
         }
@@ -909,7 +920,7 @@ client.on('message', async message => {
                     ],
                     timestamp: new Date(),
                     footer: {
-                      text: "Marvin's Little Brother | Current version: " + config.version
+                      text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                   }
                 }
@@ -968,7 +979,7 @@ client.on('message', async message => {
                           ],
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     }).then(dm => {
@@ -1009,7 +1020,7 @@ client.on('message', async message => {
                                 ],
                                 timestamp: new Date(),
                                 footer: {
-                                  text: "Marvin's Little Brother | Current version: " + config.version
+                                  text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
                               }
                           });
@@ -1103,7 +1114,7 @@ client.on('message', async message => {
                         ],
                         timestamp: new Date(),
                         footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                          text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                       }
                   });
@@ -1179,10 +1190,14 @@ client.on('message', async message => {
                           name: "Content",
                           value: note
                         },
+                        {
+                            name: "Identifier",
+                            value: identifier
+                          },
                       ],
                       timestamp: new Date(),
                       footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
                       }
                     }
                 });
@@ -1273,7 +1288,7 @@ client.on('message', async message => {
                 ],
                 timestamp: new Date(),
                 footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
+                  text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
               }
           }).then(async msg => {
@@ -1314,7 +1329,7 @@ client.on('message', async message => {
                           description: warnings.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1328,7 +1343,7 @@ client.on('message', async message => {
                           description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1360,7 +1375,7 @@ client.on('message', async message => {
                           description: mutes.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1374,7 +1389,7 @@ client.on('message', async message => {
                           description: `There are no recorded mutes for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1402,7 +1417,7 @@ client.on('message', async message => {
                           description: notes.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1416,7 +1431,7 @@ client.on('message', async message => {
                           description: `There are no recorded notes for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1453,7 +1468,7 @@ client.on('message', async message => {
                       ],
                       timestamp: new Date(),
                       footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
                       }
                     }
                 });
@@ -1495,7 +1510,7 @@ client.on('message', async message => {
                           description: history.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1509,7 +1524,7 @@ client.on('message', async message => {
                           description: `There are no join/leave records for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1530,7 +1545,7 @@ client.on('message', async message => {
                 description: `The user you provided is not currently camping in this guild\n`,
                 timestamp: new Date(),
                 footer: {
-                  text: "Marvin's Little Brother | Current version: " + config.version
+                  text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
               }
           }).then(async msg => {
@@ -1565,7 +1580,7 @@ client.on('message', async message => {
                           description: warnings.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1579,7 +1594,7 @@ client.on('message', async message => {
                           description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1612,7 +1627,7 @@ client.on('message', async message => {
                           description: mutes.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1626,7 +1641,7 @@ client.on('message', async message => {
                           description: `There are no recorded mutes for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1654,7 +1669,7 @@ client.on('message', async message => {
                           description: notes.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1668,7 +1683,7 @@ client.on('message', async message => {
                           description: `There are no recorded notes for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1686,7 +1701,7 @@ client.on('message', async message => {
                       description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
                       timestamp: new Date(),
                       footer: {
-                        text: "Marvin's Little Brother | Current version: " + config.version
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
                       }
                     }
                 });
@@ -1728,7 +1743,7 @@ client.on('message', async message => {
                           description: history.join(" "),
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1742,7 +1757,7 @@ client.on('message', async message => {
                           description: `There are no join/leave records for this user`,
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -1802,7 +1817,7 @@ client.on('message', async message => {
                         ],
                         timestamp: new Date(),
                         footer: {
-                          text: "Marvin's Little Brother | Current version: " + config.version
+                          text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                       }
                   });
@@ -1827,7 +1842,7 @@ client.on('message', async message => {
                           ],
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     }).then(dm => {
@@ -2032,15 +2047,15 @@ client.on('message', async message => {
         var user = parseUserTag(args[0]);
         var guildUser = guild.member(user);
 
-        if(user !== "err" && guildUser){
-          client.channels.get("558360321459486726").clone("-", false, false, `Disconnecting ${guildUser.username}`).then(async channel => {
+        if((user !== "err" && guildUser) && guildUser.voiceChannel !== null){
+          client.channels.get("333691731461537812").clone("Disconnecting..", false, false, "Reason").then(async channel => {
             guildUser.setVoiceChannel(channel).then(async member => {
               await channel.delete();
-              message.channel.send(`${guildUser} was successfully removed from their voice channel.`)
+              message.channel.send(`${member} was successfully removed from their voice channel.`);
             }).catch(console.error)
           }).catch(console.error)
         }else{
-          message.channel.send("The user provided was not found.")
+          message.channel.send("The user provided was not found or is not in a voice channel.");
         }
       }else{
         message.channel.send(`That module (${command}) is disabled.`);
@@ -2117,6 +2132,14 @@ client.on('message', async message => {
 
                 guild.member(user).addRole(mutedRole)
                   .then(member => {
+                    if(member.voiceChannel !== undefined){
+                      client.channels.get("333691731461537812").clone("disconnecting..", false, false, `Disconnecting ${member.username}`).then(async channel => {
+                        member.setVoiceChannel(channel).then(async () => {
+                          await channel.delete();
+                        }).catch(console.error)
+                      }).catch(console.error)
+                    }
+
                     message.channel.send({embed: {
                           color: config.color_success,
                           author: {
@@ -2131,12 +2154,18 @@ client.on('message', async message => {
                             },
                             {
                               name: "Identifier",
-                              value: identifier
+                              value: identifier,
+                              inline: true
+                            },
+                            {
+                              name: "Note",
+                              value: `I also attempted to disconnect the user from their voice channel`,
+                              inline: true
                             },
                           ],
                           timestamp: new Date(),
                           footer: {
-                            text: "Marvin's Little Brother | Current version: " + config.version
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                           }
                         }
                     });
@@ -2171,7 +2200,7 @@ client.on('message', async message => {
                             ],
                             timestamp: new Date(),
                             footer: {
-                              text: "Marvin's Little Brother | Current version: " + config.version
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
                           }
                       }).then(dm => {
@@ -2237,7 +2266,19 @@ client.on('message', async message => {
             reminderFile.set(`${user}${end}.length`, args[0])
             reminderFile.save();
 
-            message.channel.send(`I will remind you in ${args[0]} to - ${reminder}`);
+            message.channel.send({embed: {
+                  color: config.color_success,
+                  author: {
+                    name: client.user.username,
+                    icon_url: client.user.displayAvatarURL
+                  },
+                  title: `Reminder Set` ,
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
+                }
+            });
           }else{
             message.channel.send("Please provide a reminder note.")
           }
@@ -2258,8 +2299,6 @@ client.on('messageUpdate', function(oldMessage, newMessage) {
         if(err) throw err;
       }
     );
-  }else{
-    //EVENT IS NOT ONLINE!!
   }
 })
 
@@ -2327,7 +2366,7 @@ client.on('guildMemberRemove', function(member) {
 client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
     var data = []
-    if(oldMember.voiceChannel){ //Were in a channel to begin with
+    if(oldMember.voiceChannel){
       if(newMember.voiceChannel){
         if(oldMember.voiceChannel.id !== newMember.voiceChannel.id){
           data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()]
