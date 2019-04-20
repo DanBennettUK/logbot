@@ -12,6 +12,7 @@
 
 const Discord             = require("discord.js");
 const client              = new Discord.Client();
+const antispam            = require('discord-anti-spam');
 var guild;
 const Store               = require('data-store');
 const mysql               = require('mysql2');
@@ -759,7 +760,7 @@ client.on("ready", () => {
   console.log(`[${new Date()}] Bot Active.`);
 
   client.user.setPresence({
-    status: 'idle'
+    status: 'online'
   })
 
   //importWarnings();
@@ -770,6 +771,19 @@ client.on("ready", () => {
 
   updateUserTable("system", null);
   guild = client.guilds.get(config.guildid);
+
+  antispam(client, {
+     warnBuffer: 4, // Maximum ammount of messages allowed to send in the interval time before getting warned.
+     //maxBuffer: 5, // Maximum amount of messages allowed to send in the interval time before getting banned.
+     interval: 2000, // Amount of time in ms users can send the maxim amount of messages(maxBuffer) before getting banned.
+     warningMessage: "please stop spamming!", // Message users receive when warned. (message starts with '@User, ' so you only need to input continue of it.)
+     //banMessage: "has been hit by ban hammer for spamming!", // Message sent in chat when user is banned. (message starts with '@User, ' so you only need to input continue of it.)
+     maxDuplicatesWarning: 7,// Maximum amount of duplicate messages a user can send in a timespan before getting warned.
+     //maxDuplicatesBan: 10, // Maximum amount of duplicate messages a user can send in a timespan before getting banned.
+     //deleteMessagesAfterBanForPastDays: 7, // Deletes the message history of the banned user in x days.
+     //exemptRoles: ["Admins", "Moderators"], // Name of roles (case sensitive) that are exempt from spam filter.
+     //exemptUsers: ["MrAugu#9016"] // The Discord tags of the users (e.g: MrAugu#9016) (case sensitive) that are exempt from spam filter.
+   });
 
   setInterval(checkExpiredMutes, 10000);
   setInterval(checkReminders, 15000);
@@ -787,6 +801,8 @@ client.on('message', async message => {
       if(err) throw err;
     }
 	);
+
+  client.emit('checkMessage', message); //anti-spam
 
   if(modulesFile.get("EVENT_CHECKMESSAGECONTENT")){checkMessageContent(message);}
 
@@ -2071,7 +2087,6 @@ client.on('message', async message => {
         fs.appendFile('badWords.txt', ', '+string, (err) => {
           if (err) throw err;
           badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
-          console.log(badWordList);
           message.channel.send(`\`${string}\` added`);
         });
       }
