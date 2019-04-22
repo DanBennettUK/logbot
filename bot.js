@@ -772,19 +772,6 @@ client.on("ready", () => {
   updateUserTable("system", null);
   guild = client.guilds.get(config.guildid);
 
-  antispam(client, {
-     warnBuffer: 4, // Maximum ammount of messages allowed to send in the interval time before getting warned.
-     //maxBuffer: 5, // Maximum amount of messages allowed to send in the interval time before getting banned.
-     interval: 2000, // Amount of time in ms users can send the maxim amount of messages(maxBuffer) before getting banned.
-     warningMessage: "please stop spamming!", // Message users receive when warned. (message starts with '@User, ' so you only need to input continue of it.)
-     //banMessage: "has been hit by ban hammer for spamming!", // Message sent in chat when user is banned. (message starts with '@User, ' so you only need to input continue of it.)
-     maxDuplicatesWarning: 7,// Maximum amount of duplicate messages a user can send in a timespan before getting warned.
-     //maxDuplicatesBan: 10, // Maximum amount of duplicate messages a user can send in a timespan before getting banned.
-     //deleteMessagesAfterBanForPastDays: 7, // Deletes the message history of the banned user in x days.
-     //exemptRoles: ["Admins", "Moderators"], // Name of roles (case sensitive) that are exempt from spam filter.
-     //exemptUsers: ["MrAugu#9016"] // The Discord tags of the users (e.g: MrAugu#9016) (case sensitive) that are exempt from spam filter.
-   });
-
   setInterval(checkExpiredMutes, 10000);
   setInterval(checkReminders, 15000);
 });
@@ -802,8 +789,6 @@ client.on('message', async message => {
     }
 	);
 
-  client.emit('checkMessage', message); //anti-spam
-
   if(modulesFile.get("EVENT_CHECKMESSAGECONTENT")){checkMessageContent(message);}
 
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
@@ -812,13 +797,13 @@ client.on('message', async message => {
   const args =      message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
   const command =   args.shift().toLowerCase();                   //Result: "ban"
 
-  if(modulesFile.get("COMMAND_CUSTOMCOMMANDS")){
-    if(_.keys(customCommands.read()).includes(command)){
-      message.channel.send(`${customCommands.get(command)}`);
-    }
-  }else{
-    message.channel.send(`That module (custom commands) is disabled.`);;
-  }
+  // if(modulesFile.get("COMMAND_CUSTOMCOMMANDS")){
+  //   if(_.keys(customCommands.read()).includes(command)){
+  //     message.channel.send(`${customCommands.get(command)}`);
+  //   }
+  // }else{
+  //   message.channel.send(`That module (custom commands) is disabled.`);;
+  // }
 
   //fun commands
   if(command === "flipacoin"){
