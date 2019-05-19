@@ -60,5 +60,18 @@
     },
     "changed": {},
     "destroyed":{}
+  },
+  "6":{
+    "date": "2019-05-19",
+    "version": "v1.025",
+    "added":{
+      "1": "Reminders",
+      "2": "Bad word filtering",
+      "3": "Custom commands",
+      "4": "Users are now disconnected from their voice channel upon mute",
+      "5": "Helper command: Mute"
+    },
+    "changed": {},
+    "destroyed":{}
   }
 }

@@ -1,3 +1,17 @@
 {
-  "dad": "https://i.imgur.com/L7ss6YI.png"
+  "dad": {
+    "content": "https://i.imgur.com/L7ss6YI.png",
+    "cooldown": 15,
+    "end": 1558301750
+  },
+  "bandan": {
+    "content": "I agree. #BanDan",
+    "cooldown": 15,
+    "end": 1556220300
+  },
+  "help": {
+    "content": "Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail",
+    "cooldown": 10,
+    "end": 1558301672
+  }
 }

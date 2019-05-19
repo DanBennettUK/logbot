@@ -1,33 +1,31 @@
 /*
-##################################################
-##           Command Process Guideline          ##
-##                                              ##
-##            Check author permissions          ##
-##        Check arg(s) positions/existence      ##
-##         Check parsed user tag validity       ##
-##          Check guild member existence        ##
-##             ?Check following args            ##
-##################################################
+#############################################################
+##             Logger - Marvin's Younger Brother           ##
+##            Created and maintained by Sys#1602           ##
+##                                                         ##
+##       with ♡ from all those at /r/PUBATTLEGROUNDS       ##
+#############################################################
 */
-
 const Discord             = require("discord.js");
-const client              = new Discord.Client();
-const antispam            = require('discord-anti-spam');
+
 var guild;
-const Store               = require('data-store');
+var badWordList;
+var fs                    = require("fs");
+const bfj                 = require('bfj');
 const mysql               = require('mysql2');
 var moment                = require('moment');
+const client              = new Discord.Client();
+const Store               = require('data-store');
 var _                     = require('underscore');
-var fs                    = require("fs");
-const cryptoRandomString  = require('crypto-random-string');
-var stringSimilarity      = require('string-similarity');
-const editJsonFile        = require("edit-json-file");
-const bfj                 = require('bfj');
-const changelog           = require("./changelog.json");
-const modulesFilePath     = './modules.json';
-var modules               = require("./modules.json");
 const config              = require("./config.json");
-var modulesFile           = editJsonFile(modulesFilePath);
+const editJsonFile        = require("edit-json-file");
+var modules               = require("./modules.json");
+const changelog           = require("./changelog.json");
+const antispam            = require('discord-anti-spam');
+var stringSimilarity      = require('string-similarity');
+const cryptoRandomString  = require('crypto-random-string');
+
+var modulesFile           = editJsonFile("./modules.json");
 
 var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
@@ -35,10 +33,7 @@ var bannedUsersFile       = editJsonFile("./banned_users.json");
 var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
 var usercardsFile         = editJsonFile("./usercards.json");
-var customCommands         = editJsonFile("./customCommands.json");
-
-
-var badWordList;
+var customCommands        = editJsonFile("./customCommands.json");
 
 const connection = mysql.createConnection({
   host: config.host,
@@ -47,7 +42,6 @@ const connection = mysql.createConnection({
   database: config.database,
   multipleStatements: config.multipleStatements,
 });
-
 connection.connect(function(err, results){
   if (err) throw err;
 });
@@ -546,46 +540,46 @@ function isNull(value, def){
   }
 }
 function checkMessageContent(message){
-  if(message.member.roles.some(role=>["Moderators, Subreddit Mods"].includes(role.name))){
-    var wholeMessage = (message.content).split(" ");
+  var wholeMessage = (message.content).split(" ");
 
-    if(badWordList.some(word => wholeMessage.includes(word))){
-      message.delete()
-        .then(() =>{
-          message.channel.send(`${message.author} watch your language`)
-            .then(msg => {
-              setTimeout(async() =>{
-                await msg.delete();
-              },5000);
-            }).catch(console.error);
+  if(badWordList.some(word => wholeMessage.includes(word))){
+    message.delete()
+      .then(() =>{
+        message.channel.send(`${message.author} watch your language`)
+          .then(msg => {
+            setTimeout(async() =>{
+              await msg.delete();
+            },5000);
+          }).catch(console.error);
 
-          var data = [message.author.id, message.channel.id, message.content, new Date()];
-          connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
-            if(err) throw err;
-          });
-        }).catch(console.error);
-    }
+        var data = [message.author.id, message.channel.id, message.content, new Date()];
+        connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
+          if(err) throw err;
+        });
+      }).catch(console.error);
   }
 }
 function checkExpiredMutes(){
-  let mutes = mutedFile.read();
+  var mutes = mutedFile.read();
+  var muteKeys = _.keys(mutes);
 
-  for(var i in mutes){
-    if(mutes[i].end < (Math.floor(Date.now() / 1000))){
-      var actionee = guild.member(i);
+  for(var a = 0; a < muteKeys.length; a++){
+    let key = muteKeys[a];
+    if(mutes[key].end < (Math.floor(Date.now() / 1000))){
+      var actionee = guild.member(key);
       var mutedRole = guild.roles.find(val => val.name === "Muted");
 
       if(actionee){
         actionee.removeRole(mutedRole)
           .then(member => {
             guild.channels.find(val => val.name === "server-log").send(`${member} has been unmuted`);
-            mutedFile.unset(i);
+            mutedFile.unset(key);
             mutedFile.save();
           })
           .catch(console.error);
       }else{
-        console.log(`Actionee could not be found ${i}`);
-        mutedFile.unset(i);
+        console.log(`Actionee could not be found ${key}`);
+        mutedFile.unset(key);
         mutedFile.save();
       }
     }
@@ -593,23 +587,22 @@ function checkExpiredMutes(){
 }
 function checkReminders(){
   var reminders = reminderFile.read();
-  var reminderKeys = _.keys(reminders)
+  var reminderKeys = _.keys(reminders);
 
   for(var a = 0; a < reminderKeys.length; a++){
-    let key = reminderKeys[a]
-    if(reminders[key].end < (Math.floor(Date.now() / 1000))){
-      var member = guild.member(reminders[key].who);
+    var current = reminders[reminderKeys[a]];
+    if(current.end < (Math.floor(Date.now() / 1000))){
+      let member = guild.member(current.who);
       if(member){
-        member.createDM().then(async chnl => {
-          await chnl.send(`Hey ${member}, it's been ${reminders[key].length} since you set a reminder - \n\n ${reminders[key].reminder}`);
-          reminderFile.unset(key);
-          reminderFile.save();
+        member.createDM().then(chnl => {
+         chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
+          reminderFile.unset(reminderKeys[a]);
         }).catch(console.error)
       }else{
-        reminderFile.unset(key);
-        reminderFile.save();
+        reminderFile.unset(reminderKeys[a]);
       }
     }
+    reminderFile.save();
   }
 }
 function importWarnings(){
@@ -773,7 +766,7 @@ client.on("ready", () => {
   guild = client.guilds.get(config.guildid);
 
   setInterval(checkExpiredMutes, 10000);
-  setInterval(checkReminders, 15000);
+  //setInterval(checkReminders, 15000);
 });
 
 client.on('message', async message => {
@@ -794,16 +787,17 @@ client.on('message', async message => {
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
 
 
-  const args =      message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
-  const command =   args.shift().toLowerCase();                   //Result: "ban"
+  const args    = message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
+  const command = args.shift().toLowerCase();                   //Result: "ban"
 
-  // if(modulesFile.get("COMMAND_CUSTOMCOMMANDS")){
-  //   if(_.keys(customCommands.read()).includes(command)){
-  //     message.channel.send(`${customCommands.get(command)}`);
-  //   }
-  // }else{
-  //   message.channel.send(`That module (custom commands) is disabled.`);;
-  // }
+  if(_.keys(customCommands.read()).includes(command)){
+    var obj = customCommands.get(command)
+    if(obj.end < Math.floor(Date.now() / 1000)){
+      message.channel.send(`${obj.content}`);
+      customCommands.set(`${command}.end`, (Math.floor(Date.now() / 1000)+obj.cooldown));
+      customCommands.save();
+    }
+  }
 
   //fun commands
   if(command === "flipacoin"){
@@ -1263,7 +1257,7 @@ client.on('message', async message => {
                   name: `${userObject.user.username} (${nickname})`,
                   icon_url: userObject.user.displayAvatarURL
                 },
-                description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
+                description: `${userObject.user} joined the guild on ${userObject.joinedAt}`,
                 thumbnail: {
                   url: userObject.user.displayAvatarURL
                 },
@@ -2020,7 +2014,6 @@ client.on('message', async message => {
                             }
                         });
                         var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
-                        console.log(data);
                         connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data, function(err, results){
                           if (err) throw err;
                         });
