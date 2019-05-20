@@ -818,7 +818,7 @@ client.on('message', async message => {
   }
   //utility commands
   if(command === "module"){
-    if(message.member.roles.some(role=>["Admins"].includes(role.name))){
+    if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
       if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
         if([0,1].includes(parseInt(args[1]))){ //Parses the string as an int, then checks if the result is a valid <Int> & it's either a 0 or 1
           modulesFile.set(args[0], parseInt(args[1]));
@@ -1529,7 +1529,7 @@ client.on('message', async message => {
             });
             //collector.on('end');
           }).catch(console.error)
-        }else{
+        }else if(globalUser){
           message.channel.send({embed: {
                 color: config.color_caution,
                 author:{
@@ -1558,7 +1558,7 @@ client.on('message', async message => {
               if(r.emoji.name == "👮"){
                 await r.remove(r.users.last());
 
-                connection.query('select * from log_warn where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
                   if(err) throw err;
                   var warnings = [];
                   for (var i = 0; i < rows.length; i++) {
@@ -1647,7 +1647,7 @@ client.on('message', async message => {
                 message.delete();
               }else if(r.emoji.name == "✍"){
                 await r.remove(r.users.last());
-                connection.query('select * from log_note where userID = ? and isDeleted = 0', userID, async function(err, rows, results){
+                connection.query('select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
                   if(err) throw err;
                   var notes = [];
                   for (var i = 0; i < rows.length; i++) {
@@ -1762,6 +1762,242 @@ client.on('message', async message => {
             });
             //collector.on('end');
           }).catch(console.error)
+        }else{
+          connection.query('select * from users where userid = ? order by updated desc limit 1', userID, async function(err, rows, results){
+            var cardUser = rows[0];
+            message.channel.send({embed: {
+                  color: config.color_caution,
+                  author:{
+                    name: `${cardUser.username}`,
+                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                  },
+                  title: `${userID}`,
+                  description: `This user could not be resolved. All data will be taken from the database.`,
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
+                }
+            }).then(async msg => {
+              await msg.react("👥");
+              await msg.react("👮");
+              await msg.react("🔈");
+              await msg.react("✍");
+              await msg.react("📥");
+              await msg.react("❌");
+
+              const filter = (reaction, user) => user.bot == false;
+              const collector = msg.createReactionCollector(filter);
+
+              collector.on('collect', async r =>{
+                if(r.emoji.name == "👮"){
+                  await r.remove(r.users.last());
+
+                  connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                    if(err) throw err;
+                    var warnings = [];
+                    for (var i = 0; i < rows.length; i++) {
+                      var row = rows[i];
+                      await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
+                    }
+                    if(!_.isEmpty(warnings)){
+                      msg.edit({embed: {
+                            color: config.color_info,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: warnings.join(" "),
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }else{
+                      msg.edit({embed: {
+                            color: config.color_caution,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: `There are no recorded warnings for this user`,
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }
+
+                  });
+                }else if(r.emoji.name == "🔈"){
+                  await r.remove(r.users.last());
+
+                  connection.query('select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                    if(err) throw err;
+                    var mutes = [];
+                    var max = 5;
+                    var extra;
+
+                    if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                    for (var i = 0; i < max; i++) {
+                      var row = rows[i];
+                      await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                      if(i == max - 1 && extra > 0){mutes.push(`...${extra} more`)}
+                    }
+                    if(!_.isEmpty(mutes)){
+                      await msg.edit({embed: {
+                            color: config.color_info,
+                            author:{
+                              name: `Mutes for ${cardUser.username}`,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: mutes.join(" "),
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }else{
+                      await msg.edit({embed: {
+                            color: config.color_caution,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: `There are no recorded mutes for this user`,
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }
+                  });
+                }else if(r.emoji.name == "❌"){
+                  msg.delete();
+                  message.delete();
+                }else if(r.emoji.name == "✍"){
+                  await r.remove(r.users.last());
+                  connection.query('select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                    if(err) throw err;
+                    var notes = [];
+                    for (var i = 0; i < rows.length; i++) {
+                      var row = rows[i];
+                      await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
+                    }
+                    if(!_.isEmpty(notes)){
+                      msg.edit({embed: {
+                            color: config.color_info,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: notes.join(" "),
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }else{
+                      msg.edit({embed: {
+                            color: config.color_caution,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: `There are no recorded notes for this user`,
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }
+                  });
+                }else if(r.emoji.name == "👥"){
+                  await r.remove(r.users.last());
+                  msg.edit({embed: {
+                        color: config.color_caution,
+                        author:{
+                          name: cardUser.username,
+                          icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                        },
+                        title: `${userID}`,
+                        description: `This user could not be resolved. All data will be taken from the database.`,
+                        timestamp: new Date(),
+                        footer: {
+                          text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                      }
+                  });
+                }else if(r.emoji.name == "📥"){
+                  await r.remove(r.users.last());
+                  connection.query(`
+                    select Status, timestamp
+                    from(select *, 'join' as Status from log_guildjoin where userid = ?
+                    union
+                    select * , 'leave' as Status from log_guildleave where userid = ?
+                    ) a
+                    order by timestamp desc`, [userID, userID], async function(err, rows, results){
+                    if(err) throw err;
+                    var history = [];
+                    var max = 5;
+                    var extra;
+
+                    if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+
+                    for (var i = 0; i < max; i++) {
+                      var row = rows[i];
+                      switch(row.Status){
+                        case "join":
+                          history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                          break;
+                        case "leave":
+                          history.push(`📤 ${cardUser.username} left at \`${new Date(row.timestamp)}\`\n\n`);
+                          break;
+                      }
+                      if(i == max - 1 && extra > 0){history.push(`...${extra} more`)}
+                    }
+                    if(!_.isEmpty(history)){
+                      await msg.edit({embed: {
+                            color: config.color_info,
+                            author:{
+                              name: `Join/Leave history for ${cardUser.username}`,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: history.join(" "),
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }else{
+                      await msg.edit({embed: {
+                            color: config.color_caution,
+                            author:{
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                            },
+                            description: `There are no join/leave records for this user`,
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
+                    }
+                  });
+                }else{return;}
+              });
+              //collector.on('end');
+            }).catch(console.error)
+          });
         }
       }else{
         message.channel.send(`That module (${command}) is disabled.`);
@@ -1977,7 +2213,7 @@ client.on('message', async message => {
                     guild.member(user).addRole(mutedRole)
                       .then(member => {
                         if(member.voiceChannel !== undefined){
-                          client.channels.get("333691731461537812").clone("disconnecting..", false, false, `Disconnecting ${member.username}`).then(async channel => {
+                          client.channels.get(config.voice_AFK).clone("disconnecting..", false, false, `Disconnecting ${member.username}`).then(async channel => {
                             member.setVoiceChannel(channel).then(async () => {
                               await channel.delete();
                             }).catch(console.error)
@@ -2175,7 +2411,7 @@ client.on('message', async message => {
         var guildUser = guild.member(user);
 
         if((user !== "err" && guildUser) && guildUser.voiceChannel !== undefined){
-          client.channels.get("558360734719934534").clone("Disconnecting..", false, false, `Disconnecting ${guildUser.user.username}#${guildUser.user.discriminator}`).then(async channel => {
+          client.channels.get(config.voice_AFK).clone("Disconnecting..", false, false, `Disconnecting ${guildUser.user.username}#${guildUser.user.discriminator}`).then(async channel => {
             guildUser.setVoiceChannel(channel).then(async member => {
               await channel.delete();
               message.channel.send(`${member} was successfully removed from their voice channel.`);
@@ -2260,7 +2496,7 @@ client.on('message', async message => {
                 guild.member(user).addRole(mutedRole)
                   .then(member => {
                     if(member.voiceChannel !== undefined){
-                      client.channels.get("333691731461537812").clone("disconnecting..", false, false, `Disconnecting ${member.username}`).then(async channel => {
+                      client.channels.get(config.voice_AFK).clone("disconnecting..", false, false, `Disconnecting ${member.username}`).then(async channel => {
                         member.setVoiceChannel(channel).then(async () => {
                           await channel.delete();
                         }).catch(console.error)
@@ -2411,6 +2647,37 @@ client.on('message', async message => {
           }
       }
     }
+    }
+  }
+
+  if(command === "status"){
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+
+      var client_PING = client.ping;
+      var db_PING = connection.ping();
+
+      var client_STATUS;
+      var db_STATUS;
+
+      if(client_PING >= 1 && client_PING <= 500){
+        client_STATUS = "OK";
+      }else if(client_PING > 500 && client_PING <= 5000){
+        client_STATUS = "Degraded";
+      }else{client_STATUS = "Severely Degraded or Error";}
+
+      if(db_PING){
+        db_STATUS = "OK";
+      }else{db_STATUS = "Severely Degraded or Error";}
+
+      message.channel.send({embed: {
+            color: config.color_info,
+            description: `**Client -** ${client_STATUS} (${client_PING}ms)\n **Database -** ${db_STATUS}`,
+            timestamp: new Date(),
+            footer: {
+              text: `Marvin's Little Brother | Current version: ${config.version}`
+            }
+          }
+      });
     }
   }
 

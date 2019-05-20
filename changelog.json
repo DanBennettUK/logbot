@@ -69,7 +69,8 @@
       "2": "Bad word filtering",
       "3": "Custom commands",
       "4": "Users are now disconnected from their voice channel upon mute",
-      "5": "Helper command: Mute"
+      "5": "Helper command: Mute",
+      "6": "Status command"
     },
     "changed": {},
     "destroyed":{}

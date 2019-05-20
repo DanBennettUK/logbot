@@ -1,4 +1,5 @@
 config.json
+customCommands.json
 
 
 # OS generated files #
@@ -17,3 +18,4 @@ Thumbs.db
 *.sql
 *.sqlite
 banned_users.json
+customCommands.json
