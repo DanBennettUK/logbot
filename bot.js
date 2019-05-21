@@ -1150,7 +1150,7 @@ client.on('message', async message => {
   }
 
   if(command === "note"){
-    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(modulesFile.get("COMMAND_NOTE")){
         if(args[0]){
           var user = parseUserTag(args[0]);
@@ -1209,7 +1209,7 @@ client.on('message', async message => {
   }
 
   if(command === "cnote"){
-    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(modulesFile.get("COMMAND_CNOTE")){
         if(args[0].length == 10){
           connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
@@ -1301,27 +1301,41 @@ client.on('message', async message => {
               if(r.emoji.name == "👮"){
                 await r.remove(r.users.last());
 
-                connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                connection.query(`
+                  (select 'ban' as \`type\`, gb.* from log_guildbans gb
+                  where userid = ${connection.escape(userID)}
+                  	and gb.isDeleted = 0
+                  	and gb.actioner <> '001'
+                  union all
+                  select 'warn' as \`type\`, w.* from log_warn w
+                  where userid = ${connection.escape(userID)}
+                  	and w.isDeleted = 0)
+                  order by timestamp desc
+                  `, async function(err, rows, results){
                   if(err) throw err;
-                  var warnings = [];
+                  var events = [];
                   var max = 5;
                   var extra;
 
-                  if(rows.length <= 5){max = rows.length;}else{extra = rows.length - max;}
+                  if(rows.length <= max){max = rows.length;}else{extra = rows.length - max;}
 
                   for (var i = 0; i < max; i++) {
                     var row = rows[i];
-                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
-                    if(i == max - 1 && extra > 0){warnings.push(`...${extra} more`)}
+                    if(row.type == "warn"){
+                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                    }else{
+                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                    }
+                    if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                   }
-                  if(!_.isEmpty(warnings)){
+                  if(!_.isEmpty(events)){
                     await msg.edit({embed: {
                           color: config.color_info,
                           author:{
                             name: `Warnings for ${userObject.user.username} (${nickname})`,
                             icon_url: userObject.user.displayAvatarURL
                           },
-                          description: warnings.join(" "),
+                          description: events.join(" "),
                           timestamp: new Date(),
                           footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1436,8 +1450,11 @@ client.on('message', async message => {
                 await r.remove(r.users.last());
                 msg.edit({embed: {
                       color: config.color_info,
-                      title: `${userObject.user.username} (${nickname})`,
-                      description: `${userObject.user.username} joined the guild on ${userObject.joinedAt}`,
+                      author:{
+                        name: `${userObject.user.username} (${nickname})`,
+                        icon_url: userObject.user.displayAvatarURL
+                      },
+                      description: `${userObject.user} joined the guild on ${userObject.joinedAt}`,
                       thumbnail: {
                         url: userObject.user.displayAvatarURL
                       },
@@ -1537,7 +1554,7 @@ client.on('message', async message => {
                   icon_url: globalUser.displayAvatarURL
                 },
                 title: `${userID}`,
-                description: `The user you provided is not currently camping in this guild\n`,
+                description: `The user you provided is not currently camping in this guild.`,
                 timestamp: new Date(),
                 footer: {
                   text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1558,21 +1575,41 @@ client.on('message', async message => {
               if(r.emoji.name == "👮"){
                 await r.remove(r.users.last());
 
-                connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                connection.query(`
+                  (select 'ban' as \`type\`, gb.* from log_guildbans gb
+                  where userid = ${connection.escape(userID)}
+                    and gb.isDeleted = 0
+                    and gb.actioner <> '001'
+                  union all
+                  select 'warn' as \`type\`, w.* from log_warn w
+                  where userid = ${connection.escape(userID)}
+                    and w.isDeleted = 0)
+                  order by timestamp desc
+                  `, async function(err, rows, results){
                   if(err) throw err;
-                  var warnings = [];
-                  for (var i = 0; i < rows.length; i++) {
+                  var events = [];
+                  var max = 5;
+                  var extra;
+
+                  if(rows.length <= max){max = rows.length;}else{extra = rows.length - max;}
+
+                  for (var i = 0; i < max; i++) {
                     var row = rows[i];
-                    await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
+                    if(row.type == "warn"){
+                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                    }else{
+                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                    }
+                    if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                   }
-                  if(!_.isEmpty(warnings)){
-                    msg.edit({embed: {
+                  if(!_.isEmpty(events)){
+                    await msg.edit({embed: {
                           color: config.color_info,
                           author:{
-                            name: globalUser.username,
-                            icon_url: globalUser.displayAvatarURL
+                            name: `Warnings for ${userObject.user.username} (${nickname})`,
+                            icon_url: userObject.user.displayAvatarURL
                           },
-                          description: warnings.join(" "),
+                          description: events.join(" "),
                           timestamp: new Date(),
                           footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1580,11 +1617,11 @@ client.on('message', async message => {
                         }
                     });
                   }else{
-                    msg.edit({embed: {
+                    await msg.edit({embed: {
                           color: config.color_caution,
                           author:{
-                            name: globalUser.username,
-                            icon_url: globalUser.displayAvatarURL
+                            name: userObject.user.username,
+                            icon_url: userObject.user.displayAvatarURL
                           },
                           description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
@@ -1594,7 +1631,6 @@ client.on('message', async message => {
                         }
                     });
                   }
-
                 });
               }else if(r.emoji.name == "🔈"){
                 await r.remove(r.users.last());
@@ -1693,7 +1729,7 @@ client.on('message', async message => {
                         icon_url: globalUser.displayAvatarURL
                       },
                       title: `${userID}`,
-                      description: `The user you provided is not currently camping in this guild \n\n More information will be available here soon!`,
+                      description: `The user you provided is not currently camping in this guild.`,
                       timestamp: new Date(),
                       footer: {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1793,21 +1829,41 @@ client.on('message', async message => {
                 if(r.emoji.name == "👮"){
                   await r.remove(r.users.last());
 
-                  connection.query('select * from log_warn where userID = ? and isDeleted = 0 order by timestamp desc', userID, async function(err, rows, results){
+                  connection.query(`
+                    (select 'ban' as \`type\`, gb.* from log_guildbans gb
+                    where userid = ${connection.escape(userID)}
+                      and gb.isDeleted = 0
+                      and gb.actioner <> '001'
+                    union all
+                    select 'warn' as \`type\`, w.* from log_warn w
+                    where userid = ${connection.escape(userID)}
+                      and w.isDeleted = 0)
+                    order by timestamp desc
+                    `, async function(err, rows, results){
                     if(err) throw err;
-                    var warnings = [];
-                    for (var i = 0; i < rows.length; i++) {
+                    var events = [];
+                    var max = 5;
+                    var extra;
+
+                    if(rows.length <= max){max = rows.length;}else{extra = rows.length - max;}
+
+                    for (var i = 0; i < max; i++) {
                       var row = rows[i];
-                      await warnings.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`)
+                      if(row.type == "warn"){
+                        await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      }else{
+                        await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      }
+                      if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                     }
-                    if(!_.isEmpty(warnings)){
-                      msg.edit({embed: {
+                    if(!_.isEmpty(events)){
+                      await msg.edit({embed: {
                             color: config.color_info,
                             author:{
-                              name: cardUser.username,
-                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                              name: `Warnings for ${userObject.user.username} (${nickname})`,
+                              icon_url: userObject.user.displayAvatarURL
                             },
-                            description: warnings.join(" "),
+                            description: events.join(" "),
                             timestamp: new Date(),
                             footer: {
                               text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1815,11 +1871,11 @@ client.on('message', async message => {
                           }
                       });
                     }else{
-                      msg.edit({embed: {
+                      await msg.edit({embed: {
                             color: config.color_caution,
                             author:{
-                              name: cardUser.username,
-                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                              name: userObject.user.username,
+                              icon_url: userObject.user.displayAvatarURL
                             },
                             description: `There are no recorded warnings for this user`,
                             timestamp: new Date(),
@@ -1829,7 +1885,6 @@ client.on('message', async message => {
                           }
                       });
                     }
-
                   });
                 }else if(r.emoji.name == "🔈"){
                   await r.remove(r.users.last());
