@@ -794,6 +794,7 @@ client.on('message', async message => {
     var obj = customCommands.get(command)
     if(obj.end < Math.floor(Date.now() / 1000)){
       message.channel.send(`${obj.content}`);
+      message.delete();
       customCommands.set(`${command}.end`, (Math.floor(Date.now() / 1000)+obj.cooldown));
       customCommands.save();
     }
