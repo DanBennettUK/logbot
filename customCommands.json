@@ -10,22 +10,22 @@
     "end": 1558304005
   },
   "patch": {
-      "content": "Servers are down for the patch and will be up soon!"
+      "content": "Servers are down for the patch and will be up soon!",
       "cooldown": 15,
       "end": ""
   },
   "chickendinner":{
-      "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg"
+      "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
       "cooldown": 60,
       "end": ""
   },
   "voicechat": {
-      "content": "We're still working on voice chat issues with Discord staff. Please bear with us while we work on getting them resolved."
+      "content": "We're still working on voice chat issues with Discord staff. Please bear with us while we work on getting them resolved.",
       "cooldown": 15,
       "end": ""
   },
   "down": {
-      "content": "The servers are down right now, keep an eye on #game-announcements for updates!"
+      "content": "The servers are down right now, keep an eye on #game-announcements for updates!",
       "cooldown": 15,
       "end": ""
   }
