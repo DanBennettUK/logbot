@@ -1,4 +1,4 @@
-/*
+﻿/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
@@ -1210,7 +1210,7 @@ client.on('message', async message => {
   }
 
   if(command === "cnote"){
-    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_CNOTE")){
         if(args[0].length == 10){
           connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
