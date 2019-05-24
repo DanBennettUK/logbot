@@ -25,7 +25,7 @@
       "end": ""
   },
   "down": {
-      "content": "The servers are down right now, keep an eye on #game-announcements for updates!",
+      "content": "The servers are down right now, keep an eye on <#289467450074988545> for updates!",
       "cooldown": 15,
       "end": ""
   }
