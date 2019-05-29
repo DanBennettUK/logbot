@@ -1303,14 +1303,20 @@ client.on('message', async message => {
                 await r.remove(r.users.last());
 
                 connection.query(`
-                  (select 'ban' as \`type\`, gb.* from log_guildbans gb
-                  where userid = ${connection.escape(userID)}
-                  	and gb.isDeleted = 0
-                  	and gb.actioner <> '001'
+                  (
+                  select 'unban' as \`type\`, gub.* from log_guildunbans gub
+                    where gub.userid = ${connection.escape(userID)}
+                    	and gub.isDeleted = 0
+                  union all
+                  select 'ban' as \`type\`, gb.* from log_guildbans gb
+                    where gb.userid = ${connection.escape(userID)}
+                  	 and gb.isDeleted = 0
+                  	  and gb.actioner <> '001'
                   union all
                   select 'warn' as \`type\`, w.* from log_warn w
-                  where userid = ${connection.escape(userID)}
-                  	and w.isDeleted = 0)
+                    where w.userid = ${connection.escape(userID)}
+                  	 and w.isDeleted = 0
+                   )
                   order by timestamp desc
                   `, async function(err, rows, results){
                   if(err) throw err;
@@ -1323,9 +1329,11 @@ client.on('message', async message => {
                   for (var i = 0; i < max; i++) {
                     var row = rows[i];
                     if(row.type == "warn"){
-                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                    }else if(row.type == "ban"){
+                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                     }else{
-                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                     }
                     if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                   }
@@ -1336,7 +1344,7 @@ client.on('message', async message => {
                             name: `Warnings for ${userObject.user.username} (${nickname})`,
                             icon_url: userObject.user.displayAvatarURL
                           },
-                          description: events.join(" "),
+                          description: events.join(`\n`),
                           timestamp: new Date(),
                           footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1577,14 +1585,20 @@ client.on('message', async message => {
                 await r.remove(r.users.last());
 
                 connection.query(`
-                  (select 'ban' as \`type\`, gb.* from log_guildbans gb
-                  where userid = ${connection.escape(userID)}
-                    and gb.isDeleted = 0
-                    and gb.actioner <> '001'
+                  (
+                  select 'unban' as \`type\`, gub.* from log_guildunbans gub
+                    where gub.userid = ${connection.escape(userID)}
+                    	and gub.isDeleted = 0
+                  union all
+                  select 'ban' as \`type\`, gb.* from log_guildbans gb
+                    where gb.userid = ${connection.escape(userID)}
+                  	 and gb.isDeleted = 0
+                  	  and gb.actioner <> '001'
                   union all
                   select 'warn' as \`type\`, w.* from log_warn w
-                  where userid = ${connection.escape(userID)}
-                    and w.isDeleted = 0)
+                    where w.userid = ${connection.escape(userID)}
+                  	 and w.isDeleted = 0
+                   )
                   order by timestamp desc
                   `, async function(err, rows, results){
                   if(err) throw err;
@@ -1597,9 +1611,11 @@ client.on('message', async message => {
                   for (var i = 0; i < max; i++) {
                     var row = rows[i];
                     if(row.type == "warn"){
-                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                    }else if(row.type == "ban"){
+                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                     }else{
-                      await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                      await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                     }
                     if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                   }
@@ -1607,10 +1623,10 @@ client.on('message', async message => {
                     await msg.edit({embed: {
                           color: config.color_info,
                           author:{
-                            name: `Warnings for ${userObject.user.username} (${nickname})`,
-                            icon_url: userObject.user.displayAvatarURL
+                            name: `Warnings for ${globalUser.username}`,
+                            icon_url: globalUser.displayAvatarURL
                           },
-                          description: events.join(" "),
+                          description: events.join(`\n`),
                           timestamp: new Date(),
                           footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1621,8 +1637,8 @@ client.on('message', async message => {
                     await msg.edit({embed: {
                           color: config.color_caution,
                           author:{
-                            name: userObject.user.username,
-                            icon_url: userObject.user.displayAvatarURL
+                            name: globalUser.username,
+                            icon_url: globalUser.displayAvatarURL
                           },
                           description: `There are no recorded warnings for this user`,
                           timestamp: new Date(),
@@ -1831,14 +1847,20 @@ client.on('message', async message => {
                   await r.remove(r.users.last());
 
                   connection.query(`
-                    (select 'ban' as \`type\`, gb.* from log_guildbans gb
-                    where userid = ${connection.escape(userID)}
-                      and gb.isDeleted = 0
-                      and gb.actioner <> '001'
+                    (
+                    select 'unban' as \`type\`, gub.* from log_guildunbans gub
+                      where gub.userid = ${connection.escape(userID)}
+                      	and gub.isDeleted = 0
+                    union all
+                    select 'ban' as \`type\`, gb.* from log_guildbans gb
+                      where gb.userid = ${connection.escape(userID)}
+                    	 and gb.isDeleted = 0
+                    	  and gb.actioner <> '001'
                     union all
                     select 'warn' as \`type\`, w.* from log_warn w
-                    where userid = ${connection.escape(userID)}
-                      and w.isDeleted = 0)
+                      where w.userid = ${connection.escape(userID)}
+                    	 and w.isDeleted = 0
+                     )
                     order by timestamp desc
                     `, async function(err, rows, results){
                     if(err) throw err;
@@ -1851,9 +1873,11 @@ client.on('message', async message => {
                     for (var i = 0; i < max; i++) {
                       var row = rows[i];
                       if(row.type == "warn"){
-                        await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                        await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                      }else if(row.type == "ban"){
+                        await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                       }else{
-                        await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                        await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
                       }
                       if(i == max - 1 && extra > 0){events.push(`...${extra} more`)}
                     }
@@ -1861,10 +1885,10 @@ client.on('message', async message => {
                       await msg.edit({embed: {
                             color: config.color_info,
                             author:{
-                              name: `Warnings for ${userObject.user.username} (${nickname})`,
-                              icon_url: userObject.user.displayAvatarURL
+                              name: `Warnings for ${cardUser.username}`,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                             },
-                            description: events.join(" "),
+                            description: events.join(`\n`),
                             timestamp: new Date(),
                             footer: {
                               text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1875,8 +1899,8 @@ client.on('message', async message => {
                       await msg.edit({embed: {
                             color: config.color_caution,
                             author:{
-                              name: userObject.user.username,
-                              icon_url: userObject.user.displayAvatarURL
+                              name: cardUser.username,
+                              icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                             },
                             description: `There are no recorded warnings for this user`,
                             timestamp: new Date(),
