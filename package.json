@@ -1,0 +1,38 @@
+{
+  "name": "logbot",
+  "version": "1.026",
+  "description": "Logbot AKA Logger",
+  "main": "bot.js",
+  "dependencies": {
+    "bfj": "^6.1.1",
+    "curl-request": "^1.1.1",
+    "data-store": "^3.1.0",
+    "crypto-random-string": "^1.0.0",
+    "drg-music2": "^1.4.2",
+    "discord.js": "^11.4.2",
+    "discord-anti-spam": "^2.0.0",
+    "edit-json-file": "^1.2.0",
+    "moment": "^2.24.0",
+    "node-opus": "^0.3.1",
+    "mysql2": "^1.6.4",
+    "selly.gg": "^1.0.4",
+    "shuffle-array": "^1.0.1",
+    "string-similarity": "^3.0.0",
+    "underscore": "^1.9.1",
+    "update-json-file": "^1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FMWK/logbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FMWK/logbot/issues"
+  },
+  "homepage": "https://github.com/FMWK/logbot#readme"
+}

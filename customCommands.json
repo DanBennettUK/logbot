@@ -2,7 +2,7 @@
   "dad": {
     "content": "https://i.imgur.com/L7ss6YI.png",
     "cooldown": 15,
-    "end": 1558637355
+    "end": 1559250493
   },
   "help": {
     "content": "Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail",
@@ -28,5 +28,19 @@
       "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
       "cooldown": 15,
       "end": ""
+=======
+    "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
+    "cooldown": 15,
+    "end": 1559395771
+  },
+  "voicechat": {
+    "content": "We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
+    "cooldown": 15,
+    "end": 1559395854
+  },
+  "down": {
+    "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
+    "cooldown": 15,
+    "end": 1559395794
   }
 }

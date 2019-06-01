@@ -74,5 +74,21 @@
     },
     "changed": {},
     "destroyed":{}
+  },
+  "7":{
+    "date": "2019-05-30",
+    "version": "v1.026",
+    "added":{
+      "1": "New custom commands",
+      "2": "Custom command triggers are now deleted once successfully posted",
+      "3": "Updated the discordjs package which fixes some nice things such as 'Ignore voice states referencing an invalid channel' and 'GuildMembers removed from their VoiceChannel when leaving the guild'",
+      "4": "A user's total record count is now displayed when adding a warning or mute (Total count includes all active warnings, mutes and bans)",
+      "5": "Removed ability to clear notes as Support",
+      "6": "Ban detection now shows all bans that a username matches against with a similarity of >0.5"
+    },
+    "changed": {
+      "1": "Altered ban message delivered to recipient via DM"
+    },
+    "destroyed":{}
   }
 }
