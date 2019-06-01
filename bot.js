@@ -2413,9 +2413,10 @@ client.on('message', async message => {
               for (var i = rows.length - 1; i >= 0; i--) {
                 var row = rows[i];
 
-                if(rows[i-1]){
-                  if(row.type !== 3){
-                    var next = rows[i-1];
+                if(rows[i-1]){ //We have a next event
+                  var next = rows[i-1];
+
+                  if(row.type !== 3 && ([2,3].indexOf(next.type) > -1)){ //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
                     var time1 = row.timestamp;
                     var time2 = next.timestamp;
 
@@ -2433,12 +2434,11 @@ client.on('message', async message => {
                     current.push(row.newChannel);
                     timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
                   }
-                }else if(!rows[i-1] && ([1,2].indexOf(row.type) > -1)){
+                }else if(!rows[i-1] && ([1,2].indexOf(row.type) > -1)){ //No next event available AND current event is a fresh join or move. i.e, we can assume they are still here.
                   current.push(row.newChannel)
                   times.push("Active");
                   timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
-                }else{
-                }
+                }else{}
               }
               times.reverse();
               current.reverse();
@@ -2823,26 +2823,28 @@ client.on('guildMemberAdd', function(member) {
       }
     }
 
-    data.push(identifiers); //If this work - ew.....you motherfucker, it did.
+    if(identifiers.length > 0){
+      data.push(identifiers); //If this work - ew.....you motherfucker, it did.
 
-    connection.query('select * from log_guildbans where identifier in (?)', data, function(err, rows, results){
-      if (err) throw err;
-      for(var b = 0; b < rows.length; b++){
-        var row = rows[b];
-        message.push(`\`(${((hits[b].rating).toString()).substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
-      }
+      connection.query('select * from log_guildbans where identifier in (?)', data, function(err, rows, results){
+        if (err) throw err;
+        for(var b = 0; b < rows.length; b++){
+          var row = rows[b];
+          message.push(`\`(${((hits[b].rating).toString()).substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
+        }
 
-      guild.channels.find(val => val.name === 'server-log').send({embed: {
-            color: config.color_warning,
-            title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)` ,
-            description: message.join(""),
-            timestamp: new Date(),
-            footer: {
-              text: `Marvin's Little Brother | Current version: ${config.version}`
+        guild.channels.find(val => val.name === 'server-log').send({embed: {
+              color: config.color_warning,
+              title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)` ,
+              description: message.join(""),
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
             }
-          }
+        });
       });
-    });
+    }
   }
 })
 
