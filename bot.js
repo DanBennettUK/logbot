@@ -1,4 +1,4 @@
-/*
+﻿/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
