@@ -459,7 +459,7 @@ function updateUserTable(invoker, channel){
                     );
                     break;
                   case "system":
-                    console.log("[INFO] Found " + memberArray.length + " users. Users that are not in the database will be added now.");
+                    console.log(`[INFO] Found ${memberArray.length} users.`);
                     break;
                 }
               }
@@ -614,7 +614,7 @@ function importWarnings(){
       var userID = warnings[i].DiscordId.$numberLong
       for(var a = 0; a < warnings[i].Records.length; a++){
         if(warnings[i].Records[a]._t[1] == "WarnRecord"){
-          insert.push([userID, warnings[i].Records[a].AddedByUserId.$numberLong, warnings[i].Records[a].Reason, cryptoRandomString(10), 0, warnings[i].Records[a].ActionTaken.$date, new Date()]);
+          insert.push([userID, warnings[i].Records[a].AddedByUserId.$numberLong, warnings[i].Records[a].Reason, cryptoRandomString({length: 10}), 0, warnings[i].Records[a].ActionTaken.$date, new Date()]);
         }
       }
     }
@@ -656,7 +656,7 @@ function importMutes(){
               return;
             }
           }
-          insert.push([userID, mutes[i].Records[a].AddedByUserId.$numberLong, mutes[i].Records[a].Reason, seconds, cryptoRandomString(10), 0, mutes[i].Records[a].ActionTaken.$date, new Date()]);
+          insert.push([userID, mutes[i].Records[a].AddedByUserId.$numberLong, mutes[i].Records[a].Reason, seconds, cryptoRandomString({length: 10}), 0, mutes[i].Records[a].ActionTaken.$date, new Date()]);
         }
       }
     }
@@ -680,7 +680,7 @@ function importNotes(){
     if(notes[i].Notes.length > 0){
       var userID = notes[i].DiscordId.$numberLong;
       for(var a = 0; a < notes[i].Notes.length; a++){
-        insert.push([userID, notes[i].Notes[a].AddedByUserId.$numberLong, notes[i].Notes[a].Message, cryptoRandomString(10), 0, notes[i].Notes[a].ActionTaken.$date, new Date()]);
+        insert.push([userID, notes[i].Notes[a].AddedByUserId.$numberLong, notes[i].Notes[a].Message, cryptoRandomString({length: 10}), 0, notes[i].Notes[a].ActionTaken.$date, new Date()]);
       }
     }
   }
@@ -704,7 +704,7 @@ function importBans(){
       var userID = bans[i].DiscordId.$numberLong
       for(var a = 0; a < bans[i].Records.length; a++){
         if(bans[i].Records[a]._t[1] == "BanRecord"){
-          insert.push([userID, bans[i].Records[a].AddedByUserId.$numberLong, bans[i].Records[a].Reason, cryptoRandomString(10), 0, bans[i].Records[a].ActionTaken.$date, new Date()]);
+          insert.push([userID, bans[i].Records[a].AddedByUserId.$numberLong, bans[i].Records[a].Reason, cryptoRandomString({length: 10}), 0, bans[i].Records[a].ActionTaken.$date, new Date()]);
         }
       }
     }
@@ -729,7 +729,7 @@ function importUnbans(){
       var userID = unbans[i].DiscordId.$numberLong
       for(var a = 0; a < unbans[i].Records.length; a++){
         if(unbans[i].Records[a]._t[1] == "UnbanRecord"){
-          insert.push([userID, unbans[i].Records[a].AddedByUserId.$numberLong, unbans[i].Records[a].Reason, cryptoRandomString(10), 0, unbans[i].Records[a].ActionTaken.$date, new Date()]);
+          insert.push([userID, unbans[i].Records[a].AddedByUserId.$numberLong, unbans[i].Records[a].Reason, cryptoRandomString({length: 10}), 0, unbans[i].Records[a].ActionTaken.$date, new Date()]);
         }
       }
     }
@@ -750,7 +750,10 @@ client.on("ready", () => {
   badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
 
   setupTables();
-  console.log(`[${new Date()}] Bot Active.`);
+
+  if(config.test){
+      console.log(`[TEST VERSION] [${new Date()}] Bot Active.`);
+  }else{console.log(`[${new Date()}] Bot Active.`);}
 
   client.user.setPresence({
     status: 'online'
@@ -794,6 +797,7 @@ client.on('message', async message => {
     var obj = customCommands.get(command)
     if(obj.end < Math.floor(Date.now() / 1000)){
       message.channel.send(`${obj.content}`);
+      message.delete();
       customCommands.set(`${command}.end`, (Math.floor(Date.now() / 1000)+obj.cooldown));
       customCommands.save();
     }
@@ -953,23 +957,15 @@ client.on('message', async message => {
                 var reason = tail.join(" ").trim();
 
                 if(tail.length > 0){
-                  var identifier = cryptoRandomString(10);
+                  var identifier = cryptoRandomString({length: 10});
                   client.users.get(user).createDM().then(async chnl => {
                     await chnl.send({embed: {
                           color: config.color_warning,
-                          title:`You have been banned from ${guild.name}` ,
-                          description: `Details about the ban can be found below:`,
-                          fields: [{
-                              name: "Reason",
-                              value: reason
-                            },
-                            {
-                              name: "Identifier",
-                              value: `\`${identifier}\``
-                            },
+                          title:`You have been banned from ${guild.name} for breaking one or more of the rules` ,
+                          fields: [
                             {
                               name: "Want to dispute?",
-                              value: "This ban can be disputed reasonably by contacting us via our subreddit modmail (r/PUBATTLEGROUNDS). Please quote your identifier, which can be found above, in your initial message. Thank you."
+                              value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
                             }
                           ],
                           timestamp: new Date(),
@@ -1075,7 +1071,7 @@ client.on('message', async message => {
 
             if(tail.length > 0){
               guild.unban(user, reason).then(result => {
-                var identifier = cryptoRandomString(10);
+                var identifier = cryptoRandomString({length: 10});
                   message.channel.send({embed: {
                         color: config.color_success,
                         author: {
@@ -1166,8 +1162,8 @@ client.on('message', async message => {
           var note = tail.join(" ").trim();
 
           if(tail.length > 0){
-            var identifier = cryptoRandomString(10);
-            var data = [user, message.author.id, note, identifier, 0, new Date()];
+            var identifier = cryptoRandomString({length: 10});
+            var data = [user, message.author.id, note, identifier, 0, new Date(), user];
             connection.query(
               'INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
               function(err, results){
@@ -1209,7 +1205,7 @@ client.on('message', async message => {
   }
 
   if(command === "cnote"){
-    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_CNOTE")){
         if(args[0].length == 10){
           connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
@@ -2102,9 +2098,9 @@ client.on('message', async message => {
             var content = tail.join(" ").trim();
 
             if(tail.length > 0){
-              var identifier = cryptoRandomString(10);
-              var data = [user, message.author.id, content, identifier, 0, new Date()];
-              connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+              var identifier = cryptoRandomString({length: 10});
+              var data = [user, message.author.id, content, identifier, 0, new Date(), user/*SP arg*/];
+              connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total) ', data,
                 function(err, results){
                   if(err) throw err;
 
@@ -2115,7 +2111,7 @@ client.on('message', async message => {
                           icon_url: client.user.displayAvatarURL
                         },
                         title: "[Action] Warning added" ,
-                        description: `A warning was added to ${client.users.get(user)} by ${message.author}`,
+                        description: `A warning was added to ${client.users.get(user)} by ${message.author}. User now has **${results[1][0].total}** records `,
                         fields: [{
                             name: "Reason",
                             value: content
@@ -2223,7 +2219,7 @@ client.on('message', async message => {
                     .catch(console.error);
 
                   if(deleted > 0){
-                    var identifier = cryptoRandomString(10);
+                    var identifier = cryptoRandomString({length: 10});
                     guild.channels.find(chnl => chnl.name === "helpers").send({embed: {
                           color: config.color_success,
                           title:`[Action] Messages cleared` ,
@@ -2287,7 +2283,7 @@ client.on('message', async message => {
                     mutedFile.save();
 
                     var mutedRole = guild.roles.find(val => val.name === "Muted");
-                    var identifier = cryptoRandomString(10);
+                    var identifier = cryptoRandomString({length: 10});
 
                     guild.member(user).addRole(mutedRole)
                       .then(member => {
@@ -2570,7 +2566,7 @@ client.on('message', async message => {
                 mutedFile.save();
 
                 var mutedRole = guild.roles.find(val => val.name === "Muted");
-                var identifier = cryptoRandomString(10);
+                var identifier = cryptoRandomString({length: 10});
 
                 guild.member(user).addRole(mutedRole)
                   .then(member => {
@@ -2582,38 +2578,39 @@ client.on('message', async message => {
                       }).catch(console.error)
                     }
 
-                    message.channel.send({embed: {
-                          color: config.color_success,
-                          author: {
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
-                          },
-                          title: "[Action] User Muted" ,
-                          description: `${member} was muted by ${message.author} for ${args[1]}`,
-                          fields: [{
-                              name: "Reason",
-                              value: reason
-                            },
-                            {
-                              name: "Identifier",
-                              value: identifier,
-                              inline: true
-                            },
-                            {
-                              name: "Note",
-                              value: `I also attempted to disconnect the user from their voice channel`,
-                              inline: true
-                            },
-                          ],
-                          timestamp: new Date(),
-                          footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
-                          }
-                        }
-                    });
-                    var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
-                    connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data, function(err, results){
+                    var data = [user, message.author.id, reason, seconds, identifier, 0, new Date(), user/*SP arg*/];
+                    connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data, function(err, results){
                       if (err) throw err;
+
+                      message.channel.send({embed: {
+                            color: config.color_success,
+                            author: {
+                              name: client.user.username,
+                              icon_url: client.user.displayAvatarURL
+                            },
+                            title: "[Action] User Muted" ,
+                            description: `${member} was muted by ${message.author} for ${args[1]}. User now has **${results[1][0].total}** records`,
+                            fields: [{
+                                name: "Reason",
+                                value: reason
+                              },
+                              {
+                                name: "Identifier",
+                                value: identifier,
+                                inline: true
+                              },
+                              {
+                                name: "Note",
+                                value: `I also attempted to disconnect the user from their voice channel`,
+                                inline: true
+                              },
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                              text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                          }
+                      });
                     });
 
                     member.createDM().then(async chnl => {
@@ -2807,12 +2804,45 @@ client.on('guildMemberAdd', function(member) {
     var guild       = client.guilds.get(config.guildid);
     var banndUsers  = bannedUsersFile.get();
     var usernames   = _.values(banndUsers);
+    var ids         = _.keys(banndUsers);
+    var hits        = [];
+    var identifiers = [];
+    var data        = [];
+    var message     = [];
 
     var match = stringSimilarity.findBestMatch(member.user.username, usernames);
 
-    if(match.bestMatch.rating > 0.6){
-      guild.channels.find(val => val.name === 'server-log').send(`❗ A potential ban evasion was detected. User ${member.user} matched **${match.bestMatch.target}** with a similarity of ~${match.bestMatch.rating}`);
+    for(var a = 0; a < match["ratings"].length; a++){
+      if(match["ratings"][a].rating >= 0.5){
+        hits.push({
+          username: match["ratings"][a].target, //Username of the ban
+          rating: match["ratings"][a].rating, //decimal of the similarity
+          identifier: ids[a] //<identifier> of the ban
+        })
+        identifiers.push(ids[a]);
+      }
     }
+
+    data.push(identifiers); //If this work - ew.....you motherfucker, it did.
+
+    connection.query('select * from log_guildbans where identifier in (?)', data, function(err, rows, results){
+      if (err) throw err;
+      for(var b = 0; b < rows.length; b++){
+        var row = rows[b];
+        message.push(`\`(${((hits[b].rating).toString()).substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
+      }
+
+      guild.channels.find(val => val.name === 'server-log').send({embed: {
+            color: config.color_warning,
+            title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)` ,
+            description: message.join(""),
+            timestamp: new Date(),
+            footer: {
+              text: `Marvin's Little Brother | Current version: ${config.version}`
+            }
+          }
+      });
+    });
   }
 })
 
@@ -2909,7 +2939,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
 });
 
 client.on('guildBanAdd', function(guild, user){
-  var identifier = cryptoRandomString(10);
+  var identifier = cryptoRandomString({length: 10});
   bannedUsersFile.set(identifier, user.username)
   bannedUsersFile.save();
 
