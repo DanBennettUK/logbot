@@ -10,33 +10,19 @@
     "end": 1558304005
   },
   "patch": {
-      "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
-      "cooldown": 15,
-      "end": ""
-  },
-  "chickendinner":{
-      "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
-      "cooldown": 60,
-      "end": ""
-  },
-  "voicechat": {
-      "content": "We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
-      "cooldown": 15,
-      "end": ""
-  },
-  "down": {
-      "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
-      "cooldown": 15,
-      "end": ""
-=======
     "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
     "cooldown": 15,
-    "end": 1559395771
+    "end": ""
+  },
+  "chickendinner":{
+    "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
+    "cooldown": 60,
+    "end": ""
   },
   "voicechat": {
     "content": "We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
     "cooldown": 15,
-    "end": 1559395854
+    "end": ""
   },
   "down": {
     "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
