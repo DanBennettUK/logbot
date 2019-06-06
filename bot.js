@@ -822,7 +822,10 @@ client.on('message', async message => {
   }
   if(command === "roll") {
     if(modulesFile.get("COMMAND_ROLL")){
-      var outcome = Math.floor(Math.random() * Math.floor(100));
+      var outcome = 0;
+      while(outcome==0) {
+        outcome = Math.floor(Math.random() * Math.floor(101));
+      }
       message.channel.send("Your random roll is " + outcome + "!");
     }else{
       message.channel.send(`That module (${command}) is disabled.`);
