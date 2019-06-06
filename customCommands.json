@@ -1,9 +1,4 @@
 {
-  "dad": {
-    "content": "https://i.imgur.com/KyMBEWQ.png",
-    "cooldown": 15,
-    "end": 1559250493
-  },
   "help": {
     "content": "Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail",
     "cooldown": 10,
@@ -28,5 +23,10 @@
     "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
     "cooldown": 15,
     "end": 1559395794
+  },
+  "np": {
+    "content": "No problem!",
+    "cooldown":10,
+    "end": ""
   }
 }

@@ -817,7 +817,22 @@ client.on('message', async message => {
           break;
       }
     }else{
-      message.channel.send(`That module (${command}) is disabled.`);;
+      message.channel.send(`That module (${command}) is disabled.`);
+    }
+  }
+  if(command === "roll") {
+    if(modulesFile.get("COMMAND_ROLL")){
+      var outcome = Math.floor(Math.random() * Math.floor(100));
+      message.channel.send("Your random roll is " + outcome + "!");
+    }else{
+      message.channel.send(`That module (${command}) is disabled.`);
+    }
+  }
+  if(command === "dad") {
+    if(modulesFile.get("COMMAND_DAD")){
+      message.channel.send("https://i.imgur.com/KyMBEWQ.png");
+    } else {
+      message.channel.send(`That module (${command}) is disabled.`);
     }
   }
   //utility commands
@@ -2198,7 +2213,26 @@ client.on('message', async message => {
     }
   }
 
-  if(command === "helper"){
+  if(command === "helper") {
+    if(args[0] === "commands") {
+      if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+        //var commandsStr = "```\n>flipacoin This command will flip a coin and return the result.\n>dad https://i.imgur.com/KyMBEWQ.png\n>np {delete} No problem!\n>roll Rolls a random number up to 100 and posts the result.\n>patch {delete} Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: https://www.pubg.com/category/patch-notes/!\n>down {delete} Unfortunately, the servers are down right now. Keep an eye on #game-announcements for updates!\n>voicechat {delete} We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.\n>chickendinner {delete} https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg\n```"
+        var commandsStr = [
+          "```",
+          ">flipacoin This command will flip a coin and return the result.",
+          ">np {delete} No problem!",
+          ">dad https://i.imgur.com/KyMBEWQ.png",
+          ">roll Rolls a random number up to 100 and posts the result.",
+          ">patch {delete} Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: https://www.pubg.com/category/patch-notes/!",
+          ">down {delete} Unfortunately, the servers are down right now. Keep an eye on #game-announcements for updates!",
+          ">voicechat {delete} We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
+          ">chickendinner {delete} https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
+          "```"
+          ].join("\n");
+
+        message.channel.send(commandsStr);
+      }
+    }
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_CLEAR")){
