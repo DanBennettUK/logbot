@@ -831,13 +831,6 @@ client.on('message', async message => {
       message.channel.send(`That module (${command}) is disabled.`);
     }
   }
-  if(command === "dad") {
-    if(modulesFile.get("COMMAND_DAD")){
-      message.channel.send("https://i.imgur.com/KyMBEWQ.png");
-    } else {
-      message.channel.send(`That module (${command}) is disabled.`);
-    }
-  }
   //utility commands
   if(command === "module"){
     if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
@@ -2224,7 +2217,7 @@ client.on('message', async message => {
           "```",
           ">flipacoin This command will flip a coin and return the result.",
           ">np {delete} No problem!",
-          ">dad https://i.imgur.com/KyMBEWQ.png",
+          ">dad {delete} https://i.imgur.com/KyMBEWQ.png",
           ">roll Rolls a random number up to 100 and posts the result.",
           ">patch {delete} Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: https://www.pubg.com/category/patch-notes/!",
           ">down {delete} Unfortunately, the servers are down right now. Keep an eye on #game-announcements for updates!",

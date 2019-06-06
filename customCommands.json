@@ -28,5 +28,10 @@
     "content": "No problem!",
     "cooldown":10,
     "end": ""
+  },
+  "dad": {
+    "content": "https://i.imgur.com/KyMBEWQ.png",
+    "cooldown":15,
+    "end": ""
   }
 }
