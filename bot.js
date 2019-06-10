@@ -2726,6 +2726,7 @@ client.on('message', async message => {
               break;
           }
 
+          var ms=seconds*1000;
           var reminder = _.rest(args, 1).join(" ");
 
           if(reminder.length > 0){
@@ -2734,6 +2735,10 @@ client.on('message', async message => {
             reminderFile.set(`${user}${end}.reminder`, reminder)
             reminderFile.set(`${user}${end}.length`, args[0])
             reminderFile.save();
+
+            client.setTimeout(function() {
+              client.users.get(user).send(reminder);
+            }, ms);
 
             message.channel.send({embed: {
                   color: config.color_success,
@@ -2751,8 +2756,8 @@ client.on('message', async message => {
           }else{
             message.channel.send("Please provide a reminder note.")
           }
+        }
       }
-    }
     }
   }
 
