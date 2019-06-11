@@ -805,7 +805,7 @@ client.on('message', async message => {
 
   //fun commands
   if(command === "flipacoin"){
-    if(modulesFile.get("COMMAND_FLIPACOIN")){
+    if(modulesFile.get("COMMAND_FUN")){
       var outcome = Math.floor(Math.random() * Math.floor(2));
 
       switch(outcome){
@@ -820,8 +820,32 @@ client.on('message', async message => {
       message.channel.send(`That module (${command}) is disabled.`);
     }
   }
+  if(command === "ask") {
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      if(modulesFile.get("COMMAND_FUN")){
+        var query = args.join("+");
+        var request = require('request');
+        var ans;
+        request("https://api.duckduckgo.com/?q="+query+"&format=json", function (error, response, body) {
+          //console.log('error:', error); // Print the error if one occurred
+          //console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+          //console.log('body:', body);// Print the HTML for the Google homepage
+          ans=JSON.parse(body);
+          if (ans.Abstract == "") {
+            if(ans.RelatedTopics.length>0) {
+              if(ans.RelatedTopics[0].text!="") {
+                message.channel.send(ans.RelatedTopics[0].Text);
+                } else message.channel.send("No results found.");
+            } else message.channel.send("No results found.");
+          } else {
+          message.channel.send(ans.Abstract);
+          }
+        });
+      }
+    } // End of permission checking statement
+  }
   if(command === "roll") {
-    if(modulesFile.get("COMMAND_ROLL")){
+    if(modulesFile.get("COMMAND_FUN")){
       var outcome = 0;
       while(outcome==0) {
         outcome = Math.floor(Math.random() * Math.floor(101));
