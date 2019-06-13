@@ -2798,7 +2798,7 @@ client.on('message', async message => {
               break;
           }
 
-          var ms=seconds*1000;
+          //var ms=seconds*1000;
           var reminder = _.rest(args, 1).join(" ");
 
           if(reminder.length > 0){
