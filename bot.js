@@ -593,7 +593,7 @@ function checkReminders(){
 
   for(var a = 0; a < reminderKeys.length; a++){
     var current = reminderFile.get(reminderKeys[a]);
-    console.log(reminderKeys[a]);
+    //console.log(reminderKeys[a]);
     if(current.end < (Math.floor(Date.now() / 1000))){
       member = guild.member(current.who);
       if(member){
