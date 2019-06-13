@@ -586,23 +586,24 @@ function checkExpiredMutes(){
   }
 }
 function checkReminders(){
+  var guild       = client.guilds.get(config.guildid);
   var reminders = reminderFile.read();
   var reminderKeys = _.keys(reminders);
+  var member;
 
   for(var a = 0; a < reminderKeys.length; a++){
-    var current = reminders[reminderKeys[a]];
+    var current = reminderFile.get(reminderKeys[a]);
+    console.log(reminderKeys[a]);
     if(current.end < (Math.floor(Date.now() / 1000))){
-      let member = guild.member(current.who);
+      member = guild.member(current.who);
       if(member){
         member.createDM().then(chnl => {
          chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
-          reminderFile.unset(reminderKeys[a]);
         }).catch(console.error)
-      }else{
-        reminderFile.unset(reminderKeys[a]);
       }
+      reminderFile.unset(reminderKeys[a]);
+      reminderFile.save();
     }
-    reminderFile.save();
   }
 }
 function importWarnings(){
@@ -769,7 +770,7 @@ client.on("ready", () => {
   guild = client.guilds.get(config.guildid);
 
   setInterval(checkExpiredMutes, 10000);
-  //setInterval(checkReminders, 15000);
+  setInterval(checkReminders, 15000);
 });
 
 client.on('message', async message => {
@@ -2774,6 +2775,7 @@ client.on('message', async message => {
       if(modulesFile.get("COMMAND_REMINDME")){
         var user = message.author.id;
         var end;
+        if(!args[0]) message.channel.send("Insufficient parameters.")
         var int = args[0].replace(/[a-zA-Z]$/g, "");
 
         if(parseInt(int)){
@@ -2800,15 +2802,18 @@ client.on('message', async message => {
           var reminder = _.rest(args, 1).join(" ");
 
           if(reminder.length > 0){
+            //var remId= ""+user+end;
             reminderFile.set(`${user}${end}.who`, message.author.id)
             reminderFile.set(`${user}${end}.end`, end);
             reminderFile.set(`${user}${end}.reminder`, reminder)
             reminderFile.set(`${user}${end}.length`, args[0])
             reminderFile.save();
 
-            client.setTimeout(function() {
-              client.users.get(user).send(reminder);
-            }, ms);
+            /*client.setTimeout(function() {
+              client.users.get(user).send("Hey <@"+user+">, it's been "+args[0]+" since you set a reminder - \n\n"+reminder);
+              reminderFile.unset(remId);
+              reminderFile.save();
+            }, ms)*/
 
             message.channel.send({embed: {
                   color: config.color_success,
