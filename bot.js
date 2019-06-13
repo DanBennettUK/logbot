@@ -2251,7 +2251,34 @@ client.on('message', async message => {
 
     message.channel.send(commandsStr);
   }
-
+  if(command === "commands") {
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+       if(args[0] === "add") {
+         if(!(args[1] === "")) {
+           var commandStr = _.rest(args, 2).join(" ");
+           customCommands.set(args[1]+'.content', commandStr);
+           customCommands.set(args[1]+'.cooldown', "15");
+           customCommands.set(args[1]+'.end', "");
+           customCommands.save();
+         }
+       } else if (args[0] === "remove") {
+         if(!(args[1] === "")) {
+           customCommands.unset(args[1]);
+           customCommands.save();
+       //  }
+       }
+     } else if(args[0] === "list") {
+       var cCommands = customCommands.read();
+       var cKeys = _.keys(cCommands);
+       var messageS="```";
+       for(var i = 0; i < cKeys.length; i++) {
+         messageS += "\n"+ cKeys[i] + ": "+ customCommands.get(cKeys[i]).content+"\n";
+        }
+        messageS += "```";
+        message.channel.send(messageS);
+      }
+    }
+  }
 
   if(command === "helper") {
     if(args[0] === "commands") {
