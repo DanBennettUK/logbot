@@ -1,9 +1,4 @@
 {
-  "help": {
-    "content": "Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail",
-    "cooldown": 10,
-    "end": 1558304005
-  },
   "patch": {
     "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
     "cooldown": 15,
@@ -32,6 +27,46 @@
   "dad": {
     "content": "https://i.imgur.com/KyMBEWQ.png",
     "cooldown":15,
+    "end": ""
+  },
+  "bugreport": {
+    "content": "Please go here to officially report any bugs you find in-game: \nhttp://forums.playbattlegrounds.com/forum/10-bug-reports/ \nThank you",
+    "cooldown": 15,
+    "end": ""
+  },
+  "forums": {
+    "content": "http://forums.playbattlegrounds.com/",
+    "cooldown": 15,
+    "end": ""
+  },
+  "invite": {
+    "content": "Use this link to invite others to the server:\nhttp://discord.gg/pubgreddit",
+    "cooldown": 15,
+    "end": ""
+  },
+  "official": {
+    "content": "You can join the official Discord Server run by PUBG Corp. here:\nhttp://discord.gg/battlegrounds",
+    "cooldown": 15,
+    "end": ""
+  },
+  "report": {
+    "content": "Want to report an in-game player? Please use the report button in-game as well as sending a ticket via https://pubgsupport.zendesk.com/hc/en-us \n\nIf you want to report a user on Discord, PM <@407690548401405962> in the sidebar",
+    "cooldown": 15,
+    "end": ""
+  },
+  "roc": {
+    "content": "You can find PUBG's Rules of Conduct here: http://playbattlegrounds.com/rulesOfConduct.pu",
+    "cooldown": 15,
+    "end": ""
+  },
+  "support": {
+    "content": "Have an account issue? Head here:\nhttps://support.pubg.com/hc/en-us",
+    "cooldown": 15,
+    "end": ""
+  },
+  "wiki": {
+    "content": "An official wiki for BATTLEGROUNDS can be found @ http://battlegrounds.gamepedia.com/",
+    "cooldown": 15,
     "end": ""
   }
 }

@@ -2232,11 +2232,30 @@ client.on('message', async message => {
       }
     }
   }
+  if(command === "help") {
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      message.channel.send("Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail");
+    }
+    var commandsStr = [
+      "```",
+      ">bugreport",
+      ">forums",
+      ">invite",
+      ">official.",
+      ">report",
+      ">roc",
+      ">support",
+      ">wiki",
+      "```"
+      ].join("\n");
+
+    message.channel.send(commandsStr);
+  }
+
 
   if(command === "helper") {
     if(args[0] === "commands") {
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-        //var commandsStr = "```\n>flipacoin This command will flip a coin and return the result.\n>dad https://i.imgur.com/KyMBEWQ.png\n>np {delete} No problem!\n>roll Rolls a random number up to 100 and posts the result.\n>patch {delete} Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: https://www.pubg.com/category/patch-notes/!\n>down {delete} Unfortunately, the servers are down right now. Keep an eye on #game-announcements for updates!\n>voicechat {delete} We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.\n>chickendinner {delete} https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg\n```"
         var commandsStr = [
           "```",
           ">flipacoin This command will flip a coin and return the result.",
