@@ -585,7 +585,7 @@ function checkExpiredMutes(){
     }
   }
 }
-function checkReminders(){
+/*function checkReminders(){
   var guild       = client.guilds.get(config.guildid);
   var reminders = reminderFile.read();
   var reminderKeys = _.keys(reminders);
@@ -605,6 +605,33 @@ function checkReminders(){
       reminderFile.save();
     }
   }
+}*/
+function checkReminders(){
+  var guild = client.guilds.get(config.guildid);
+  var reminders = reminderFile.read();
+  var reminderKeys = _.keys(reminders);
+
+  var a=0;
+  function loop() {
+    setTimeout(function() {
+      var current = reminderFile.get(reminderKeys[a]);
+      if(current.end < (Math.floor(Date.now() / 1000))){
+        var member = guild.member(current.who);
+        if(member){
+          member.createDM().then(chnl => {
+          chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
+          }).catch(console.error);
+        }
+        reminderFile.unset(reminderKeys[a]);
+        reminderFile.save();
+      }
+      a++;
+      if(a<reminderKeys.length) {
+        loop();
+      }
+    }, 100);
+  }
+  loop();
 }
 function importWarnings(){
   var warnings = usercardsFile.get();
