@@ -2313,7 +2313,7 @@ client.on('message', async message => {
          if(!(args[1] === "")) {
            var commandStr = _.rest(args, 2).join(" ");
            customCommands.set(args[1]+'.content', commandStr);
-           customCommands.set(args[1]+'.cooldown', "15");
+           customCommands.set(args[1]+'.cooldown', 15);
            customCommands.set(args[1]+'.end', "");
            customCommands.save();
          }
