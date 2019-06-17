@@ -2316,11 +2316,13 @@ client.on('message', async message => {
            customCommands.set(args[1]+'.cooldown', 15);
            customCommands.set(args[1]+'.end', "");
            customCommands.save();
+           message.channel.send("Command added successfully.");
          }
        } else if (args[0] === "remove") {
          if(!(args[1] === "")) {
            customCommands.unset(args[1]);
            customCommands.save();
+           message.channel.send("Command added successfully.");
        //  }
        }
      } else if(args[0] === "list") {
