@@ -30,12 +30,12 @@
     "end": ""
   },
   "bugreport": {
-    "content": "Please go here to officially report any bugs you find in-game: \nhttp://forums.pubg.com/forum/10-bug-reports/",
+    "content": "Please go here to officially report any bugs you find in-game: \n<http://forums.pubg.com/forum/10-bug-reports/>",
     "cooldown": 15,
     "end": 1560436758
   },
   "forums": {
-    "content": "http://forums.pubg.com/",
+    "content": "<http://forums.pubg.com/>",
     "cooldown": 15,
     "end": 1560436762
   },
@@ -50,22 +50,22 @@
     "end": ""
   },
   "report": {
-    "content": "Want to report an in-game player? Please use the report button in-game as well as sending a ticket via https://www.pubg.com/support/ \n\nIf you want to report a user on Discord, PM <@407690548401405962> in the sidebar",
+    "content": "Want to report an in-game player? Please use the report button in-game as well as sending a ticket via <https://www.pubg.com/support/> \n\nIf you want to report a user on Discord, PM <@407690548401405962> in the sidebar",
     "cooldown": 15,
     "end": 1560437089
   },
   "roc": {
-    "content": "You can find PUBG's Rules of Conduct here: http://pubg.com/rules-of-conduct",
+    "content": "You can find PUBG's Rules of Conduct here: <http://pubg.com/rules-of-conduct>",
     "cooldown": 15,
     "end": 1560436937
   },
   "support": {
-    "content": "Have an account issue? Head here:\nhttps://www.pubg.com/support/",
+    "content": "Have an account issue? Head here:\n<https://www.pubg.com/support/>",
     "cooldown": 15,
     "end": 1560436997
   },
   "wiki": {
-    "content": "An official wiki for BATTLEGROUNDS can be found @ http://battlegrounds.gamepedia.com/",
+    "content": "An official wiki for BATTLEGROUNDS can be found @ <http://battlegrounds.gamepedia.com/>",
     "cooldown": 15,
     "end": ""
   }

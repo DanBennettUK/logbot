@@ -2286,7 +2286,7 @@ client.on('message', async message => {
   }
   if(command === "help") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      message.channel.send("Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail");
+      message.channel.send("Commands in detail can be found here: <https://github.com/FMWK/logbot/wiki/Commands-in-detail>");
     }
     var commandsStr = [
       "```",
