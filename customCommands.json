@@ -68,5 +68,10 @@
     "content": "An official wiki for BATTLEGROUNDS can be found @ <http://battlegrounds.gamepedia.com/>",
     "cooldown": 15,
     "end": ""
+  },
+  "steam": {
+    "content": "Steam is currently down. Check <https://steamstat.us/> for more information.",
+    "cooldown": 15,
+    "end": ""
   }
 }
