@@ -2327,12 +2327,12 @@ client.on('message', async message => {
      } else if(args[0] === "list") {
        var cCommands = customCommands.read();
        var cKeys = _.keys(cCommands);
-       var messageS="```";
+       var allCommands="```";
        for(var i = 0; i < cKeys.length; i++) {
-         messageS += "\n"+ cKeys[i] + ": "+ customCommands.get(cKeys[i]).content+"\n";
+         allCommands += "\n"+ cKeys[i] + ": "+ customCommands.get(cKeys[i]).content+"\n";
         }
-        messageS += "```";
-        message.channel.send(messageS);
+        allCommands += "```";
+        message.channel.send(allCommands);
       }
     }
   }
