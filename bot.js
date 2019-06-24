@@ -2322,8 +2322,7 @@ client.on('message', async message => {
          if(!(args[1] === "")) {
            customCommands.unset(args[1]);
            customCommands.save();
-           message.channel.send("Command added successfully.");
-       //  }
+           message.channel.send("Command removed successfully.");
        }
      } else if(args[0] === "list") {
        var cCommands = customCommands.read();
