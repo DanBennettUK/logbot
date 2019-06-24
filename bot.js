@@ -2325,8 +2325,7 @@ client.on('message', async message => {
            message.channel.send("Command removed successfully.");
        }
      } else if(args[0] === "list") {
-       var cCommands = customCommands.read();
-       var cKeys = _.keys(cCommands);
+       var cKeys = _.keys(customCommands.read());
        var allCommands="```";
        for(var i = 0; i < cKeys.length; i++) {
          allCommands += "\n"+ cKeys[i] + ": "+ customCommands.get(cKeys[i]).content+"\n";
