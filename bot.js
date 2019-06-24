@@ -2915,7 +2915,7 @@ client.on('message', async message => {
   if(command === "status"){
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
 
-      var client_PING = client.ping;
+      var client_PING = Math.floor(client.ping);
       var db_PING = connection.ping();
 
       var client_STATUS;
