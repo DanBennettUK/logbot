@@ -857,20 +857,17 @@ client.on('message', async message => {
         }
         var query = args.join("+");
         var request = require('request');
-        var ans;
+        var answer;
         request("https://api.duckduckgo.com/?q="+query+"&format=json", function (error, response, body) {
-          //console.log('error:', error); // Print the error if one occurred
-          //console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-          //console.log('body:', body);// Print the HTML for the Google homepage
-          ans=JSON.parse(body);
-          if (ans.Abstract == "") {
-            if(ans.RelatedTopics.length>0) {
-              if(ans.RelatedTopics[0].text!="") {
+          answer=JSON.parse(body);
+          if (answer.Abstract == "") {
+            if(answer.RelatedTopics.length>0) {
+              if(answer.RelatedTopics[0].text!="") {
                 message.channel.send(ans.RelatedTopics[0].Text);
                 } else message.channel.send("No results found.");
             } else message.channel.send("No results found.");
           } else {
-          message.channel.send(ans.Abstract);
+          message.channel.send(answer.Abstract);
           }
         });
       }
@@ -2285,53 +2282,143 @@ client.on('message', async message => {
     }
   }
   if(command === "help") {
-    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      message.channel.send("Commands in detail can be found here: <https://github.com/FMWK/logbot/wiki/Commands-in-detail>");
-    }
-    var commandsStr = [
-      "```",
-      ">bugreport",
-      ">forums",
-      ">invite",
-      ">official.",
-      ">report",
-      ">roc",
-      ">support",
-      ">wiki",
-      "```"
-      ].join("\n");
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      var staffHelpCommands = `
+      Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail
 
-    message.channel.send(commandsStr);
+      **Fun commands:**
+      ${config.prefix}flipacoin
+      ${config.prefix}roll
+      ${config.prefix}ask <query>
+
+      **Utility commands:**
+      ${config.prefix}module <module> <0/1>
+      ${config.prefix}listmodules
+      ${config.prefix}users count
+      ${config.prefix}users update
+      ${config.prefix}ban <user> <reason>
+      ${config.prefix}unban <user> <reason>
+      ${config.prefix}note <user> <note_content>
+      ${config.prefix}cnote <identifier>
+      ${config.prefix}warn <user> <reason>
+      ${config.prefix}cwarn <identifier>
+      ${config.prefix}user <user>
+      ${config.prefix}helper clear <amount> <channel> <user>
+      ${config.prefix}helper mute <user> <length> <reason>
+      ${config.prefix}voicelog <user>
+      ${config.prefix}disconnect <user>
+      ${config.prefix}badwords add <word>
+      ${config.prefix}badwords list
+      ${config.prefix}mute <user> <length> <reason>
+      ${config.prefix}remindme <length> <reminder>
+      ${config.prefix}commands add <command> <content>
+      ${config.prefix}commands remove <command>
+      ${config.prefix}commands list
+      `
+      const staffHelpEmbed = new Discord.RichEmbed()
+      .setColor(config.color_info)
+      .setAuthor(client.user.username, client.user.displayAvatarURL)
+      .setTitle(`**Listing available commands:**`)
+      .setDescription(staffHelpCommands)
+      .setTimestamp()
+      .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
+
+    message.channel.send(staffHelpEmbed);
+    return;
+    }
+    if(message.member.roles.some(role=>["Support"].includes(role.name))){
+      var helperCommands = `
+      **Fun commands:**
+      **${config.prefix}flipacoin:** This command will flip a coin and return the result.
+      **${config.prefix}roll:** This command will return a random number between 1 and 100.
+      **${config.prefix}ask <query>:** This command will return an answer to the query.
+
+      **Utility commands:**
+      **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
+      **${config.prefix}helper clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
+      **${config.prefix}helper mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
+      **${config.prefix}commands list:** This command lists all current custom commands.
+      **${config.prefix}remindme <length> <reminder>:** This command is used to remind you of the note provided after the specified time has passed.
+
+      Length formats (Case insensitive):
+      \`1m\`
+      \`1h\`
+      \`1d\`
+      \`1\` - If no suffix is given, default will be hours
+      `
+
+      const helperEmbed = new Discord.RichEmbed()
+      .setColor(config.color_info)
+      .setAuthor(client.user.username, client.user.displayAvatarURL)
+      .setTitle(`**Listing available commands:**`)
+      .setDescription(helperCommands)
+      .setTimestamp()
+      .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
+
+      message.channel.send(helperEmbed);
+      return;
+    }
+
+    var helpCommands = `
+    ${config.prefix}bugreport
+    ${config.prefix}forums
+    ${config.prefix}invite
+    ${config.prefix}official
+    ${config.prefix}report
+    ${config.prefix}roc
+    ${config.prefix}support
+    ${config.prefix}wiki
+    `
+
+    const helpEmbed = new Discord.RichEmbed()
+    .setColor(config.color_info)
+    .setAuthor(client.user.username, client.user.displayAvatarURL)
+    .setTitle(`**Listing available commands:**`)
+    .setDescription(helpCommands)
+    .setTimestamp()
+    .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
+
+    message.channel.send(helpEmbed);
   }
   if(command === "commands") {
-    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators, Support"].includes(role.name))){
       if(!args[0]) {
         message.channel.send("Missing arguments");
         return;
       }
-       if(args[0] === "add") {
-         if(!(args[1] === "")) {
-           var commandStr = _.rest(args, 2).join(" ");
-           customCommands.set(args[1]+'.content', commandStr);
-           customCommands.set(args[1]+'.cooldown', 15);
-           customCommands.set(args[1]+'.end', "");
-           customCommands.save();
-           message.channel.send("Command added successfully.");
-         }
-       } else if (args[0] === "remove") {
-         if(!(args[1] === "")) {
-           customCommands.unset(args[1]);
-           customCommands.save();
-           message.channel.send("Command removed successfully.");
-       }
-     } else if(args[0] === "list") {
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(args[0] === "add") {
+          if(!(args[1] === "")) {
+            var commandStr = _.rest(args, 2).join(" ");
+            customCommands.set(args[1]+'.content', commandStr);
+            customCommands.set(args[1]+'.cooldown', 15);
+            customCommands.set(args[1]+'.end', "");
+            customCommands.save();
+            message.channel.send("Command added successfully.");
+          }
+        } if (args[0] === "remove") {
+            if(!(args[1] === "")) {
+              customCommands.unset(args[1]);
+              customCommands.save();
+              message.channel.send("Command removed successfully.");
+          }
+        } 
+      }
+       if(args[0] === "list") {
        var cKeys = _.keys(customCommands.read());
-       var allCommands="```";
+       var allCommands="";
        for(var i = 0; i < cKeys.length; i++) {
-         allCommands += "\n"+ cKeys[i] + ": "+ customCommands.get(cKeys[i]).content+"\n";
+         allCommands += "\n **"+ cKeys[i] + ":** "+ customCommands.get(cKeys[i]).content;
         }
-        allCommands += "```";
-        message.channel.send(allCommands);
+        const customCommandsEmbed = new Discord.RichEmbed()
+        .setColor(config.color_info)
+        .setAuthor(client.user, client.user.displayAvatarURL)
+        .setTitle(`**Listing all custom commands:**`)
+        .setDescription(allCommands)
+        .setTimestamp()
+        .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
+
+        message.channel.send(customCommandsEmbed);
       }
     }
   }
@@ -2340,24 +2427,6 @@ client.on('message', async message => {
     if(!args[0]) {
       message.channel.send("Missing arguments");
       return;
-    }
-    if(args[0] === "commands") {
-      if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-        var commandsStr = [
-          "```",
-          ">flipacoin This command will flip a coin and return the result.",
-          ">np {delete} No problem!",
-          ">dad {delete} https://i.imgur.com/KyMBEWQ.png",
-          ">roll Rolls a random number up to 100 and posts the result.",
-          ">patch {delete} Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: https://www.pubg.com/category/patch-notes/!",
-          ">down {delete} Unfortunately, the servers are down right now. Keep an eye on #game-announcements for updates!",
-          ">voicechat {delete} We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
-          ">chickendinner {delete} https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
-          "```"
-          ].join("\n");
-
-        message.channel.send(commandsStr);
-      }
     }
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
