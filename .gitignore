@@ -1,5 +1,6 @@
 config.json
 customCommands.json
+node_modules
 
 
 # OS generated files #

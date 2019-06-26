@@ -1,4 +1,4 @@
-﻿/*
+/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
@@ -2315,14 +2315,21 @@ client.on('message', async message => {
       ${config.prefix}commands remove <command>
       ${config.prefix}commands list
       `
-      const staffHelpEmbed = new Discord.RichEmbed()
-      .setColor(config.color_info)
-      .setAuthor(client.user.username, client.user.displayAvatarURL)
-      .setTitle(`**Listing available commands:**`)
-      .setDescription(staffHelpCommands)
-      .setTimestamp()
-      .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
-
+      message.channel.send({embed: {
+          color: config.color_info,
+          title: `**Listing all available commands:**`,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.displayAvatarURL
+          },
+          description: `${staffHelpCommands}`,
+          timestamp: new Date(),
+          footer: {
+            text: `Marvin's Little Brother | Current version: ${config.version}`
+          }
+        }
+      });
+      
     message.channel.send(staffHelpEmbed);
     return;
     }
@@ -2347,15 +2354,20 @@ client.on('message', async message => {
       \`1\` - If no suffix is given, default will be hours
       `
 
-      const helperEmbed = new Discord.RichEmbed()
-      .setColor(config.color_info)
-      .setAuthor(client.user.username, client.user.displayAvatarURL)
-      .setTitle(`**Listing available commands:**`)
-      .setDescription(helperCommands)
-      .setTimestamp()
-      .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
-
-      message.channel.send(helperEmbed);
+      message.channel.send({embed: {
+        color: config.color_info,
+        title: `**Listing all available commands:**`,
+        author: {
+          name: client.user.username,
+          icon_url: client.user.displayAvatarURL
+        },
+        description: `${helperCommands}`,
+        timestamp: new Date(),
+        footer: {
+          text: `Marvin's Little Brother | Current version: ${config.version}`
+        }
+      }
+    });
       return;
     }
 
@@ -2370,15 +2382,20 @@ client.on('message', async message => {
     ${config.prefix}wiki
     `
 
-    const helpEmbed = new Discord.RichEmbed()
-    .setColor(config.color_info)
-    .setAuthor(client.user.username, client.user.displayAvatarURL)
-    .setTitle(`**Listing available commands:**`)
-    .setDescription(helpCommands)
-    .setTimestamp()
-    .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
-
-    message.channel.send(helpEmbed);
+    message.channel.send({embed: {
+      color: config.color_info,
+      title: `**Listing all available commands:**`,
+      author: {
+        name: client.user.username,
+        icon_url: client.user.displayAvatarURL
+      },
+      description: `${helpCommands}`,
+      timestamp: new Date(),
+      footer: {
+        text: `Marvin's Little Brother | Current version: ${config.version}`
+      }
+    }
+  });
   }
   if(command === "commands") {
     if(message.member.roles.some(role=>["Moderators, Support"].includes(role.name))){
