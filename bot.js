@@ -2329,8 +2329,6 @@ client.on('message', async message => {
           }
         }
       });
-      
-    message.channel.send(staffHelpEmbed);
     return;
     }
     if(message.member.roles.some(role=>["Support"].includes(role.name))){
@@ -2398,7 +2396,7 @@ client.on('message', async message => {
   });
   }
   if(command === "commands") {
-    if(message.member.roles.some(role=>["Moderators, Support"].includes(role.name))){
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(!args[0]) {
         message.channel.send("Missing arguments");
         return;
@@ -2418,24 +2416,28 @@ client.on('message', async message => {
               customCommands.unset(args[1]);
               customCommands.save();
               message.channel.send("Command removed successfully.");
+            }
           }
-        } 
-      }
+        }
        if(args[0] === "list") {
        var cKeys = _.keys(customCommands.read());
        var allCommands="";
        for(var i = 0; i < cKeys.length; i++) {
          allCommands += "\n **"+ cKeys[i] + ":** "+ customCommands.get(cKeys[i]).content;
         }
-        const customCommandsEmbed = new Discord.RichEmbed()
-        .setColor(config.color_info)
-        .setAuthor(client.user, client.user.displayAvatarURL)
-        .setTitle(`**Listing all custom commands:**`)
-        .setDescription(allCommands)
-        .setTimestamp()
-        .setFooter(`Marvin's Little Brother | Current version: ${config.version}`);
-
-        message.channel.send(customCommandsEmbed);
+       message.channel.send({embed: {
+        color: config.color_info,
+        title: `**Listing all custom commands:**`,
+        author: {
+          name: client.user.username,
+          icon_url: client.user.displayAvatarURL
+        },
+        description: `${allCommands}`,
+        timestamp: new Date(),
+        footer: {
+          text: `Marvin's Little Brother | Current version: ${config.version}`
+        }
+       }});
       }
     }
   }
