@@ -586,27 +586,6 @@ function checkExpiredMutes(){
     }
   }
 }
-/*function checkReminders(){
-  var guild       = client.guilds.get(config.guildid);
-  var reminders = reminderFile.read();
-  var reminderKeys = _.keys(reminders);
-  var member;
-
-  for(var a = 0; a < reminderKeys.length; a++){
-    var current = reminderFile.get(reminderKeys[a]);
-    //console.log(reminderKeys[a]);
-    if(current.end < (Math.floor(Date.now() / 1000))){
-      member = guild.member(current.who);
-      if(member){
-        member.createDM().then(chnl => {
-         chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
-        }).catch(console.error)
-      }
-      reminderFile.unset(reminderKeys[a]);
-      reminderFile.save();
-    }
-  }
-}*/
 function checkReminders(){
   var guild = client.guilds.get(config.guildid);
   var reminders = reminderFile.read();
@@ -3237,7 +3216,7 @@ client.on('guildMemberRemove', function(member) {
 
 client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
-    var data = []
+    var data = [];
     if(oldMember.voiceChannel){
       if(newMember.voiceChannel){
         if(oldMember.voiceChannel.id !== newMember.voiceChannel.id){
@@ -3260,6 +3239,17 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
         function(err, results){
           if(err) throw err;
+
+          if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES_LOG")){
+            switch(data[5]){ //Switch on the type
+              case 1: //join
+                newMember.guild.channels.get(config.channel_voicelog).send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6]}`);
+                break;
+              case 2: //move
+                newMember.guild.channels.get(config.channel_voicelog).send(`<@${data[0]}> has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
+                break;
+            }
+          }
         }
       );
     }
