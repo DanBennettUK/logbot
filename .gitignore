@@ -1,5 +1,6 @@
 config.json
 customCommands.json
+node_modules
 
 
 # OS generated files #
@@ -19,3 +20,4 @@ Thumbs.db
 *.sqlite
 banned_users.json
 customCommands.json
+bad_words.json

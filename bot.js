@@ -9,8 +9,6 @@
 const Discord             = require("discord.js");
 
 var guild;
-var badWordList;
-var fs                    = require("fs");
 const bfj                 = require('bfj');
 const mysql               = require('mysql2');
 var moment                = require('moment');
@@ -29,7 +27,7 @@ var modulesFile           = editJsonFile("./modules.json");
 
 var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
-
+var badWordsFile          = editJsonFile(`./bad_words.json`);
 var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
 var usercardsFile         = editJsonFile("./usercards.json");
@@ -540,23 +538,26 @@ function isNull(value, def){
   }
 }
 function checkMessageContent(message){
+  if(message.member.roles.some(role => ["Moderators"].includes(role.name))) return;
   var wholeMessage = (message.content).split(" ");
+  var badWordList = _.keys(badWordsFile.read());
+  if(badWordList.length > 0) {
+    if(badWordList.some(word => wholeMessage.includes(word))){
+      message.delete()
+        .then(() =>{
+          message.channel.send(`${message.author} watch your language`)
+            .then(msg => {
+              setTimeout(async() =>{
+                await msg.delete();
+              },5000);
+            }).catch(console.error);
 
-  if(badWordList.some(word => wholeMessage.includes(word))){
-    message.delete()
-      .then(() =>{
-        message.channel.send(`${message.author} watch your language`)
-          .then(msg => {
-            setTimeout(async() =>{
-              await msg.delete();
-            },5000);
-          }).catch(console.error);
-
-        var data = [message.author.id, message.channel.id, message.content, new Date()];
-        connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
-          if(err) throw err;
-        });
-      }).catch(console.error);
+          var data = [message.author.id, message.channel.id, message.content, new Date()];
+          connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
+            if(err) throw err;
+          });
+        }).catch(console.error);
+    }
   }
 }
 function checkExpiredMutes(){
@@ -586,24 +587,31 @@ function checkExpiredMutes(){
   }
 }
 function checkReminders(){
+  var guild = client.guilds.get(config.guildid);
   var reminders = reminderFile.read();
   var reminderKeys = _.keys(reminders);
 
-  for(var a = 0; a < reminderKeys.length; a++){
-    var current = reminders[reminderKeys[a]];
-    if(current.end < (Math.floor(Date.now() / 1000))){
-      let member = guild.member(current.who);
-      if(member){
-        member.createDM().then(chnl => {
-         chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
-          reminderFile.unset(reminderKeys[a]);
-        }).catch(console.error)
-      }else{
+  var a=0;
+  function loop() {
+    setTimeout(function() {
+      var current = reminderFile.get(reminderKeys[a]);
+      if(current.end < (Math.floor(Date.now() / 1000))){
+        var member = guild.member(current.who);
+        if(member){
+          member.createDM().then(chnl => {
+          chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
+          }).catch(console.error);
+        }
         reminderFile.unset(reminderKeys[a]);
+        reminderFile.save();
       }
-    }
-    reminderFile.save();
+      a++;
+      if(a<reminderKeys.length) {
+        loop();
+      }
+    }, 100);
   }
+  loop();
 }
 function importWarnings(){
   var warnings = usercardsFile.get();
@@ -747,8 +755,6 @@ function importUnbans(){
 }
 
 client.on("ready", () => {
-  badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
-
   setupTables();
 
   if(config.test){
@@ -769,7 +775,7 @@ client.on("ready", () => {
   guild = client.guilds.get(config.guildid);
 
   setInterval(checkExpiredMutes, 10000);
-  //setInterval(checkReminders, 15000);
+  setInterval(checkReminders, 15000);
 });
 
 client.on('message', async message => {
@@ -817,7 +823,39 @@ client.on('message', async message => {
           break;
       }
     }else{
-      message.channel.send(`That module (${command}) is disabled.`);;
+      message.channel.send(`That module (${command}) is disabled.`);
+    }
+  }
+  if(command === "ask") {
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      if(modulesFile.get("COMMAND_ASK")){
+        var query = args.join("+");
+        var request = require('request');
+        var answer;
+        request("https://api.duckduckgo.com/?q="+query+"&format=json", function (error, response, body) {
+          answer=JSON.parse(body);
+          if (answer.Abstract == "") {
+            if(answer.RelatedTopics.length>0) {
+              if(answer.RelatedTopics[0].text!="") {
+                message.channel.send(ans.RelatedTopics[0].Text);
+                } else message.channel.send("No results found.");
+            } else message.channel.send("No results found.");
+          } else {
+          message.channel.send(answer.Abstract);
+          }
+        });
+      }
+    } // End of permission checking statement
+  }
+  if(command === "roll") {
+    if(modulesFile.get("COMMAND_ROLL")){
+      var outcome = 0;
+      while(outcome==0) {
+        outcome = Math.floor(Math.random() * Math.floor(101));
+      }
+      message.channel.send("Your random roll is " + outcome + "!");
+    }else{
+      message.channel.send(`That module (${command}) is disabled.`);
     }
   }
   //utility commands
@@ -1043,7 +1081,7 @@ client.on('message', async message => {
             }
           }
         }else{
-          syntaxErr(message, "ban")
+          syntaxErr(message, "ban");
           return;
         }
       }else{
@@ -2197,8 +2235,170 @@ client.on('message', async message => {
       }
     }
   }
+  if(command === "help") {
+    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+      var staffHelpCommands = `
+      Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail
 
-  if(command === "helper"){
+      **Fun commands:**
+      ${config.prefix}flipacoin
+      ${config.prefix}roll
+      ${config.prefix}ask <query>
+
+      **Utility commands:**
+      ${config.prefix}module <module> <0/1>
+      ${config.prefix}listmodules
+      ${config.prefix}users count
+      ${config.prefix}users update
+      ${config.prefix}ban <user> <reason>
+      ${config.prefix}unban <user> <reason>
+      ${config.prefix}note <user> <note_content>
+      ${config.prefix}cnote <identifier>
+      ${config.prefix}warn <user> <reason>
+      ${config.prefix}cwarn <identifier>
+      ${config.prefix}user <user>
+      ${config.prefix}helper clear <amount> <channel> <user>
+      ${config.prefix}helper mute <user> <length> <reason>
+      ${config.prefix}voicelog <user>
+      ${config.prefix}disconnect <user>
+      ${config.prefix}badwords add <word/s>
+      ${config.prefix}badwords remove <word/s>
+      ${config.prefix}badwords clear
+      ${config.prefix}badwords list
+      ${config.prefix}mute <user> <length> <reason>
+      ${config.prefix}remindme <length> <reminder>
+      ${config.prefix}commands add <command> <content>
+      ${config.prefix}commands remove <command>
+      ${config.prefix}commands list
+      `
+      message.channel.send({embed: {
+          color: config.color_info,
+          title: `**Listing all available commands:**`,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.displayAvatarURL
+          },
+          description: `${staffHelpCommands}`,
+          timestamp: new Date(),
+          footer: {
+            text: `Marvin's Little Brother | Current version: ${config.version}`
+          }
+        }
+      });
+    return;
+    }
+    if(message.member.roles.some(role=>["Support"].includes(role.name))){
+      var helperCommands = `
+      **Fun commands:**
+      **${config.prefix}flipacoin:** This command will flip a coin and return the result.
+      **${config.prefix}roll:** This command will return a random number between 1 and 100.
+      **${config.prefix}ask <query>:** This command will return an answer to the query.
+
+      **Utility commands:**
+      **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
+      **${config.prefix}helper clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
+      **${config.prefix}helper mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
+      **${config.prefix}commands list:** This command lists all current custom commands.
+      **${config.prefix}remindme <length> <reminder>:** This command is used to remind you of the note provided after the specified time has passed.
+
+      Length formats (Case insensitive):
+      \`1m\`
+      \`1h\`
+      \`1d\`
+      \`1\` - If no suffix is given, default will be hours
+      `
+
+      message.channel.send({embed: {
+        color: config.color_info,
+        title: `**Listing all available commands:**`,
+        author: {
+          name: client.user.username,
+          icon_url: client.user.displayAvatarURL
+        },
+        description: `${helperCommands}`,
+        timestamp: new Date(),
+        footer: {
+          text: `Marvin's Little Brother | Current version: ${config.version}`
+        }
+      }
+    });
+      return;
+    }
+
+    var helpCommands = `
+    ${config.prefix}bugreport
+    ${config.prefix}forums
+    ${config.prefix}invite
+    ${config.prefix}official
+    ${config.prefix}report
+    ${config.prefix}roc
+    ${config.prefix}support
+    ${config.prefix}wiki
+    `
+
+    message.channel.send({embed: {
+      color: config.color_info,
+      title: `**Listing all available commands:**`,
+      author: {
+        name: client.user.username,
+        icon_url: client.user.displayAvatarURL
+      },
+      description: `${helpCommands}`,
+      timestamp: new Date(),
+      footer: {
+        text: `Marvin's Little Brother | Current version: ${config.version}`
+      }
+    }
+  });
+  }
+  if(command === "commands") {
+    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
+      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+        if(args[0] === "add") {
+          if(args[1]) {
+            var commandStr = _.rest(args, 2).join(" ");
+            customCommands.set(args[1]+'.content', commandStr);
+            customCommands.set(args[1]+'.cooldown', 15);
+            customCommands.set(args[1]+'.end', "");
+            customCommands.save();
+            message.channel.send(":white_check_mark: Command added successfully.");
+          } else {
+            syntaxErr(message, `commands_add`);
+          }
+        } if (args[0] === "remove") {
+            if(args[1]) {
+              customCommands.unset(args[1]);
+              customCommands.save();
+              message.channel.send(":white_check_mark: Command removed successfully.");
+            } else {
+              syntaxErr(message, `commands_remove`);
+            }
+          }
+        }
+       if(args[0] === "list") {
+       var cKeys = _.keys(customCommands.read());
+       var allCommands="";
+       for(var i = 0; i < cKeys.length; i++) {
+         allCommands += "\n **"+ cKeys[i] + ":** "+ customCommands.get(cKeys[i]).content;
+        }
+       message.channel.send({embed: {
+        color: config.color_info,
+        title: `**Listing all custom commands:**`,
+        author: {
+          name: client.user.username,
+          icon_url: client.user.displayAvatarURL
+        },
+        description: `${allCommands}`,
+        timestamp: new Date(),
+        footer: {
+          text: `Marvin's Little Brother | Current version: ${config.version}`
+        }
+       }});
+      }
+    }
+  }
+
+  if(command === "helper") {
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_CLEAR")){
@@ -2504,18 +2704,128 @@ client.on('message', async message => {
   if(command === "badwords"){
     if(args[0] === "add"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        var string = (_.rest(args, 1)).join(" ");
-
-        fs.appendFile('badWords.txt', ', '+string, (err) => {
-          if (err) throw err;
-          badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
-          message.channel.send(`\`${string}\` added`);
-        });
+        if(args[1]) {
+          var newWords = args.splice(1);
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (i != j && newWords[i] == newWords[j]) {
+                message.channel.send(`:x: The argument contains duplicates.`);
+                return;
+              }
+            }
+          }
+          var currentWords = _.keys(badWordsFile.read());
+          if(currentWords.length > 0) {
+            if (currentWords.some(word => newWords.includes(word))) {
+              message.channel.send(`:x: One or more words are already on the list.`);
+              return;
+            }
+          }
+          for(var i = 0; i < newWords.length; i++) {
+            badWordsFile.set(newWords[i], newWords[i]);
+          }
+          badWordsFile.save();
+          message.channel.send(`:white_check_mark: Word(s) \`${newWords}\` added successfully.`);
+        } else {
+          message.channel.send(`Please specify a word or words to add.`).
+          then(msg => {
+            setTimeout(async ()=>{
+              await message.delete();
+              await msg.delete();
+            }, 7000)
+          }).catch(console.error);        
+        }
+      }
+    }
+    if(args[0] === "remove") {
+      if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+        if(args[1]) {
+          var newWords = args.splice(1);
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (i != j && newWords[i] == newWords[j]) {
+                message.channel.send(`:x: The argument contains duplicates.`);
+                return;
+              }
+            }
+          }
+          var currentWords = _.keys(badWordsFile.read());
+          var numberOfElements = 0;
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < currentWords.length; j++) {
+              if (newWords[i] === currentWords[j]) numberOfElements++;
+            }
+          }
+          if (numberOfElements < newWords.length) {
+            message.channel.send(`:x: One or more words are not on the list.`)
+            return;
+          }
+          for (var i = 0; i < currentWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (currentWords[i] === newWords[j]) {
+                badWordsFile.unset(newWords[j]);
+              }
+            }
+          }
+          badWordsFile.save();
+          message.channel.send(`:white_check_mark: All words \`${checkForDuplicates}\` removed successfully.`);
+        } else {
+          message.channel.send(`Please specify a word or words to remove.`).
+          then(msg => {
+            setTimeout(async ()=>{
+              await message.delete();
+              await msg.delete();
+            }, 7000)
+          }).catch(console.error); 
+        }
+      }
+    }
+    if(args[0] === "clear") {
+      if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+        var currentWords = _.keys(badWordsFile.read());
+        if(currentWords.length > 0) {
+          for(var i = 0; i < currentWords.length; i++) {
+            badWordsFile.unset(currentWords[i]);
+          }
+          badWordsFile.save();
+          message.channel.send(`:white_check_mark: All bad words successfully removed.`);
+        } else message.channel.send(`:x: No bad words could be found.`)
       }
     }
     if(args[0] === "list"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        message.channel.send((fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")));
+        var currentWords = _.keys(badWordsFile.read()).join(`\n`);
+        if(currentWords) {
+          message.channel.send({embed: {
+              color: config.color_info,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.displayAvatarURL
+              },
+              title: `Current bad words:`,
+              description: `${currentWords}`,
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            } 
+          });
+        } else {
+            message.channel.send({embed: {
+              color: config.color_info,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.displayAvatarURL
+              },
+              title: `Current bad words:`,
+              description: `No bad words could be found.`,
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            } 
+          });   
+        }
       }
     }
   }
@@ -2675,7 +2985,6 @@ client.on('message', async message => {
         var user = message.author.id;
         var end;
         var int = args[0].replace(/[a-zA-Z]$/g, "");
-
         if(parseInt(int)){
           switch((args[0].toLowerCase()).charAt(args[0].length - 1)){
             case "d":
@@ -2721,15 +3030,15 @@ client.on('message', async message => {
           }else{
             message.channel.send("Please provide a reminder note.")
           }
+        }
       }
-    }
     }
   }
 
   if(command === "status"){
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
 
-      var client_PING = client.ping;
+      var client_PING = Math.floor(client.ping);
       var db_PING = connection.ping();
 
       var client_STATUS;
