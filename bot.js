@@ -830,10 +830,6 @@ client.on('message', async message => {
   if(command === "ask") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(modulesFile.get("COMMAND_FUN")){
-        if(!args[0]) {
-          message.channel.send("Missing arguments");
-          return;
-        }
         var query = args.join("+");
         var request = require('request');
         var answer;
@@ -866,10 +862,6 @@ client.on('message', async message => {
   //utility commands
   if(command === "module"){
     if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
-      if(!args[0]) {
-        message.channel.send("Missing arguments");
-        return;
-      }
       if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
         if([0,1].includes(parseInt(args[1]))){ //Parses the string as an int, then checks if the result is a valid <Int> & it's either a 0 or 1
           modulesFile.set(args[0], parseInt(args[1]));
@@ -940,10 +932,6 @@ client.on('message', async message => {
   }
 
   if(command === "users"){
-    if(!args[0]) {
-      message.channel.send("Missing arguments");
-      return;
-    }
     if(args[0] == "count"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(modulesFile.get("COMMAND_USER_COUNT")){
@@ -1094,7 +1082,7 @@ client.on('message', async message => {
             }
           }
         }else{
-          syntaxErr(message, "ban")
+          syntaxErr(message, "ban");
           return;
         }
       }else{
@@ -1258,10 +1246,6 @@ client.on('message', async message => {
   if(command === "cnote"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_CNOTE")){
-        if(!args[0]) {
-          message.channel.send("Missing identifier");
-          return;
-        }
         if(args[0].length == 10){
           connection.query('UPDATE log_note SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
             if(err) throw err;
@@ -1289,10 +1273,6 @@ client.on('message', async message => {
   if(command === "user"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_USER")){
-        if(!args[0]) {
-          message.channel.send("Missing ID")
-          return;
-        }
         var userID = parseUserTag(args[0]);
         var globalUser = client.users.get(userID);
         var userObject = guild.member(globalUser);
@@ -2233,10 +2213,6 @@ client.on('message', async message => {
   if(command === "cwarn"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_CWARN")){
-        if(!args[0]) {
-          message.channel.send("Missing identifier");
-          return;
-        }
         if(args[0].length == 10){
           connection.query('UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?', args[0].trim(), function(err, results, rows){
             if(err) throw err;
@@ -2376,26 +2352,22 @@ client.on('message', async message => {
   }
   if(command === "commands") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      if(!args[0]) {
-        message.channel.send("Missing arguments");
-        return;
-      }
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(args[0] === "add") {
-          if(!(args[1] === "")) {
+          if(args[1]) {
             var commandStr = _.rest(args, 2).join(" ");
             customCommands.set(args[1]+'.content', commandStr);
             customCommands.set(args[1]+'.cooldown', 15);
             customCommands.set(args[1]+'.end', "");
             customCommands.save();
             message.channel.send("Command added successfully.");
-          }
+          } else syntaxErr(message, `commands_add`);
         } if (args[0] === "remove") {
-            if(!(args[1] === "")) {
+            if(args[1]) {
               customCommands.unset(args[1]);
               customCommands.save();
               message.channel.send("Command removed successfully.");
-            }
+            } else syntaxErr(message, `commands_remove`);
           }
         }
        if(args[0] === "list") {
@@ -2422,10 +2394,6 @@ client.on('message', async message => {
   }
 
   if(command === "helper") {
-    if(!args[0]) {
-      message.channel.send("Missing arguments");
-      return;
-    }
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_CLEAR")){
@@ -2709,10 +2677,6 @@ client.on('message', async message => {
   if(command === "disconnect"){
     if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
       if(modulesFile.get("COMMAND_DISCONNECT")){
-        if(args[0]) {
-          message.channel.send("Missing ID");
-          return;
-        }
         var user = parseUserTag(args[0]);
         var guildUser = guild.member(user);
 
@@ -2734,7 +2698,7 @@ client.on('message', async message => {
 
   if(command === "badwords"){
     if(!args[0]) {
-      message.channel.send("Missing arguments");
+      syntaxErr(message, `badwords`);
       return;
     }
     if(args[0] === "add"){
@@ -2758,10 +2722,6 @@ client.on('message', async message => {
   if(command === "mute"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_MUTE")){
-        if(!args[0]) {
-          message.channel.send("Missing ID");
-          return;
-        }
         var user = parseUserTag(args[0]);
         var guildUser = guild.member(user);
 
@@ -2914,7 +2874,7 @@ client.on('message', async message => {
         var user = message.author.id;
         var end;
         if(!args[0]) {
-          message.channel.send("Missing arguments")
+          syntaxErr(message, `remindme`);
           return;
         }
         var int = args[0].replace(/[a-zA-Z]$/g, "");
@@ -2939,22 +2899,14 @@ client.on('message', async message => {
               break;
           }
 
-          //var ms=seconds*1000;
           var reminder = _.rest(args, 1).join(" ");
 
           if(reminder.length > 0){
-            //var remId= ""+user+end;
             reminderFile.set(`${user}${end}.who`, message.author.id)
             reminderFile.set(`${user}${end}.end`, end);
             reminderFile.set(`${user}${end}.reminder`, reminder)
             reminderFile.set(`${user}${end}.length`, args[0])
             reminderFile.save();
-
-            /*client.setTimeout(function() {
-              client.users.get(user).send("Hey <@"+user+">, it's been "+args[0]+" since you set a reminder - \n\n"+reminder);
-              reminderFile.unset(remId);
-              reminderFile.save();
-            }, ms)*/
 
             message.channel.send({embed: {
                   color: config.color_success,
