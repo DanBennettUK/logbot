@@ -829,10 +829,6 @@ client.on('message', async message => {
   if(command === "ask") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(modulesFile.get("COMMAND_FUN")){
-        if(!args[0]) {
-          syntaxErr(message, `ask`);
-          return;
-        }
         var query = args.join("+");
         var request = require('request');
         var answer;
@@ -935,10 +931,6 @@ client.on('message', async message => {
   }
 
   if(command === "users"){
-    if(!args[0]) {
-      syntaxErr(message, `users`);
-      return;
-    }
     if(args[0] == "count"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(modulesFile.get("COMMAND_USER_COUNT")){
@@ -1280,10 +1272,6 @@ client.on('message', async message => {
   if(command === "user"){
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       if(modulesFile.get("COMMAND_USER")){
-        if(!args[0]) {
-          syntaxErr(message, `user`);
-          return;
-        }
         var userID = parseUserTag(args[0]);
         var globalUser = client.users.get(userID);
         var userObject = guild.member(globalUser);
@@ -2365,10 +2353,6 @@ client.on('message', async message => {
   }
   if(command === "commands") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      if(!args[0]) {
-        syntaxErr(message, `commands`);
-        return;
-      }
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(args[0] === "add") {
           if(args[1]) {
@@ -2415,10 +2399,6 @@ client.on('message', async message => {
   }
 
   if(command === "helper") {
-    if(!args[0]) {
-      syntaxErr(message, `helper`)
-      return;
-    }
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_CLEAR")){
@@ -2722,10 +2702,6 @@ client.on('message', async message => {
   }
 
   if(command === "badwords"){
-    if(!args[0]) {
-      syntaxErr(message, `badwords`);
-      return;
-    }
     if(args[0] === "add"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(args[1]) {
@@ -3008,10 +2984,6 @@ client.on('message', async message => {
       if(modulesFile.get("COMMAND_REMINDME")){
         var user = message.author.id;
         var end;
-        if(!args[0]) {
-          syntaxErr(message, `remindme`);
-          return;
-        }
         var int = args[0].replace(/[a-zA-Z]$/g, "");
 
         if(parseInt(int)){
