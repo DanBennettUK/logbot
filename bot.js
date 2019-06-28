@@ -3121,7 +3121,7 @@ client.on('guildMemberRemove', function(member) {
 
 client.on('voiceStateUpdate', function(oldMember, newMember) {
   if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES")){
-    var data = []
+    var data = [];
     if(oldMember.voiceChannel){
       if(newMember.voiceChannel){
         if(oldMember.voiceChannel.id !== newMember.voiceChannel.id){
@@ -3144,6 +3144,17 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
         'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)', data,
         function(err, results){
           if(err) throw err;
+
+          if(modulesFile.get("EVENT_GUILD_VOICE_UPDATES_LOG")){
+            switch(data[5]){ //Switch on the type
+              case 1: //join
+                newMember.guild.channels.get(config.channel_voicelog).send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6]}`);
+                break;
+              case 2: //move
+                newMember.guild.channels.get(config.channel_voicelog).send(`<@${data[0]}> has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
+                break;
+            }
+          }
         }
       );
     }
