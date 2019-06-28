@@ -540,7 +540,7 @@ function isNull(value, def){
 function checkMessageContent(message){
   if(message.member.roles.some(role => ["Moderators"].includes(role.name))) return;
   var wholeMessage = (message.content).split(" ");
-  var badWordList = _.keys(badWordsFile.read());
+  var badWordList = badWordsFile.get(`${message.guild.id}.badWords`);
   if(badWordList.length > 0) {
     if(badWordList.some(word => wholeMessage.includes(word))){
       message.delete()
@@ -795,6 +795,10 @@ client.on('message', async message => {
 
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
 
+  if(!(_.keys(badWordsFile.read()).length > 0)) {
+    badWordsFile.set(`${message.guild.id}.badWords`, []);
+    badWordsFile.save();
+  }
 
   const args    = message.content.slice(1).trim().split(/\s+/);   //Result: ["<TAG>", "Bad", "person!"]
   const command = args.shift().toLowerCase();                   //Result: "ban"
@@ -2714,16 +2718,15 @@ client.on('message', async message => {
               }
             }
           }
-          var currentWords = _.keys(badWordsFile.read());
+          var currentWords = badWordsFile.get(message.guild.id).badWords;
           if(currentWords.length > 0) {
             if (currentWords.some(word => newWords.includes(word))) {
               message.channel.send(`:x: One or more words are already on the list.`);
               return;
             }
           }
-          for(var i = 0; i < newWords.length; i++) {
-            badWordsFile.set(newWords[i], newWords[i]);
-          }
+          currentWords = currentWords.concat(newWords);
+          badWordsFile.set(`${message.guild.id}.badWords`, currentWords);
           badWordsFile.save();
           message.channel.send(`:white_check_mark: Word(s) \`${newWords}\` added successfully.`);
         } else {
@@ -2749,7 +2752,7 @@ client.on('message', async message => {
               }
             }
           }
-          var currentWords = _.keys(badWordsFile.read());
+          var currentWords = badWordsFile.get(message.guild.id).badWords;
           var numberOfElements = 0;
           for (var i = 0; i < newWords.length; i++) {
             for (var j = 0; j < currentWords.length; j++) {
@@ -2763,12 +2766,12 @@ client.on('message', async message => {
           for (var i = 0; i < currentWords.length; i++) {
             for (var j = 0; j < newWords.length; j++) {
               if (currentWords[i] === newWords[j]) {
-                badWordsFile.unset(newWords[j]);
+                currentWords = currentWords.splice(i, 1);
               }
             }
           }
           badWordsFile.save();
-          message.channel.send(`:white_check_mark: All words \`${checkForDuplicates}\` removed successfully.`);
+          message.channel.send(`:white_check_mark: All words \`${newWords}\` removed successfully.`);
         } else {
           message.channel.send(`Please specify a word or words to remove.`).
           then(msg => {
@@ -2782,11 +2785,9 @@ client.on('message', async message => {
     }
     if(args[0] === "clear") {
       if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
-        var currentWords = _.keys(badWordsFile.read());
-        if(currentWords.length > 0) {
-          for(var i = 0; i < currentWords.length; i++) {
-            badWordsFile.unset(currentWords[i]);
-          }
+        if(badWordsFile.get(message.guild.id).badWords.length > 0) {
+          badWordsFile.unset(`${message.guild.id}`);
+          badWordsFile.set(`${message.guild.id}`.badWords, []);
           badWordsFile.save();
           message.channel.send(`:white_check_mark: All bad words successfully removed.`);
         } else message.channel.send(`:x: No bad words could be found.`)
@@ -2794,7 +2795,7 @@ client.on('message', async message => {
     }
     if(args[0] === "list"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        var currentWords = _.keys(badWordsFile.read()).join(`\n`);
+        var currentWords = badWordsFile.get(message.guild.id).badWords.join(`\n`);
         if(currentWords) {
           message.channel.send({embed: {
               color: config.color_info,
