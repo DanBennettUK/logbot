@@ -585,27 +585,6 @@ function checkExpiredMutes(){
     }
   }
 }
-/*function checkReminders(){
-  var guild       = client.guilds.get(config.guildid);
-  var reminders = reminderFile.read();
-  var reminderKeys = _.keys(reminders);
-  var member;
-
-  for(var a = 0; a < reminderKeys.length; a++){
-    var current = reminderFile.get(reminderKeys[a]);
-    //console.log(reminderKeys[a]);
-    if(current.end < (Math.floor(Date.now() / 1000))){
-      member = guild.member(current.who);
-      if(member){
-        member.createDM().then(chnl => {
-         chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
-        }).catch(console.error)
-      }
-      reminderFile.unset(reminderKeys[a]);
-      reminderFile.save();
-    }
-  }
-}*/
 function checkReminders(){
   var guild = client.guilds.get(config.guildid);
   var reminders = reminderFile.read();
