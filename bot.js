@@ -2360,13 +2360,13 @@ client.on('message', async message => {
             customCommands.set(args[1]+'.cooldown', 15);
             customCommands.set(args[1]+'.end', "");
             customCommands.save();
-            message.channel.send("Command added successfully.");
+            message.channel.send(":white_check_mark: Command added successfully.");
           } else syntaxErr(message, `commands_add`);
         } if (args[0] === "remove") {
             if(args[1]) {
               customCommands.unset(args[1]);
               customCommands.save();
-              message.channel.send("Command removed successfully.");
+              message.channel.send(":white_check_mark: Command removed successfully.");
             } else syntaxErr(message, `commands_remove`);
           }
         }
@@ -2697,10 +2697,6 @@ client.on('message', async message => {
   }
 
   if(command === "badwords"){
-    if(!args[0]) {
-      syntaxErr(message, `badwords`);
-      return;
-    }
     if(args[0] === "add"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         var string = (_.rest(args, 1)).join(" ");
@@ -2873,10 +2869,6 @@ client.on('message', async message => {
       if(modulesFile.get("COMMAND_REMINDME")){
         var user = message.author.id;
         var end;
-        if(!args[0]) {
-          syntaxErr(message, `remindme`);
-          return;
-        }
         var int = args[0].replace(/[a-zA-Z]$/g, "");
 
         if(parseInt(int)){
