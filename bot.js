@@ -811,7 +811,7 @@ client.on('message', async message => {
 
   //fun commands
   if(command === "flipacoin"){
-    if(modulesFile.get("COMMAND_FUN")){
+    if(modulesFile.get("COMMAND_FLIPACOIN")){
       var outcome = Math.floor(Math.random() * Math.floor(2));
 
       switch(outcome){
@@ -828,7 +828,7 @@ client.on('message', async message => {
   }
   if(command === "ask") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      if(modulesFile.get("COMMAND_FUN")){
+      if(modulesFile.get("COMMAND_ASK")){
         var query = args.join("+");
         var request = require('request');
         var answer;
@@ -848,7 +848,7 @@ client.on('message', async message => {
     } // End of permission checking statement
   }
   if(command === "roll") {
-    if(modulesFile.get("COMMAND_FUN")){
+    if(modulesFile.get("COMMAND_ROLL")){
       var outcome = 0;
       while(outcome==0) {
         outcome = Math.floor(Math.random() * Math.floor(101));
