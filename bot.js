@@ -2985,7 +2985,6 @@ client.on('message', async message => {
         var user = message.author.id;
         var end;
         var int = args[0].replace(/[a-zA-Z]$/g, "");
-
         if(parseInt(int)){
           switch((args[0].toLowerCase()).charAt(args[0].length - 1)){
             case "d":
