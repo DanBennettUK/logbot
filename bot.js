@@ -9,8 +9,6 @@
 const Discord             = require("discord.js");
 
 var guild;
-var badWordList;
-var fs                    = require("fs");
 const bfj                 = require('bfj');
 const mysql               = require('mysql2');
 var moment                = require('moment');
@@ -29,7 +27,7 @@ var modulesFile           = editJsonFile("./modules.json");
 
 var bannedUsers           = require("./banned_users.json");
 var bannedUsersFile       = editJsonFile("./banned_users.json");
-
+var badWordsFile          = editJsonFile(`./bad_words.json`);
 var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
 var usercardsFile         = editJsonFile("./usercards.json");
@@ -540,23 +538,26 @@ function isNull(value, def){
   }
 }
 function checkMessageContent(message){
+  if(message.member.roles.some(role => ["Moderators"].includes(role.name))) return;
   var wholeMessage = (message.content).split(" ");
+  var badWordList = _.keys(badWordsFile.read());
+  if(badWordList.length > 0) {
+    if(badWordList.some(word => wholeMessage.includes(word))){
+      message.delete()
+        .then(() =>{
+          message.channel.send(`${message.author} watch your language`)
+            .then(msg => {
+              setTimeout(async() =>{
+                await msg.delete();
+              },5000);
+            }).catch(console.error);
 
-  if(badWordList.some(word => wholeMessage.includes(word))){
-    message.delete()
-      .then(() =>{
-        message.channel.send(`${message.author} watch your language`)
-          .then(msg => {
-            setTimeout(async() =>{
-              await msg.delete();
-            },5000);
-          }).catch(console.error);
-
-        var data = [message.author.id, message.channel.id, message.content, new Date()];
-        connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
-          if(err) throw err;
-        });
-      }).catch(console.error);
+          var data = [message.author.id, message.channel.id, message.content, new Date()];
+          connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data, function(err, results){
+            if(err) throw err;
+          });
+        }).catch(console.error);
+    }
   }
 }
 function checkExpiredMutes(){
@@ -775,8 +776,6 @@ function importUnbans(){
 }
 
 client.on("ready", () => {
-  badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ")//Load initial list of bad words
-
   setupTables();
 
   if(config.test){
@@ -2307,7 +2306,9 @@ client.on('message', async message => {
       ${config.prefix}helper mute <user> <length> <reason>
       ${config.prefix}voicelog <user>
       ${config.prefix}disconnect <user>
-      ${config.prefix}badwords add <word>
+      ${config.prefix}badwords add <word/s>
+      ${config.prefix}badwords remove <word/s>
+      ${config.prefix}badwords clear
       ${config.prefix}badwords list
       ${config.prefix}mute <user> <length> <reason>
       ${config.prefix}remindme <length> <reminder>
@@ -2760,18 +2761,112 @@ client.on('message', async message => {
     }
     if(args[0] === "add"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        var string = (_.rest(args, 1)).join(" ");
-
-        fs.appendFile('badWords.txt', ', '+string, (err) => {
-          if (err) throw err;
-          badWordList = (fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")).split(", ");
-          message.channel.send(`\`${string}\` added`);
-        });
+        if(args[1]) {
+          var newWords = args.splice(1);
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (i != j && newWords[i] == newWords[j]) {
+                message.channel.send(`:x: The argument contains duplicates.`);
+                return;
+              }
+            }
+          }
+          var currentWords = _.keys(badWordsFile.read());
+          if(currentWords.length > 0) {
+            if (currentWords.some(word => newWords.includes(word))) {
+              message.channel.send(`:x: One or more words are already on the list.`);
+              return;
+            }
+          }
+          for(var i = 0; i < newWords.length; i++) {
+            badWordsFile.set(newWords[i], newWords[i]);
+          }
+          badWordsFile.save();
+          message.channel.send(`:white_check_mark: Word(s) \`${newWords}\` added successfully.`);
+        } else message.channel.send(`Please specify a word or words to add.`)
+      }
+    }
+    if(args[0] === "remove") {
+      if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+        if(args[1]) {
+          var newWords = args.splice(1);
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (i != j && newWords[i] == newWords[j]) {
+                message.channel.send(`:x: The argument contains duplicates.`);
+                return;
+              }
+            }
+          }
+          var currentWords = _.keys(badWordsFile.read());
+          var numberOfElements = 0;
+          for (var i = 0; i < newWords.length; i++) {
+            for (var j = 0; j < currentWords.length; j++) {
+              if (newWords[i] === currentWords[j]) numberOfElements++;
+            }
+          }
+          if (numberOfElements < newWords.length) {
+            message.channel.send(`:x: One or more words are not on the list.`)
+            return;
+          }
+          for (var i = 0; i < currentWords.length; i++) {
+            for (var j = 0; j < newWords.length; j++) {
+              if (currentWords[i] === newWords[j]) {
+                badWordsFile.unset(newWords[j]);
+              }
+            }
+          }
+          badWordsFile.save();
+          message.channel.send(`:white_check_mark: All words \`${checkForDuplicates}\` removed successfully.`);
+        } else message.channel.send(`Please specify a word or words to remove.`)
+      }
+    }
+    if(args[0] === "clear") {
+      if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+        var currentWords = _.keys(badWordsFile.read());
+        if(currentWords.length > 0) {
+          for(var i = 0; i < currentWords.length; i++) {
+            badWordsFile.unset(currentWords[i]);
+          }
+          badWordsFile.save();
+          message.channel.send(`All bad words successfully removed.`);
+        } else message.channel.send(`No bad words could be found.`)
       }
     }
     if(args[0] === "list"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        message.channel.send((fs.readFileSync('badwords.txt', 'utf8').replace(/\r?\n|\r/g, "")));
+        var currentWords = _.keys(badWordsFile.read()).join(`\n`);
+        if(currentWords) {
+          message.channel.send({embed: {
+              color: config.color_info,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.displayAvatarURL
+              },
+              title: `Current bad words:`,
+              description: `${currentWords}`,
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            } 
+          });
+        } else {
+            message.channel.send({embed: {
+              color: config.color_info,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.displayAvatarURL
+              },
+              title: `Current bad words:`,
+              description: `No bad words could be found.`,
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            } 
+          });   
+        }
       }
     }
   }
