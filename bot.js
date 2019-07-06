@@ -2311,7 +2311,6 @@ client.on('message', async message => {
       \`1d\`
       \`1\` - If no suffix is given, default will be hours
       `
-
       message.channel.send({embed: {
         color: config.color_info,
         title: `**Listing all available commands:**`,
@@ -2401,7 +2400,7 @@ client.on('message', async message => {
       }
     }
   }
-
+  
   if(command === "helper") {
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
