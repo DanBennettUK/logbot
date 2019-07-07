@@ -2365,17 +2365,25 @@ client.on('message', async message => {
             customCommands.set(args[1]+'.end', "");
             customCommands.save();
             message.channel.send(":white_check_mark: Command added successfully.");
+<<<<<<< HEAD
           } else {
             syntaxErr(message, `commands_add`);
           }
+=======
+          } else syntaxErr(message, `commands_add`);
+>>>>>>> master
         } if (args[0] === "remove") {
             if(args[1]) {
               customCommands.unset(args[1]);
               customCommands.save();
               message.channel.send(":white_check_mark: Command removed successfully.");
+<<<<<<< HEAD
             } else {
               syntaxErr(message, `commands_remove`);
             }
+=======
+            } else syntaxErr(message, `commands_remove`);
+>>>>>>> master
           }
         }
        if(args[0] === "list") {
