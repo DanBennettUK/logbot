@@ -540,7 +540,12 @@ function isNull(value, def){
 function checkMessageContent(message){
   if(message.member.roles.some(role => ["Moderators"].includes(role.name))) return;
   var wholeMessage = (message.content).split(" ");
-  var badWordList = badWordsFile.get(`${message.guild.id}.badWords`);
+  var badWordList = badWordsFile.get(`badWords`);
+  if (badWordList == undefined) {
+    badWordsFile.set(`badWords`, []);
+    badWordsFile.save();
+    return;
+  }
   if(badWordList.length > 0) {
     if(badWordList.some(word => wholeMessage.includes(word))){
       message.delete()
@@ -796,7 +801,7 @@ client.on('message', async message => {
   if(message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
 
   if(!(_.keys(badWordsFile.read()).length > 0)) {
-    badWordsFile.set(`${message.guild.id}.badWords`, []);
+    badWordsFile.set(`badWords`, []);
     badWordsFile.save();
   }
 
@@ -2713,7 +2718,7 @@ client.on('message', async message => {
               }
             }
           }
-          var currentWords = badWordsFile.get(message.guild.id).badWords;
+          var currentWords = badWordsFile.get(`badWords`);
           if(currentWords.length > 0) {
             if (currentWords.some(word => newWords.includes(word))) {
               message.channel.send(`:x: One or more words are already on the list.`);
@@ -2721,7 +2726,7 @@ client.on('message', async message => {
             }
           }
           currentWords = currentWords.concat(newWords);
-          badWordsFile.set(`${message.guild.id}.badWords`, currentWords);
+          badWordsFile.set(`badWords`, currentWords);
           badWordsFile.save();
           message.channel.send(`:white_check_mark: Word(s) \`${newWords}\` added successfully.`);
         } else {
@@ -2747,7 +2752,7 @@ client.on('message', async message => {
               }
             }
           }
-          var currentWords = badWordsFile.get(message.guild.id).badWords;
+          var currentWords = badWordsFile.get(`badWords`);
           var numberOfElements = 0;
           for (var i = 0; i < newWords.length; i++) {
             for (var j = 0; j < currentWords.length; j++) {
@@ -2780,9 +2785,9 @@ client.on('message', async message => {
     }
     if(args[0] === "clear") {
       if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
-        if(badWordsFile.get(message.guild.id).badWords.length > 0) {
-          badWordsFile.unset(`${message.guild.id}`);
-          badWordsFile.set(`${message.guild.id}`.badWords, []);
+        if(badWordsFile.get(`badWords`).length > 0) {
+          badWordsFile.unset(`badWords`);
+          badWordsFile.set(`badWords`, []);
           badWordsFile.save();
           message.channel.send(`:white_check_mark: All bad words successfully removed.`);
         } else message.channel.send(`:x: No bad words could be found.`)
@@ -2790,7 +2795,7 @@ client.on('message', async message => {
     }
     if(args[0] === "list"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        var currentWords = badWordsFile.get(message.guild.id).badWords.join(`\n`);
+        var currentWords = badWordsFile.get(`badWords`).join(`\n`);
         if(currentWords) {
           message.channel.send({embed: {
               color: config.color_info,
