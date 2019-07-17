@@ -596,22 +596,55 @@ function checkReminders(){
   var reminders = reminderFile.read();
   var reminderKeys = _.keys(reminders);
 
-  var a=0;
+  var a = 0;
   function loop() {
-    setTimeout(function() {
+    setTimeout( function() {
       var current = reminderFile.get(reminderKeys[a]);
       if(current.end < (Math.floor(Date.now() / 1000))){
         var member = guild.member(current.who);
+        var time = current.length;
+        var unit = time.replace(/[0-9]+/g, ``);
+        time = time.replace(/[a-z]$/i, ``);
+        switch (unit) {
+          case `m`:
+            if (parseInt(time) == 1) unit = `minute`
+            else unit = `minutes`;
+            break;
+          case `h`:
+            if (parseInt(time) == 1) unit = `hour`
+            else unit = `hours`;
+            break;
+          case `d`: 
+            if (parseInt(time) == 1) unit = `day`
+            else unit = `days`;
+            break;
+          default: 
+            if (parseInt(time) == 1) unit = `hour`
+            else unit = `hours`;
+        }
         if(member){
           member.createDM().then(chnl => {
-          chnl.send(`Hey ${member}, it's been ${current.length} since you set a reminder - \n\n ${current.reminder}`);
+          chnl.send({embed: {
+              color: config.color_info,
+              author: {
+                name: client.user.username,
+                icon_url: client.user.displayAvatarURL
+              },
+              title: `You set a reminder ${time} ${unit} ago.`,
+              description: current.reminder,
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            }
+          });
           }).catch(console.error);
         }
         reminderFile.unset(reminderKeys[a]);
         reminderFile.save();
       }
       a++;
-      if(a<reminderKeys.length) {
+      if (a < reminderKeys.length) {
         loop();
       }
     }, 100);
@@ -846,7 +879,7 @@ client.on('message', async message => {
           if (answer.Abstract == "") {
             if(answer.RelatedTopics.length>0) {
               if(answer.RelatedTopics[0].text!="") {
-                message.channel.send(ans.RelatedTopics[0].Text);
+                message.channel.send(answer.RelatedTopics[0].Text);
                 } else message.channel.send("No results found.");
             } else message.channel.send("No results found.");
           } else {
