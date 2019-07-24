@@ -2450,18 +2450,20 @@ client.on('message', async message => {
           guild.channels.find(ch => ch.name == "eu-duos-tpp")
         ];
         for (var i = 0; i < channels.length; i++) {
+          if (channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
             await channels[i].overwritePermissions(everyone, {
               'SEND_MESSAGES': false
             }, "Servers are down for the update").then(channel => channel.send({embed: {
-              color: config.color_info,
-              title: "Maintenance has begun",
-              description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
-              timestamp: new Date(),
-              footer: {
-                text: `Marvin's Little Brother | Current version: ${config.version}`
+                color: config.color_info,
+                title: "Maintenance has begun",
+                description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
+                timestamp: new Date(),
+                footer: {
+                  text: `Marvin's Little Brother | Current version: ${config.version}`
+                }
               }
-            }
-          }));
+            }));
+          } else message.channel.send(`Channel ${channels[i]} is already locked.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
@@ -2482,18 +2484,20 @@ client.on('message', async message => {
           guild.channels.find(ch => ch.name == "eu-duos-tpp")
         ];
         for (var i = 0; i < channels.length; i++) {
+          if (!channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
             await channels[i].overwritePermissions(everyone, {
               'SEND_MESSAGES': true
             }, "Servers are down for the update").then(channel => channel.send({embed: {
-              color: config.color_info,
-              title: "Maintenance has ended",
-              description: "Channel is now unlocked.",
-              timestamp: new Date(),
-              footer: {
-                text: `Marvin's Little Brother | Current version: ${config.version}`
+                color: config.color_info,
+                title: "Maintenance has ended",
+                description: "Channel is now unlocked.",
+                timestamp: new Date(),
+                footer: {
+                  text: `Marvin's Little Brother | Current version: ${config.version}`
+                }
               }
-            }
-          }));
+            }));
+          } else message.channel.send(`Channel ${channels[i]} is not locked.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
