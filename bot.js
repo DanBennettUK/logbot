@@ -2435,6 +2435,70 @@ client.on('message', async message => {
     }
   }
   
+  if (command === "lock") {
+    if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+      if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
+        var everyone = guild.roles.find(role => role.name === "@everyone");
+        var channels = [
+          guild.channels.find(ch => ch.name == "na-squad-fpp"),
+          guild.channels.find(ch => ch.name == "na-squad-tpp"),
+          guild.channels.find(ch => ch.name == "na-duos-fpp"),
+          guild.channels.find(ch => ch.name == "na-duos-tpp"),
+          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
+          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
+          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
+          guild.channels.find(ch => ch.name == "eu-duos-tpp")
+        ];
+        for (var i = 0; i < channels.length; i++) {
+            await channels[i].overwritePermissions(everyone, {
+              'SEND_MESSAGES': false
+            }, "Servers are down for the update").then(channel => channel.send({embed: {
+              color: config.color_info,
+              title: "Maintenance has begun",
+              description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            }
+          }));
+        }
+      } else message.channel.send(`That module (${command}) is disabled.`);
+    }
+  }
+
+  if (command === "unlock") {
+    if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
+      if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
+        var everyone = guild.roles.find(role => role.name === "@everyone");
+        var channels = [
+          guild.channels.find(ch => ch.name == "na-squad-fpp"),
+          guild.channels.find(ch => ch.name == "na-squad-tpp"),
+          guild.channels.find(ch => ch.name == "na-duos-fpp"),
+          guild.channels.find(ch => ch.name == "na-duos-tpp"),
+          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
+          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
+          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
+          guild.channels.find(ch => ch.name == "eu-duos-tpp")
+        ];
+        for (var i = 0; i < channels.length; i++) {
+            await channels[i].overwritePermissions(everyone, {
+              'SEND_MESSAGES': true
+            }, "Servers are down for the update").then(channel => channel.send({embed: {
+              color: config.color_info,
+              title: "Maintenance has ended",
+              description: "Channel is now unlocked.",
+              timestamp: new Date(),
+              footer: {
+                text: `Marvin's Little Brother | Current version: ${config.version}`
+              }
+            }
+          }));
+        }
+      } else message.channel.send(`That module (${command}) is disabled.`);
+    }
+  }
+
   if(command === "helper") {
     if(args[0] === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
