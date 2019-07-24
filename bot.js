@@ -2486,7 +2486,7 @@ client.on('message', async message => {
         for (var i = 0; i < channels.length; i++) {
           if (!channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
             await channels[i].overwritePermissions(everyone, {
-              'SEND_MESSAGES': true
+              'SEND_MESSAGES': null
             }, "Servers are down for the update").then(channel => channel.send({embed: {
                 color: config.color_info,
                 title: "Maintenance has ended",
