@@ -1,7 +1,9 @@
-/*
+``/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
+##                                                         ##
+##             Another big thanks to MrSergo15#0015        ##
 ##                                                         ##
 ##       with ♡ from all those at /r/PUBATTLEGROUNDS       ##
 #############################################################
@@ -32,6 +34,7 @@ var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
 var usercardsFile         = editJsonFile("./usercards.json");
 var customCommands        = editJsonFile("./customCommands.json");
+var LFGRoomsFile        = editJsonFile("./LFGRooms.json");
 
 const connection = mysql.createConnection({
   host: config.host,
@@ -614,11 +617,11 @@ function checkReminders(){
             if (parseInt(time) == 1) unit = `hour`
             else unit = `hours`;
             break;
-          case `d`: 
+          case `d`:
             if (parseInt(time) == 1) unit = `day`
             else unit = `days`;
             break;
-          default: 
+          default:
             if (parseInt(time) == 1) unit = `hour`
             else unit = `hours`;
         }
@@ -2277,6 +2280,7 @@ client.on('message', async message => {
       }
     }
   }
+
   if(command === "help") {
     if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
       var staffHelpCommands = `
@@ -2312,6 +2316,8 @@ client.on('message', async message => {
       ${config.prefix}commands add <command> <content>
       ${config.prefix}commands remove <command>
       ${config.prefix}commands list
+      ${config.prefix}lock
+      ${config.prefix}unlock
       `
       message.channel.send({embed: {
           color: config.color_info,
@@ -2392,6 +2398,7 @@ client.on('message', async message => {
     }
   });
   }
+
   if(command === "commands") {
     if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
@@ -2434,36 +2441,61 @@ client.on('message', async message => {
       }
     }
   }
-  
+
+  if(command === "lfgrooms") {
+    if(args[0] === "add"){
+      let next = (_.keys(LFGRoomsFile.read()).length) + 1;
+      LFGRoomsFile.set(args[1], next);
+      LFGRoomsFile.save();
+
+      message.channel.send(`Added \`${args[1]}\``);
+    }
+    if(args[0] === "remove"){
+      LFGRoomsFile.unset(args[1]);
+      LFGRoomsFile.save();
+
+      message.channel.send(`Removed \`${args[1]}\``);
+    }
+
+    if(_.size(args) == 0){
+      var list = _.keys(LFGRoomsFile.read());
+
+      message.channel.send({embed: {
+          color: config.color_info,
+          title: "List of LFG rooms",
+          description: `${list.join("\n")}`,
+          timestamp: new Date(),
+          footer: {
+            text: `Marvin's Little Brother | Current version: ${config.version}`
+          }
+        }
+      })
+    }
+  }
+
   if (command === "lock") {
     if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
       if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
         var everyone = guild.roles.find(role => role.name === "@everyone");
-        var channels = [
-          guild.channels.find(ch => ch.name == "na-squad-fpp"),
-          guild.channels.find(ch => ch.name == "na-squad-tpp"),
-          guild.channels.find(ch => ch.name == "na-duos-fpp"),
-          guild.channels.find(ch => ch.name == "na-duos-tpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-tpp")
-        ];
+        var channels = _.keys(LFGRoomsFile.read());
         for (var i = 0; i < channels.length; i++) {
-          if (channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
-            await channels[i].overwritePermissions(everyone, {
-              'SEND_MESSAGES': false
-            }, "Servers are down for the update").then(channel => channel.send({embed: {
-                color: config.color_info,
-                title: "Maintenance has begun",
-                description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
-                timestamp: new Date(),
-                footer: {
-                  text: `Marvin's Little Brother | Current version: ${config.version}`
+          var channelObj = guild.channels.find(obj => obj.name == channels[i]);
+          if(channelObj){
+            if (channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
+              await channelObj.overwritePermissions(everyone, {
+                'SEND_MESSAGES': false
+              }, "Servers are down for the update").then(channel => channel.send({embed: {
+                  color: config.color_info,
+                  title: "Maintenance has begun",
+                  description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
                 }
-              }
-            }));
-          } else message.channel.send(`Channel ${channels[i]} is already locked.`);
+              }));
+            } else message.channel.send(`Channel ${channels[i]} is already locked.`);
+          } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
@@ -2473,31 +2505,25 @@ client.on('message', async message => {
     if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
       if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
         var everyone = guild.roles.find(role => role.name === "@everyone");
-        var channels = [
-          guild.channels.find(ch => ch.name == "na-squad-fpp"),
-          guild.channels.find(ch => ch.name == "na-squad-tpp"),
-          guild.channels.find(ch => ch.name == "na-duos-fpp"),
-          guild.channels.find(ch => ch.name == "na-duos-tpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-tpp")
-        ];
+        var channels = _.keys(LFGRoomsFile.read());
         for (var i = 0; i < channels.length; i++) {
-          if (!channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
-            await channels[i].overwritePermissions(everyone, {
-              'SEND_MESSAGES': null
-            }, "Servers are down for the update").then(channel => channel.send({embed: {
-                color: config.color_info,
-                title: "Maintenance has ended",
-                description: "Channel is now unlocked.",
-                timestamp: new Date(),
-                footer: {
-                  text: `Marvin's Little Brother | Current version: ${config.version}`
+          var channelObj = guild.channels.find(obj => obj.name == channels[i]);
+          if(channelObj){
+            if (!channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
+              await channelObj.overwritePermissions(everyone, {
+                'SEND_MESSAGES': null
+              }, "Servers are down for the update").then(channel => channel.send({embed: {
+                  color: config.color_info,
+                  title: "Maintenance has ended",
+                  description: "Channel is now unlocked.",
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
                 }
-              }
-            }));
-          } else message.channel.send(`Channel ${channels[i]} is not locked.`);
+              }));
+            } else message.channel.send(`Channel ${channels[i]} is not locked.`);
+          } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
@@ -2837,7 +2863,7 @@ client.on('message', async message => {
               await message.delete();
               await msg.delete();
             }, 7000)
-          }).catch(console.error);        
+          }).catch(console.error);
         }
       }
     }
@@ -2880,7 +2906,7 @@ client.on('message', async message => {
               await message.delete();
               await msg.delete();
             }, 7000)
-          }).catch(console.error); 
+          }).catch(console.error);
         }
       }
     }
@@ -2910,7 +2936,7 @@ client.on('message', async message => {
               footer: {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
               }
-            } 
+            }
           });
         } else {
             message.channel.send({embed: {
@@ -2925,8 +2951,8 @@ client.on('message', async message => {
               footer: {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
               }
-            } 
-          });   
+            }
+          });
         }
       }
     }
