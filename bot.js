@@ -1,7 +1,9 @@
-/*
+``/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
+##                                                         ##
+##             Another big thanks to MrSergo15#0015        ##
 ##                                                         ##
 ##       with ♡ from all those at /r/PUBATTLEGROUNDS       ##
 #############################################################
@@ -32,6 +34,7 @@ var mutedFile             = editJsonFile("./muted.json");
 var reminderFile          = editJsonFile("./reminders.json");
 var usercardsFile         = editJsonFile("./usercards.json");
 var customCommands        = editJsonFile("./customCommands.json");
+var LFGRoomsFile        = editJsonFile("./LFGRooms.json");
 
 const connection = mysql.createConnection({
   host: config.host,
@@ -614,11 +617,11 @@ function checkReminders(){
             if (parseInt(time) == 1) unit = `hour`
             else unit = `hours`;
             break;
-          case `d`: 
+          case `d`:
             if (parseInt(time) == 1) unit = `day`
             else unit = `days`;
             break;
-          default: 
+          default:
             if (parseInt(time) == 1) unit = `hour`
             else unit = `hours`;
         }
@@ -903,6 +906,7 @@ client.on('message', async message => {
   //utility commands
   if(command === "module"){
     if(message.member.roles.some(role=>["Admins", "Full Mods"].includes(role.name))){
+      args[0] = args[0].toUpperCase();
       if(typeof modulesFile.get(args[0]) != "undefined"){ //Checks if the module provided exists
         if([0,1].includes(parseInt(args[1]))){ //Parses the string as an int, then checks if the result is a valid <Int> & it's either a 0 or 1
           modulesFile.set(args[0], parseInt(args[1]));
@@ -973,7 +977,7 @@ client.on('message', async message => {
   }
 
   if(command === "users"){
-    if(args[0] == "count"){
+    if(args[0].toLowerCase() == "count"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(modulesFile.get("COMMAND_USER_COUNT")){
           connection.query(
@@ -1011,7 +1015,7 @@ client.on('message', async message => {
         }
       }//End of permission checking statement
     }
-    if(args[0] == "update"){
+    if(args[0].toLowerCase() == "update"){
       if(message.member.roles.some(role=>["Admins"].includes(role.name))){
         if(modulesFile.get("COMMAND_USER_UPDATE")){
           updateUserTable("user", message.channel.id);
@@ -1030,9 +1034,9 @@ client.on('message', async message => {
 
           if(user == "err"){ //Check if the user parameter is valid
             message.channel.send("An invalid user was provided. Please try again");
-          }else{
-            if(guild.member(user)){ //Check if the user exists in the guild
-              if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0){
+          } else {
+            if (guild.member(user)) { //Check if the user exists in the guild
+              if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
                 var tail = args.slice(1);
                 var reason = tail.join(" ").trim();
 
@@ -1115,11 +1119,121 @@ client.on('message', async message => {
                 else{
                   message.channel.send("Please provide a reason for the ban");
                 }
-              }else{
-                message.channel.send("You can not ban a user with a higher role than yourself");
-              }
-            }else{
-              message.channel.send("The user provided was not found in this guild");
+              } else message.channel.send("You can not ban a user with a higher role than yourself");
+            } else { // if the user isn't in the guild, have a confirmation message and proceed upon reacting
+              var toBeBanned = client.users.get(user);
+              if (toBeBanned == undefined) toBeBanned = user;
+              await message.channel.send(`User ${toBeBanned} is not in the guild. Are you sure you want to proceed?`)
+              .then(async msg => {
+                await msg.react('✅');
+                await msg.react('❌');
+
+                const filter = (reaction, user) => user == message.member.user;
+                const collector = msg.createReactionCollector(filter);
+                
+                collector.on('collect', async react => {
+                  if (react.emoji.name == '✅') {
+                    await msg.delete();
+                    var tail = args.slice(1);
+                    var reason = tail.join(" ").trim();
+
+                    if (tail.length > 0) {
+                      var identifier = cryptoRandomString({length: 10});
+                      guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                        if (toBeBanned === user) {
+                          await message.channel.send({embed: {
+                              color: config.color_success,
+                              author: {
+                                name: client.user.username,
+                                icon_url: client.user.displayAvatarURL
+                              },
+                              title: "[Action] Ban" ,
+                              description: `The user provided has been successfully banned`,
+                              fields: [{
+                                  name: "User ID",
+                                  value: toBeBanned,
+                                  inline: true
+                                },
+                                {
+                                  name: "Reason",
+                                  value: reason
+                                },
+                                {
+                                  name: "Banned by",
+                                  value: message.author.username
+                                },
+                                {
+                                  name: "Identifier",
+                                  value: identifier
+                                },
+                              ],
+                              timestamp: new Date(),
+                              footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                              }
+                            }
+                          });
+                        } else {
+                          await message.channel.send({embed: {
+                                color: config.color_success,
+                                author: {
+                                  name: client.user.username,
+                                  icon_url: client.user.displayAvatarURL
+                                },
+                                title: "[Action] Ban" ,
+                                description: `${client.users.get(user)} has been successfully banned`,
+                                fields: [{
+                                    name: "User ID",
+                                    value: result.id,
+                                    inline: true
+                                  },
+                                  {
+                                    name: "Username/Discrim",
+                                    value: `${result.username}#${result.discriminator}`,
+                                    inline: true
+                                  },
+                                  {
+                                    name: "Reason",
+                                    value: reason
+                                  },
+                                  {
+                                    name: "Banned by",
+                                    value: message.author.username
+                                  },
+                                  {
+                                    name: "Identifier",
+                                    value: identifier
+                                  },
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                  text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                              }
+                          });
+                        }
+                        var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                        connection.query(
+                          'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                          function(err, results){
+                            if(err) throw err;
+                          }
+                        );
+
+                        //Adding the user to our banned users JSON
+                        bannedUsersFile.set(identifier, result.username);
+                        bannedUsersFile.save();
+                      }).catch(console.error);
+                    }
+                  } 
+                  if (react.emoji.name == '❌') {
+                    await msg.delete();
+                    message.channel.send("Action cancelled").then(msg2 => {
+                      setTimeout(function() {msg2.delete();}, 5000);
+                    });
+                  }
+                });
+              });           
             }
           }
         }else{
@@ -2277,8 +2391,9 @@ client.on('message', async message => {
       }
     }
   }
+
   if(command === "help") {
-    if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
+    if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
       var staffHelpCommands = `
       Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail
 
@@ -2312,6 +2427,8 @@ client.on('message', async message => {
       ${config.prefix}commands add <command> <content>
       ${config.prefix}commands remove <command>
       ${config.prefix}commands list
+      ${config.prefix}lock
+      ${config.prefix}unlock
       `
       message.channel.send({embed: {
           color: config.color_info,
@@ -2329,7 +2446,7 @@ client.on('message', async message => {
       });
     return;
     }
-    if(message.member.roles.some(role=>["Support"].includes(role.name))){
+    if (message.member.roles.some(role => ["Support"].includes(role.name))) {
       var helperCommands = `
       **Fun commands:**
       **${config.prefix}flipacoin:** This command will flip a coin and return the result.
@@ -2392,11 +2509,12 @@ client.on('message', async message => {
     }
   });
   }
-  if(command === "commands") {
-    if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
-      if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
-        if(args[0] === "add") {
-          if(args[1]) {
+
+  if (command === "commands") {
+    if (message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))) {
+      if (message.member.roles.some(role=>["Moderators"].includes(role.name))) {
+        if (args[0].toLowerCase() === "add") {
+          if (args[1]) {
             var commandStr = _.rest(args, 2).join(" ");
             customCommands.set(args[1]+'.content', commandStr);
             customCommands.set(args[1]+'.cooldown', 15);
@@ -2404,18 +2522,18 @@ client.on('message', async message => {
             customCommands.save();
             message.channel.send(":white_check_mark: Command added successfully.");
           } else syntaxErr(message, `commands_add`);
-        } if (args[0] === "remove") {
-            if(args[1]) {
+        } if (args[0].toLowerCase() === "remove") {
+            if (args[1]) {
               customCommands.unset(args[1]);
               customCommands.save();
               message.channel.send(":white_check_mark: Command removed successfully.");
             } else syntaxErr(message, `commands_remove`);
           }
         }
-       if(args[0] === "list") {
+       if (args[0].toLowerCase() === "list") {
        var cKeys = _.keys(customCommands.read());
        var allCommands="";
-       for(var i = 0; i < cKeys.length; i++) {
+       for (var i = 0; i < cKeys.length; i++) {
          allCommands += "\n **"+ cKeys[i] + ":** "+ customCommands.get(cKeys[i]).content;
         }
        message.channel.send({embed: {
@@ -2434,36 +2552,61 @@ client.on('message', async message => {
       }
     }
   }
-  
+
+  if (command === "lfgrooms") {
+    if (args[0].toLowerCase() === "add") {
+      let next = (_.keys(LFGRoomsFile.read()).length) + 1;
+      LFGRoomsFile.set(args[1], next);
+      LFGRoomsFile.save();
+
+      message.channel.send(`Added \`${args[1]}\``);
+    }
+    if (args[0].toLowerCase() === "remove") {
+      LFGRoomsFile.unset(args[1]);
+      LFGRoomsFile.save();
+
+      message.channel.send(`Removed \`${args[1]}\``);
+    }
+
+    if (_.size(args) == 0) {
+      var list = _.keys(LFGRoomsFile.read());
+
+      message.channel.send({embed: {
+          color: config.color_info,
+          title: "List of LFG rooms",
+          description: `${list.join("\n")}`,
+          timestamp: new Date(),
+          footer: {
+            text: `Marvin's Little Brother | Current version: ${config.version}`
+          }
+        }
+      })
+    }
+  }
+
   if (command === "lock") {
     if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
       if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
         var everyone = guild.roles.find(role => role.name === "@everyone");
-        var channels = [
-          guild.channels.find(ch => ch.name == "na-squad-fpp"),
-          guild.channels.find(ch => ch.name == "na-squad-tpp"),
-          guild.channels.find(ch => ch.name == "na-duos-fpp"),
-          guild.channels.find(ch => ch.name == "na-duos-tpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-tpp")
-        ];
+        var channels = _.keys(LFGRoomsFile.read());
         for (var i = 0; i < channels.length; i++) {
-          if (channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
-            await channels[i].overwritePermissions(everyone, {
-              'SEND_MESSAGES': false
-            }, "Servers are down for the update").then(channel => channel.send({embed: {
-                color: config.color_info,
-                title: "Maintenance has begun",
-                description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
-                timestamp: new Date(),
-                footer: {
-                  text: `Marvin's Little Brother | Current version: ${config.version}`
+          var channelObj = guild.channels.find(obj => obj.name == channels[i]);
+          if (channelObj) {
+            if (channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
+              await channelObj.overwritePermissions(everyone, {
+                'SEND_MESSAGES': false
+              }, "Servers are down for the update").then(channel => channel.send({embed: {
+                  color: config.color_info,
+                  title: "Maintenance has begun",
+                  description: "Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.",
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
                 }
-              }
-            }));
-          } else message.channel.send(`Channel ${channels[i]} is already locked.`);
+              }));
+            } else message.channel.send(`Channel ${channels[i]} is already locked.`);
+          } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
@@ -2473,38 +2616,32 @@ client.on('message', async message => {
     if (message.member.roles.some(role => ["Moderators"].includes(role.name))) {
       if (modulesFile.get("COMMAND_LOCK/UNLOCK")) {
         var everyone = guild.roles.find(role => role.name === "@everyone");
-        var channels = [
-          guild.channels.find(ch => ch.name == "na-squad-fpp"),
-          guild.channels.find(ch => ch.name == "na-squad-tpp"),
-          guild.channels.find(ch => ch.name == "na-duos-fpp"),
-          guild.channels.find(ch => ch.name == "na-duos-tpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-fpp"),
-          guild.channels.find(ch => ch.name == "eu-squad-tpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-fpp"),
-          guild.channels.find(ch => ch.name == "eu-duos-tpp")
-        ];
+        var channels = _.keys(LFGRoomsFile.read());
         for (var i = 0; i < channels.length; i++) {
-          if (!channels[i].permissionsFor(everyone).has('SEND_MESSAGES')) {
-            await channels[i].overwritePermissions(everyone, {
-              'SEND_MESSAGES': null
-            }, "Servers are down for the update").then(channel => channel.send({embed: {
-                color: config.color_info,
-                title: "Maintenance has ended",
-                description: "Channel is now unlocked.",
-                timestamp: new Date(),
-                footer: {
-                  text: `Marvin's Little Brother | Current version: ${config.version}`
+          var channelObj = guild.channels.find(obj => obj.name == channels[i]);
+          if (channelObj) {
+            if (!channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
+              await channelObj.overwritePermissions(everyone, {
+                'SEND_MESSAGES': null
+              }, "Servers are down for the update").then(channel => channel.send({embed: {
+                  color: config.color_info,
+                  title: "Maintenance has ended",
+                  description: "Channel is now unlocked.",
+                  timestamp: new Date(),
+                  footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                  }
                 }
-              }
-            }));
-          } else message.channel.send(`Channel ${channels[i]} is not locked.`);
+              }));
+            } else message.channel.send(`Channel ${channels[i]} is not locked.`);
+          } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
         }
       } else message.channel.send(`That module (${command}) is disabled.`);
     }
   }
 
   if(command === "helper") {
-    if(args[0] === "clear"){
+    if(args[0].toLowerCase() === "clear"){
       if(message.member.roles.some(role=>["Moderators", "Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_CLEAR")){
           if(args.length >= 4){
@@ -2560,7 +2697,7 @@ client.on('message', async message => {
         }
       }
     }
-    if(args[0] === "mute"){
+    if(args[0].toLowerCase() === "mute"){
       //mute userid 5 why
       if(message.member.roles.some(role=>["Support"].includes(role.name))){
         if(modulesFile.get("COMMAND_HELPER_MUTE")){
@@ -2807,7 +2944,7 @@ client.on('message', async message => {
   }
 
   if(command === "badwords"){
-    if(args[0] === "add"){
+    if(args[0].toLowerCase() === "add"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         if(args[1]) {
           var newWords = args.splice(1);
@@ -2837,11 +2974,11 @@ client.on('message', async message => {
               await message.delete();
               await msg.delete();
             }, 7000)
-          }).catch(console.error);        
+          }).catch(console.error);
         }
       }
     }
-    if(args[0] === "remove") {
+    if(args[0].toLowerCase() === "remove") {
       if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
         if(args[1]) {
           var newWords = args.splice(1);
@@ -2880,11 +3017,11 @@ client.on('message', async message => {
               await message.delete();
               await msg.delete();
             }, 7000)
-          }).catch(console.error); 
+          }).catch(console.error);
         }
       }
     }
-    if(args[0] === "clear") {
+    if(args[0].toLowerCase() === "clear") {
       if(message.member.roles.some(role => ["Moderators"].includes(role.name))) {
         if(badWordsFile.get(`badWords`).length > 0) {
           badWordsFile.unset(`badWords`);
@@ -2894,7 +3031,7 @@ client.on('message', async message => {
         } else message.channel.send(`:x: No bad words could be found.`)
       }
     }
-    if(args[0] === "list"){
+    if(args[0].toLowerCase() === "list"){
       if(message.member.roles.some(role=>["Moderators"].includes(role.name))){
         var currentWords = badWordsFile.get(`badWords`).join(`\n`);
         if(currentWords) {
@@ -2910,7 +3047,7 @@ client.on('message', async message => {
               footer: {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
               }
-            } 
+            }
           });
         } else {
             message.channel.send({embed: {
@@ -2925,8 +3062,8 @@ client.on('message', async message => {
               footer: {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
               }
-            } 
-          });   
+            }
+          });
         }
       }
     }
