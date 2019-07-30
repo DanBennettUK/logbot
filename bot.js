@@ -384,6 +384,7 @@ function parseUserTag(tag){
     var split = tag.split("#");
     var usernameResolve = client.users.find(obj => obj.username === split[0]);
 
+    if (usernameResolve == null) return "err";
     if(usernameResolve.discriminator == split[1]){
       return usernameResolve.id;
     }else{
