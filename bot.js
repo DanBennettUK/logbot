@@ -1121,119 +1121,87 @@ client.on('message', async message => {
                 }
               } else message.channel.send("You can not ban a user with a higher role than yourself");
             } else { // if the user isn't in the guild, have a confirmation message and proceed upon reacting
-              var toBeBanned = client.users.get(user);
-              if (toBeBanned == undefined) toBeBanned = user;
-              await message.channel.send(`User ${toBeBanned} is not in the guild. Are you sure you want to proceed?`)
-              .then(async msg => {
-                await msg.react('✅');
-                await msg.react('❌');
+              if (client.fetchUser(user)) {
+                await client.fetchUser(user).then(async userObj =>{
 
-                const filter = (reaction, user) => user == message.member.user;
-                const collector = msg.createReactionCollector(filter);
-                
-                collector.on('collect', async react => {
-                  if (react.emoji.name == '✅') {
-                    await msg.delete();
-                    var tail = args.slice(1);
-                    var reason = tail.join(" ").trim();
+                  await message.channel.send(`User ${userObj} is not in the guild. Are you sure you want to proceed?`)
+                  .then(async msg => {
+                    await msg.react('✅');
+                    await msg.react('❌');
 
-                    if (tail.length > 0) {
-                      var identifier = cryptoRandomString({length: 10});
-                      guild.ban(user, { days: 1, reason: reason }).then(async result => {
-                        if (toBeBanned === user) {
-                          await message.channel.send({embed: {
-                              color: config.color_success,
-                              author: {
-                                name: client.user.username,
-                                icon_url: client.user.displayAvatarURL
-                              },
-                              title: "[Action] Ban" ,
-                              description: `The user provided has been successfully banned`,
-                              fields: [{
-                                  name: "User ID",
-                                  value: toBeBanned,
-                                  inline: true
-                                },
-                                {
-                                  name: "Reason",
-                                  value: reason
-                                },
-                                {
-                                  name: "Banned by",
-                                  value: message.author.username
-                                },
-                                {
-                                  name: "Identifier",
-                                  value: identifier
-                                },
-                              ],
-                              timestamp: new Date(),
-                              footer: {
-                                text: `Marvin's Little Brother | Current version: ${config.version}`
-                              }
-                            }
-                          });
-                        } else {
-                          await message.channel.send({embed: {
-                                color: config.color_success,
-                                author: {
-                                  name: client.user.username,
-                                  icon_url: client.user.displayAvatarURL
-                                },
-                                title: "[Action] Ban" ,
-                                description: `${client.users.get(user)} has been successfully banned`,
-                                fields: [{
-                                    name: "User ID",
-                                    value: result.id,
-                                    inline: true
+                    const filter = (reaction, user) => user == message.member.user;
+                    const collector = msg.createReactionCollector(filter);
+                    
+                    collector.on('collect', async react => {
+                      if (react.emoji.name == '✅') {
+                        await msg.delete();
+                        var tail = args.slice(1);
+                        var reason = tail.join(" ").trim();
+
+                        if (tail.length > 0) {
+                          var identifier = cryptoRandomString({length: 10});
+                          guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                            await message.channel.send({embed: {
+                                  color: config.color_success,
+                                  author: {
+                                    name: client.user.username,
+                                    icon_url: client.user.displayAvatarURL
                                   },
-                                  {
-                                    name: "Username/Discrim",
-                                    value: `${result.username}#${result.discriminator}`,
-                                    inline: true
-                                  },
-                                  {
-                                    name: "Reason",
-                                    value: reason
-                                  },
-                                  {
-                                    name: "Banned by",
-                                    value: message.author.username
-                                  },
-                                  {
-                                    name: "Identifier",
-                                    value: identifier
-                                  },
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                  text: `Marvin's Little Brother | Current version: ${config.version}`
+                                  title: "[Action] Ban" ,
+                                  description: `${client.users.get(user)} has been successfully banned`,
+                                  fields: [{
+                                      name: "User ID",
+                                      value: result.id,
+                                      inline: true
+                                    },
+                                    {
+                                      name: "Username/Discrim",
+                                      value: `${result.username}#${result.discriminator}`,
+                                      inline: true
+                                    },
+                                    {
+                                      name: "Reason",
+                                      value: reason
+                                    },
+                                    {
+                                      name: "Banned by",
+                                      value: message.author.username
+                                    },
+                                    {
+                                      name: "Identifier",
+                                      value: identifier
+                                    },
+                                  ],
+                                  timestamp: new Date(),
+                                  footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                  }
                                 }
+                            });
+                            var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                            connection.query(
+                              'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                              function(err, results){
+                                if(err) throw err;
                               }
-                          });
-                        }
-                        var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
-                        connection.query(
-                          'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                          function(err, results){
-                            if(err) throw err;
-                          }
-                        );
+                            );
 
-                        //Adding the user to our banned users JSON
-                        bannedUsersFile.set(identifier, result.username);
-                        bannedUsersFile.save();
-                      }).catch(console.error);
-                    }
-                  } 
-                  if (react.emoji.name == '❌') {
-                    await msg.delete();
-                    message.channel.send("Action cancelled").then(msg2 => {
-                      setTimeout(function() {msg2.delete();}, 5000);
+                            //Adding the user to our banned users JSON
+                            bannedUsersFile.set(identifier, result.username);
+                            bannedUsersFile.save();
+                          }).catch(console.error);
+                        }
+                      } 
+                      if (react.emoji.name == '❌') {
+                        await msg.delete();
+                        message.channel.send("Action cancelled").then(msg2 => {
+                          setTimeout(function() {msg2.delete();}, 5000);
+                        });
+                      }
                     });
-                  }
+                  });
                 });
-              });           
+              }        
             }
           }
         }else{
@@ -1260,75 +1228,77 @@ client.on('message', async message => {
           message.channel.send(":thinking: An invalid user was provided. Please try again");
         }else{
           if(client.fetchUser(user)){
-            var tail = args.slice(1);
-            var reason = tail.join(" ").trim();
+            await client.fetchUser(user).then(async userObj => {
+              var tail = args.slice(1);
+              var reason = tail.join(" ").trim();
 
-            if(tail.length > 0){
-              guild.unban(user, reason).then(result => {
-                var identifier = cryptoRandomString({length: 10});
-                  message.channel.send({embed: {
-                        color: config.color_success,
-                        author: {
-                          name: client.user.username,
-                          icon_url: client.user.displayAvatarURL
-                        },
-                        title: `[Action] Unban` ,
-                        description: "The user provided has been successfully unbanned",
-                        fields: [{
-                            name: "ID",
-                            value: result.id,
-                            inline: true
+              if(tail.length > 0){
+                guild.unban(user, reason).then(result => {
+                  var identifier = cryptoRandomString({length: 10});
+                    message.channel.send({embed: {
+                          color: config.color_success,
+                          author: {
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
                           },
-                          {
-                            name: "Username/Discrim",
-                            value: `${result.username}#${result.discriminator}`,
-                            inline: true
-                          },
-                          {
-                            name: "Reason",
-                            value: reason
-                          },
-                          {
-                            name: "Unbanned by",
-                            value: message.author.username
-                          },
-                          {
-                            name: "Identifier",
-                            value: identifier
-                          },
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                          text: `Marvin's Little Brother | Current version: ${config.version}`
+                          title: `[Action] Unban` ,
+                          description: `${userObj} has been successfully unbanned`,
+                          fields: [{
+                              name: "User ID",
+                              value: result.id,
+                              inline: true
+                            },
+                            {
+                              name: "Username/Discrim",
+                              value: `${result.username}#${result.discriminator}`,
+                              inline: true
+                            },
+                            {
+                              name: "Reason",
+                              value: reason
+                            },
+                            {
+                              name: "Unbanned by",
+                              value: message.author.username
+                            },
+                            {
+                              name: "Identifier",
+                              value: identifier
+                            },
+                          ],
+                          timestamp: new Date(),
+                          footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                          }
                         }
+                    });
+
+                    var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                    connection.query(
+                      'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                      function(err, results){
+                        if(err) throw err;
                       }
-                  });
-
-                  var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
-                  connection.query(
-                    'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                    function(err, results){
+                    );
+                    connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', result.id, function(err, rows, results){
                       if(err) throw err;
-                    }
-                  );
-                  connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', result.id, function(err, rows, results){
-                    if(err) throw err;
 
-                    //var file = bannedUsersFile.get();
-                    bannedUsersFile.set(rows[0].identifier, '')
-                    bannedUsersFile.save();
-                  });
-                })
-              .catch(err => {
-                if(err.message === "Unknown Ban"){
-                  message.channel.send("That user doesn't appear to be banned");
-                }else{
-                  console.log(err);
-                }
-              });
-            }else{
-              message.channel.send("Please provide a reason for the unban")
-            }
+                      //var file = bannedUsersFile.get();
+                      bannedUsersFile.set(rows[0].identifier, '')
+                      bannedUsersFile.save();
+                    });
+                  })
+                .catch(err => {
+                  if(err.message === "Unknown Ban"){
+                    message.channel.send("That user doesn't appear to be banned");
+                  }else{
+                    console.log(err);
+                  }
+                });
+              }else{
+                message.channel.send("Please provide a reason for the unban")
+              }
+            });
           }else{
             message.channel.send("Could not find a Discord user with that tag/ID")
           }
