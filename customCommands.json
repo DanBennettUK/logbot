@@ -1,77 +1,77 @@
 {
-  "patch": {
-    "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
-    "cooldown": 15,
-    "end": ""
-  },
-  "chickendinner":{
-    "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
-    "cooldown": 60,
-    "end": ""
-  },
-  "voicechat": {
-    "content": "We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
-    "cooldown": 15,
-    "end": ""
-  },
-  "down": {
-    "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
-    "cooldown": 15,
-    "end": 1559395794
-  },
-  "np": {
-    "content": "No problem!",
-    "cooldown":10,
-    "end": ""
-  },
-  "dad": {
-    "content": "https://i.imgur.com/KyMBEWQ.png",
-    "cooldown":15,
-    "end": ""
-  },
-  "bugreport": {
-    "content": "Please go here to officially report any bugs you find in-game: \n<http://forums.pubg.com/forum/10-bug-reports/>",
-    "cooldown": 15,
-    "end": 1560436758
-  },
-  "forums": {
-    "content": "<http://forums.pubg.com/>",
-    "cooldown": 15,
-    "end": 1560436762
-  },
-  "invite": {
-    "content": "Use this link to invite others to the server:\nhttp://discord.gg/pubgreddit",
-    "cooldown": 15,
-    "end": ""
-  },
-  "official": {
-    "content": "You can join the official Discord Server run by PUBG Corp. here:\nhttp://discord.gg/battlegrounds",
-    "cooldown": 15,
-    "end": ""
-  },
-  "report": {
-    "content": "Want to report an in-game player? Please use the report button in-game as well as sending a ticket via <https://www.pubg.com/support/> \n\nIf you want to report a user on Discord, PM <@407690548401405962> in the sidebar",
-    "cooldown": 15,
-    "end": 1560437089
-  },
-  "roc": {
-    "content": "You can find PUBG's Rules of Conduct here: <http://pubg.com/rules-of-conduct>",
-    "cooldown": 15,
-    "end": 1560436937
-  },
-  "support": {
-    "content": "Have an account issue? Head here:\n<https://www.pubg.com/support/>",
-    "cooldown": 15,
-    "end": 1560436997
-  },
-  "wiki": {
-    "content": "An official wiki for BATTLEGROUNDS can be found @ <http://battlegrounds.gamepedia.com/>",
-    "cooldown": 15,
-    "end": ""
-  },
-  "steam": {
-    "content": "Steam is currently down. Check <https://steamstat.us/> for more information.",
-    "cooldown": 15,
-    "end": ""
-  }
+    "patch": {
+        "content": "Servers are currently in maintenance to upgrade to the latest patch! Check the latest patch notes here: <https://www.pubg.com/category/patch-notes/>!",
+        "cooldown": 15,
+        "end": ""
+    },
+    "chickendinner": {
+        "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
+        "cooldown": 60,
+        "end": ""
+    },
+    "voicechat": {
+        "content": "We are aware there are currently issues with the voice chat. This is an issue with Discord and we hope it will be resolved soon.",
+        "cooldown": 15,
+        "end": ""
+    },
+    "down": {
+        "content": "Unfortunately, the servers are down right now. Keep an eye on <#289467450074988545> for updates!",
+        "cooldown": 15,
+        "end": 1559395794
+    },
+    "np": {
+        "content": "No problem!",
+        "cooldown": 10,
+        "end": ""
+    },
+    "dad": {
+        "content": "https://i.imgur.com/KyMBEWQ.png",
+        "cooldown": 15,
+        "end": ""
+    },
+    "bugreport": {
+        "content": "Please go here to officially report any bugs you find in-game: \n<http://forums.pubg.com/forum/10-bug-reports/>",
+        "cooldown": 15,
+        "end": 1560436758
+    },
+    "forums": {
+        "content": "<http://forums.pubg.com/>",
+        "cooldown": 15,
+        "end": 1560436762
+    },
+    "invite": {
+        "content": "Use this link to invite others to the server:\nhttp://discord.gg/pubgreddit",
+        "cooldown": 15,
+        "end": ""
+    },
+    "official": {
+        "content": "You can join the official Discord Server run by PUBG Corp. here:\nhttp://discord.gg/battlegrounds",
+        "cooldown": 15,
+        "end": ""
+    },
+    "report": {
+        "content": "Want to report an in-game player? Please use the report button in-game as well as sending a ticket via <https://www.pubg.com/support/> \n\nIf you want to report a user on Discord, PM <@407690548401405962> in the sidebar",
+        "cooldown": 15,
+        "end": 1560437089
+    },
+    "roc": {
+        "content": "You can find PUBG's Rules of Conduct here: <http://pubg.com/rules-of-conduct>",
+        "cooldown": 15,
+        "end": 1560436937
+    },
+    "support": {
+        "content": "Have an account issue? Head here:\n<https://www.pubg.com/support/>",
+        "cooldown": 15,
+        "end": 1560436997
+    },
+    "wiki": {
+        "content": "An official wiki for BATTLEGROUNDS can be found @ <http://battlegrounds.gamepedia.com/>",
+        "cooldown": 15,
+        "end": ""
+    },
+    "steam": {
+        "content": "Steam is currently down. Check <https://steamstat.us/> for more information.",
+        "cooldown": 15,
+        "end": ""
+    }
 }
