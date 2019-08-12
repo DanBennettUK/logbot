@@ -1,4 +1,5 @@
-``; /*
+``;
+/*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
 ##            Created and maintained by Sys#1602           ##
@@ -43,7 +44,7 @@ const connection = mysql.createConnection({
     database: config.database,
     multipleStatements: config.multipleStatements
 });
-connection.connect(function(err, results) {
+connection.connect(function (err, results) {
     if (err) throw err;
 });
 
@@ -61,7 +62,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -78,7 +79,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -91,7 +92,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -112,7 +113,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -129,7 +130,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -142,7 +143,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -163,7 +164,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -176,7 +177,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -189,7 +190,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -210,7 +211,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -231,7 +232,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -252,7 +253,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -273,7 +274,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -293,7 +294,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -313,7 +314,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -330,7 +331,7 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -352,23 +353,24 @@ function setupTables() {
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
     connection.query(
         `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
     connection.query(
         `INSERT IGNORE INTO voiceTypes (id, type) VALUES (1, "join"), (2, "move"), (3, "leave")`,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
 }
+
 function parseUserTag(tag) {
     /*
   - Function used for parsing multiple types of the <user> argument
@@ -406,6 +408,7 @@ function parseUserTag(tag) {
         }
     }
 }
+
 function parseChannelTag(tag) {
     /*
   - Function used for parsing multiple types of the <channel> argument
@@ -422,6 +425,7 @@ function parseChannelTag(tag) {
         return 'err';
     }
 }
+
 function updateUserTable(invoker, channel) {
     var memberArray = [];
     var guild = client.guilds.get(config.guildid);
@@ -439,7 +443,7 @@ function updateUserTable(invoker, channel) {
         connection.query(
             'INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES ?',
             [memberArray],
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
                 if (results) {
                     switch (invoker) {
@@ -452,10 +456,8 @@ function updateUserTable(invoker, channel) {
                                         icon_url: client.user.displayAvatarURL
                                     },
                                     title: '[COMMAND] User update',
-                                    description:
-                                        'Users that are not known to the database will be added.',
-                                    fields: [
-                                        {
+                                    description: 'Users that are not known to the database will be added.',
+                                    fields: [{
                                             name: 'Total users found',
                                             value: ' ' + memberArray.length
                                         },
@@ -466,8 +468,7 @@ function updateUserTable(invoker, channel) {
                                         },
                                         {
                                             name: 'Note',
-                                            value:
-                                                'If the amount of users inserted is `0`, this is most likely due to the database already being up to date, not an error.'
+                                            value: 'If the amount of users inserted is `0`, this is most likely due to the database already being up to date, not an error.'
                                         }
                                     ],
                                     timestamp: new Date(),
@@ -490,6 +491,7 @@ function updateUserTable(invoker, channel) {
         );
     });
 }
+
 function updateGuildBansTable(invoker, channel) {
     var banArray = [];
     var guild = client.guilds.get(config.guildid);
@@ -509,7 +511,7 @@ function updateGuildBansTable(invoker, channel) {
         connection.query(
             'INSERT IGNORE INTO log_guildbans (userID, username, discriminator, bannedBy, reason, note, timestamp) VALUES ?',
             [banArray],
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
                 if (results) {
                     switch (invoker) {
@@ -522,10 +524,8 @@ function updateGuildBansTable(invoker, channel) {
                                         icon_url: client.user.displayAvatarURL
                                     },
                                     title: '[COMMAND] Bans update',
-                                    description:
-                                        'Bans that are not known to us will be added to the database',
-                                    fields: [
-                                        {
+                                    description: 'Bans that are not known to us will be added to the database',
+                                    fields: [{
                                             name: 'Total bans found',
                                             value: `${bans.size}`,
                                             inline: true
@@ -537,8 +537,7 @@ function updateGuildBansTable(invoker, channel) {
                                         },
                                         {
                                             name: 'Note',
-                                            value:
-                                                'If the amount of bans inserted is 0, this is most likely due to the database already being up to date, not an error.'
+                                            value: 'If the amount of bans inserted is 0, this is most likely due to the database already being up to date, not an error.'
                                         }
                                     ],
                                     timestamp: new Date(),
@@ -553,10 +552,10 @@ function updateGuildBansTable(invoker, channel) {
                         case 'system':
                             console.log(
                                 '[INFO] Found ' +
-                                    banArray.length +
-                                    ' bans / Inserted ' +
-                                    results.affectedRows +
-                                    ' rows. Bans that are not in the database will be added now. '
+                                banArray.length +
+                                ' bans / Inserted ' +
+                                results.affectedRows +
+                                ' rows. Bans that are not in the database will be added now. '
                             );
                             break;
                     }
@@ -565,6 +564,7 @@ function updateGuildBansTable(invoker, channel) {
         );
     });
 }
+
 function syntaxErr(message, command) {
     message.channel
         .send(`There is a problem in your syntax.`)
@@ -576,6 +576,7 @@ function syntaxErr(message, command) {
         })
         .catch(console.error);
 }
+
 function isNull(value, def) {
     if (!value || (value === undefined || value === null)) {
         return def;
@@ -583,6 +584,7 @@ function isNull(value, def) {
         return value;
     }
 }
+
 function checkMessageContent(message) {
     if (message.member.roles.some(role => ['Moderators'].includes(role.name)))
         return;
@@ -616,7 +618,7 @@ function checkMessageContent(message) {
                     connection.query(
                         'INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)',
                         data,
-                        function(err, results) {
+                        function (err, results) {
                             if (err) throw err;
                         }
                     );
@@ -625,6 +627,7 @@ function checkMessageContent(message) {
         }
     }
 }
+
 function checkExpiredMutes() {
     var mutes = mutedFile.read();
     var muteKeys = _.keys(mutes);
@@ -654,14 +657,16 @@ function checkExpiredMutes() {
         }
     }
 }
+
 function checkReminders() {
     var guild = client.guilds.get(config.guildid);
     var reminders = reminderFile.read();
     var reminderKeys = _.keys(reminders);
 
     var a = 0;
+
     function loop() {
-        setTimeout(function() {
+        setTimeout(function () {
             var current = reminderFile.get(reminderKeys[a]);
             if (current.end < Math.floor(Date.now() / 1000)) {
                 var member = guild.member(current.who);
@@ -720,6 +725,7 @@ function checkReminders() {
     }
     loop();
 }
+
 function importWarnings() {
     var warnings = usercardsFile.get();
     var insert = [];
@@ -733,7 +739,9 @@ function importWarnings() {
                         userID,
                         warnings[i].Records[a].AddedByUserId.$numberLong,
                         warnings[i].Records[a].Reason,
-                        cryptoRandomString({ length: 10 }),
+                        cryptoRandomString({
+                            length: 10
+                        }),
                         0,
                         warnings[i].Records[a].ActionTaken.$date,
                         new Date()
@@ -746,7 +754,7 @@ function importWarnings() {
     connection.query(
         'INSERT IGNORE INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?',
         [insert],
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
             if (results) {
                 console.log('Success!');
@@ -754,6 +762,7 @@ function importWarnings() {
         }
     );
 }
+
 function importMutes() {
     var mutes = usercardsFile.get();
     var insert = [];
@@ -789,7 +798,9 @@ function importMutes() {
                         mutes[i].Records[a].AddedByUserId.$numberLong,
                         mutes[i].Records[a].Reason,
                         seconds,
-                        cryptoRandomString({ length: 10 }),
+                        cryptoRandomString({
+                            length: 10
+                        }),
                         0,
                         mutes[i].Records[a].ActionTaken.$date,
                         new Date()
@@ -802,7 +813,7 @@ function importMutes() {
     connection.query(
         'INSERT IGNORE INTO log_mutes (userID, actioner, description, length, identifier, isDeleted, timestamp, updated) VALUES ?',
         [insert],
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
             if (results) {
                 console.log('Success!');
@@ -810,6 +821,7 @@ function importMutes() {
         }
     );
 }
+
 function importNotes() {
     var notes = usercardsFile.get();
     var insert = [];
@@ -822,7 +834,9 @@ function importNotes() {
                     userID,
                     notes[i].Notes[a].AddedByUserId.$numberLong,
                     notes[i].Notes[a].Message,
-                    cryptoRandomString({ length: 10 }),
+                    cryptoRandomString({
+                        length: 10
+                    }),
                     0,
                     notes[i].Notes[a].ActionTaken.$date,
                     new Date()
@@ -834,7 +848,7 @@ function importNotes() {
     connection.query(
         'INSERT IGNORE INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?',
         [insert],
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
             if (results) {
                 console.log('Success!');
@@ -842,6 +856,7 @@ function importNotes() {
         }
     );
 }
+
 function importBans() {
     var bans = usercardsFile.get();
     var insert = [];
@@ -855,7 +870,9 @@ function importBans() {
                         userID,
                         bans[i].Records[a].AddedByUserId.$numberLong,
                         bans[i].Records[a].Reason,
-                        cryptoRandomString({ length: 10 }),
+                        cryptoRandomString({
+                            length: 10
+                        }),
                         0,
                         bans[i].Records[a].ActionTaken.$date,
                         new Date()
@@ -868,7 +885,7 @@ function importBans() {
     connection.query(
         'INSERT IGNORE INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?',
         [insert],
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
             if (results) {
                 console.log('Success!');
@@ -876,6 +893,7 @@ function importBans() {
         }
     );
 }
+
 function importUnbans() {
     var unbans = usercardsFile.get();
     var insert = [];
@@ -889,7 +907,9 @@ function importUnbans() {
                         userID,
                         unbans[i].Records[a].AddedByUserId.$numberLong,
                         unbans[i].Records[a].Reason,
-                        cryptoRandomString({ length: 10 }),
+                        cryptoRandomString({
+                            length: 10
+                        }),
                         0,
                         unbans[i].Records[a].ActionTaken.$date,
                         new Date()
@@ -902,7 +922,7 @@ function importUnbans() {
     connection.query(
         'INSERT IGNORE INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp, updated) VALUES ?',
         [insert],
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
             if (results) {
                 console.log('Success!');
@@ -954,7 +974,7 @@ client.on('message', async message => {
     connection.query(
         'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)',
         data,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
@@ -1008,9 +1028,7 @@ client.on('message', async message => {
     }
     if (command === 'ask') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators', 'Support'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_ASK')) {
                 var query = args.join('+');
@@ -1018,7 +1036,7 @@ client.on('message', async message => {
                 var answer;
                 request(
                     'https://api.duckduckgo.com/?q=' + query + '&format=json',
-                    function(error, response, body) {
+                    function (error, response, body) {
                         answer = JSON.parse(body);
                         if (answer.Abstract == '') {
                             if (answer.RelatedTopics.length > 0) {
@@ -1048,13 +1066,11 @@ client.on('message', async message => {
             message.channel.send(`That module (${command}) is disabled.`);
         }
     }
-  
+
     //utility commands
     if (command === 'module') {
         if (
-            message.member.roles.some(role =>
-                ['Admins', 'Full Mods'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Admins', 'Full Mods'].includes(role.name))
         ) {
             if (typeof modulesFile.get(args[0]) != 'undefined') {
                 //Checks if the module provided exists
@@ -1067,8 +1083,7 @@ client.on('message', async message => {
                         embed: {
                             color: config.color_info,
                             title: '🔶 A module was updated',
-                            description:
-                                args[0] + ' was set to status ' + args[1],
+                            description: args[0] + ' was set to status ' + args[1],
                             timestamp: new Date(),
                             footer: {
                                 text: `Marvin's Little Brother | Current version: ${
@@ -1098,9 +1113,7 @@ client.on('message', async message => {
 
     if (command === 'listmodules') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             var file = modulesFile.get();
             var moduleNames = _.keys(file);
@@ -1114,8 +1127,7 @@ client.on('message', async message => {
                         icon_url: client.user.displayAvatarURL
                     },
                     title: '[COMMAND] List Modules',
-                    fields: [
-                        {
+                    fields: [{
                             name: 'Module',
                             value: moduleNames.join('\n'),
                             inline: true
@@ -1127,8 +1139,7 @@ client.on('message', async message => {
                         },
                         {
                             name: 'Note',
-                            value:
-                                'If you would like a module enabling/disabling. Please ask an Admin.'
+                            value: 'If you would like a module enabling/disabling. Please ask an Admin.'
                         }
                     ],
                     timestamp: new Date(),
@@ -1145,14 +1156,12 @@ client.on('message', async message => {
     if (command === 'users') {
         if (args[0] == 'count') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 if (modulesFile.get('COMMAND_USER_COUNT')) {
                     connection.query(
                         'SELECT COUNT(*) AS TotalUsers FROM users',
-                        function(err, result) {
+                        function (err, result) {
                             if (err) throw err;
                             if (result)
                                 message.channel.send({
@@ -1160,21 +1169,17 @@ client.on('message', async message => {
                                         color: config.color_info,
                                         author: {
                                             name: client.user.username,
-                                            icon_url:
-                                                client.user.displayAvatarURL
+                                            icon_url: client.user.displayAvatarURL
                                         },
                                         title: '[COMMAND] User count',
-                                        description:
-                                            'The current count of users known to us',
-                                        fields: [
-                                            {
+                                        description: 'The current count of users known to us',
+                                        fields: [{
                                                 name: 'Total user count',
                                                 value: result[0].TotalUsers
                                             },
                                             {
                                                 name: 'Note',
-                                                value:
-                                                    'This number includes users past and present.'
+                                                value: 'This number includes users past and present.'
                                             }
                                         ],
                                         timestamp: new Date(),
@@ -1196,9 +1201,7 @@ client.on('message', async message => {
         }
         if (args[0] == 'update') {
             if (
-                message.member.roles.some(role =>
-                    ['Admins'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Admins'].includes(role.name))
             ) {
                 if (modulesFile.get('COMMAND_USER_UPDATE')) {
                     updateUserTable('user', message.channel.id);
@@ -1213,9 +1216,7 @@ client.on('message', async message => {
 
     if (command === 'ban') {
         if (
-            message.member.roles.some(role =>
-                ['Admins', 'Full Mods'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_BAN')) {
                 if (args[0]) {
@@ -1248,18 +1249,14 @@ client.on('message', async message => {
                                             await chnl
                                                 .send({
                                                     embed: {
-                                                        color:
-                                                            config.color_warning,
+                                                        color: config.color_warning,
                                                         title: `You have been banned from ${
                                                             guild.name
                                                         } for breaking one or more of the rules`,
-                                                        fields: [
-                                                            {
-                                                                name:
-                                                                    'Want to dispute?',
-                                                                value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
-                                                            }
-                                                        ],
+                                                        fields: [{
+                                                            name: 'Want to dispute?',
+                                                            value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
+                                                        }],
                                                         timestamp: new Date(),
                                                         footer: {
                                                             text: `Marvin's Little Brother | Current version: ${
@@ -1283,7 +1280,7 @@ client.on('message', async message => {
                                                     connection.query(
                                                         'INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',
                                                         data,
-                                                        function(err, results) {
+                                                        function (err, results) {
                                                             if (err) throw err;
                                                         }
                                                     );
@@ -1294,77 +1291,63 @@ client.on('message', async message => {
                                                             reason: reason
                                                         })
                                                         .then(async result => {
-                                                            await message.channel.send(
-                                                                {
-                                                                    embed: {
-                                                                        color:
-                                                                            config.color_success,
-                                                                        author: {
-                                                                            name:
-                                                                                client
-                                                                                    .user
-                                                                                    .username,
-                                                                            icon_url:
-                                                                                client
-                                                                                    .user
-                                                                                    .displayAvatarURL
-                                                                        },
-                                                                        title:
-                                                                            '[Action] Ban',
-                                                                        description: `${client.users.get(
+                                                            await message.channel.send({
+                                                                embed: {
+                                                                    color: config.color_success,
+                                                                    author: {
+                                                                        name: client
+                                                                            .user
+                                                                            .username,
+                                                                        icon_url: client
+                                                                            .user
+                                                                            .displayAvatarURL
+                                                                    },
+                                                                    title: '[Action] Ban',
+                                                                    description: `${client.users.get(
                                                                             user
                                                                         )} has been successfully banned`,
-                                                                        fields: [
-                                                                            {
-                                                                                name:
-                                                                                    'User ID',
-                                                                                value:
-                                                                                    result.id,
-                                                                                inline: true
-                                                                            },
-                                                                            {
-                                                                                name:
-                                                                                    'Username/Discrim',
-                                                                                value: `${
+                                                                    fields: [{
+                                                                            name: 'User ID',
+                                                                            value: result.id,
+                                                                            inline: true
+                                                                        },
+                                                                        {
+                                                                            name: 'Username/Discrim',
+                                                                            value: `${
                                                                                     result.username
                                                                                 }#${
                                                                                     result.discriminator
                                                                                 }`,
-                                                                                inline: true
-                                                                            },
-                                                                            {
-                                                                                name:
-                                                                                    'Reason',
-                                                                                value: reason
-                                                                            },
-                                                                            {
-                                                                                name:
-                                                                                    'Banned by',
-                                                                                value:
-                                                                                    message
-                                                                                        .author
-                                                                                        .username
-                                                                            },
-                                                                            {
-                                                                                name:
-                                                                                    'Identifier',
-                                                                                value: identifier
-                                                                            }
-                                                                        ],
-                                                                        timestamp: new Date(),
-                                                                        footer: {
-                                                                            text: `Marvin's Little Brother | Current version: ${
+                                                                            inline: true
+                                                                        },
+                                                                        {
+                                                                            name: 'Reason',
+                                                                            value: reason
+                                                                        },
+                                                                        {
+                                                                            name: 'Banned by',
+                                                                            value: message
+                                                                                .author
+                                                                                .username
+                                                                        },
+                                                                        {
+                                                                            name: 'Identifier',
+                                                                            value: identifier
+                                                                        }
+                                                                    ],
+                                                                    timestamp: new Date(),
+                                                                    footer: {
+                                                                        text: `Marvin's Little Brother | Current version: ${
                                                                                 config.version
                                                                             }`
-                                                                        }
                                                                     }
                                                                 }
-                                                            );
+                                                            });
 
                                                             var data = [
                                                                 result.id,
                                                                 message.author
-                                                                    .id,
+                                                                .id,
                                                                 reason,
                                                                 identifier,
                                                                 0,
@@ -1373,7 +1356,7 @@ client.on('message', async message => {
                                                             connection.query(
                                                                 'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)',
                                                                 data,
-                                                                function(
+                                                                function (
                                                                     err,
                                                                     results
                                                                 ) {
@@ -1421,9 +1404,7 @@ client.on('message', async message => {
 
     if (command === 'unban') {
         if (
-            message.member.roles.some(role =>
-                ['Admins', 'Full Mods'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_UNBAN')) {
                 if (args[0]) {
@@ -1457,14 +1438,11 @@ client.on('message', async message => {
                                             color: config.color_success,
                                             author: {
                                                 name: client.user.username,
-                                                icon_url:
-                                                    client.user.displayAvatarURL
+                                                icon_url: client.user.displayAvatarURL
                                             },
                                             title: `[Action] Unban`,
-                                            description:
-                                                'The user provided has been successfully unbanned',
-                                            fields: [
-                                                {
+                                            description: 'The user provided has been successfully unbanned',
+                                            fields: [{
                                                     name: 'ID',
                                                     value: result.id,
                                                     inline: true
@@ -1482,8 +1460,7 @@ client.on('message', async message => {
                                                 },
                                                 {
                                                     name: 'Unbanned by',
-                                                    value:
-                                                        message.author.username
+                                                    value: message.author.username
                                                 },
                                                 {
                                                     name: 'Identifier',
@@ -1510,14 +1487,14 @@ client.on('message', async message => {
                                     connection.query(
                                         'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)',
                                         data,
-                                        function(err, results) {
+                                        function (err, results) {
                                             if (err) throw err;
                                         }
                                     );
                                     connection.query(
                                         'select identifier from log_guildbans where userid = ? order by timestamp desc limit 1',
                                         result.id,
-                                        function(err, rows, results) {
+                                        function (err, rows, results) {
                                             if (err) throw err;
 
                                             //var file = bannedUsersFile.get();
@@ -1557,9 +1534,7 @@ client.on('message', async message => {
 
     if (command === 'note') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators', 'Support'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_NOTE')) {
                 if (args[0]) {
@@ -1580,7 +1555,9 @@ client.on('message', async message => {
                     var note = tail.join(' ').trim();
 
                     if (tail.length > 0) {
-                        var identifier = cryptoRandomString({ length: 10 });
+                        var identifier = cryptoRandomString({
+                            length: 10
+                        });
                         var data = [
                             user,
                             message.author.id,
@@ -1593,7 +1570,7 @@ client.on('message', async message => {
                         connection.query(
                             'INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)',
                             data,
-                            function(err, results) {
+                            function (err, results) {
                                 if (err) throw err;
 
                                 message.channel.send({
@@ -1601,15 +1578,13 @@ client.on('message', async message => {
                                         color: config.color_success,
                                         author: {
                                             name: client.user.username,
-                                            icon_url:
-                                                client.user.displayAvatarURL
+                                            icon_url: client.user.displayAvatarURL
                                         },
                                         title: '[Action] Note added',
                                         description: `A note was added to ${client.users.get(
                                             user
                                         )} by ${message.author}`,
-                                        fields: [
-                                            {
+                                        fields: [{
                                                 name: 'Content',
                                                 value: note
                                             },
@@ -1640,16 +1615,14 @@ client.on('message', async message => {
 
     if (command === 'cnote') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_CNOTE')) {
                 if (args[0].length == 10) {
                     connection.query(
                         'UPDATE log_note SET isDeleted = 1 WHERE identifier = ?',
                         args[0].trim(),
-                        function(err, results, rows) {
+                        function (err, results, rows) {
                             if (err) throw err;
                             if (results.affectedRows == 1) {
                                 message.channel.send(
@@ -1681,9 +1654,7 @@ client.on('message', async message => {
 
     if (command === 'user') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_USER')) {
                 var userID = parseUserTag(args[0]);
@@ -1727,8 +1698,7 @@ client.on('message', async message => {
                                 thumbnail: {
                                     url: userObject.user.displayAvatarURL
                                 },
-                                fields: [
-                                    {
+                                fields: [{
                                         name: 'Created',
                                         value: userObject.user.createdAt
                                     },
@@ -1791,7 +1761,7 @@ client.on('message', async message => {
                    )
                   order by timestamp desc
                   `,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var events = [];
                                             var max = 5;
@@ -1851,16 +1821,14 @@ client.on('message', async message => {
                                             if (!_.isEmpty(events)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Warnings for ${
                                                                 userObject.user
                                                                     .username
                                                             } (${nickname})`,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: events.join(
                                                             `\n`
@@ -1876,15 +1844,12 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                userObject.user
-                                                                    .username,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            name: userObject.user
+                                                                .username,
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: `There are no recorded warnings for this user`,
                                                         timestamp: new Date(),
@@ -1904,7 +1869,7 @@ client.on('message', async message => {
                                     connection.query(
                                         'select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc',
                                         userID,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var mutes = [];
                                             var max = 5;
@@ -1940,16 +1905,14 @@ client.on('message', async message => {
                                             if (!_.isEmpty(mutes)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Mutes for ${
                                                                 userObject.user
                                                                     .username
                                                             } (${nickname})`,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: mutes.join(
                                                             ' '
@@ -1965,15 +1928,12 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                userObject.user
-                                                                    .username,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            name: userObject.user
+                                                                .username,
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: `There are no recorded mutes for this user`,
                                                         timestamp: new Date(),
@@ -1995,13 +1955,11 @@ client.on('message', async message => {
                                     connection.query(
                                         'select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc',
                                         userID,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var notes = [];
                                             for (
-                                                var i = 0;
-                                                i < rows.length;
-                                                i++
+                                                var i = 0; i < rows.length; i++
                                             ) {
                                                 var row = rows[i];
                                                 await notes.push(
@@ -2019,16 +1977,14 @@ client.on('message', async message => {
                                             if (!_.isEmpty(notes)) {
                                                 msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `${
                                                                 userObject.user
                                                                     .username
                                                             } (${nickname})`,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: notes.join(
                                                             ' '
@@ -2044,15 +2000,12 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                userObject.user
-                                                                    .username,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            name: userObject.user
+                                                                .username,
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: `There are no recorded notes for this user`,
                                                         timestamp: new Date(),
@@ -2075,9 +2028,8 @@ client.on('message', async message => {
                                                 name: `${
                                                     userObject.user.username
                                                 } (${nickname})`,
-                                                icon_url:
-                                                    userObject.user
-                                                        .displayAvatarURL
+                                                icon_url: userObject.user
+                                                    .displayAvatarURL
                                             },
                                             description: `${
                                                 userObject.user
@@ -2085,22 +2037,18 @@ client.on('message', async message => {
                                                 userObject.joinedAt
                                             }`,
                                             thumbnail: {
-                                                url:
-                                                    userObject.user
-                                                        .displayAvatarURL
+                                                url: userObject.user
+                                                    .displayAvatarURL
                                             },
-                                            fields: [
-                                                {
+                                            fields: [{
                                                     name: 'Created',
-                                                    value:
-                                                        userObject.user
-                                                            .createdAt
+                                                    value: userObject.user
+                                                        .createdAt
                                                 },
                                                 {
                                                     name: 'Status',
-                                                    value:
-                                                        userObject.user.presence
-                                                            .status,
+                                                    value: userObject.user.presence
+                                                        .status,
                                                     inline: true
                                                 },
                                                 {
@@ -2132,7 +2080,7 @@ client.on('message', async message => {
                   ) a
                   order by timestamp desc`,
                                         [userID, userID],
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var history = [];
                                             var max = 5;
@@ -2177,16 +2125,14 @@ client.on('message', async message => {
                                             if (!_.isEmpty(history)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Join/Leave history for ${
                                                                 userObject.user
                                                                     .username
                                                             } (${nickname})`,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: history.join(
                                                             ' '
@@ -2202,15 +2148,12 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                userObject.user
-                                                                    .username,
-                                                            icon_url:
-                                                                userObject.user
-                                                                    .displayAvatarURL
+                                                            name: userObject.user
+                                                                .username,
+                                                            icon_url: userObject.user
+                                                                .displayAvatarURL
                                                         },
                                                         description: `There are no join/leave records for this user`,
                                                         timestamp: new Date(),
@@ -2286,7 +2229,7 @@ client.on('message', async message => {
                    )
                   order by timestamp desc
                   `,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var events = [];
                                             var max = 5;
@@ -2346,14 +2289,12 @@ client.on('message', async message => {
                                             if (!_.isEmpty(events)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Warnings for ${
                                                                 globalUser.username
                                                             }`,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: events.join(
                                                             `\n`
@@ -2369,13 +2310,10 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                globalUser.username,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            name: globalUser.username,
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: `There are no recorded warnings for this user`,
                                                         timestamp: new Date(),
@@ -2395,7 +2333,7 @@ client.on('message', async message => {
                                     connection.query(
                                         'select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc',
                                         userID,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var mutes = [];
                                             var max = 5;
@@ -2431,14 +2369,12 @@ client.on('message', async message => {
                                             if (!_.isEmpty(mutes)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Mutes for ${
                                                                 globalUser.username
                                                             }`,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: mutes.join(
                                                             ' '
@@ -2454,13 +2390,10 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                globalUser.username,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            name: globalUser.username,
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: `There are no recorded mutes for this user`,
                                                         timestamp: new Date(),
@@ -2482,13 +2415,11 @@ client.on('message', async message => {
                                     connection.query(
                                         'select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc',
                                         userID,
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var notes = [];
                                             for (
-                                                var i = 0;
-                                                i < rows.length;
-                                                i++
+                                                var i = 0; i < rows.length; i++
                                             ) {
                                                 var row = rows[i];
                                                 await notes.push(
@@ -2506,13 +2437,10 @@ client.on('message', async message => {
                                             if (!_.isEmpty(notes)) {
                                                 msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
-                                                            name:
-                                                                globalUser.username,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            name: globalUser.username,
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: notes.join(
                                                             ' '
@@ -2528,13 +2456,10 @@ client.on('message', async message => {
                                             } else {
                                                 msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                globalUser.username,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            name: globalUser.username,
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: `There are no recorded notes for this user`,
                                                         timestamp: new Date(),
@@ -2555,8 +2480,7 @@ client.on('message', async message => {
                                             color: config.color_caution,
                                             author: {
                                                 name: globalUser.username,
-                                                icon_url:
-                                                    globalUser.displayAvatarURL
+                                                icon_url: globalUser.displayAvatarURL
                                             },
                                             title: `${userID}`,
                                             description: `The user you provided is not currently camping in this guild.`,
@@ -2579,7 +2503,7 @@ client.on('message', async message => {
                   ) a
                   order by timestamp desc`,
                                         [userID, userID],
-                                        async function(err, rows, results) {
+                                        async function (err, rows, results) {
                                             if (err) throw err;
                                             var history = [];
                                             var max = 5;
@@ -2622,14 +2546,12 @@ client.on('message', async message => {
                                             if (!_.isEmpty(history)) {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_info,
+                                                        color: config.color_info,
                                                         author: {
                                                             name: `Join/Leave history for ${
                                                                 globalUser.username
                                                             }`,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: history.join(
                                                             ' '
@@ -2645,13 +2567,10 @@ client.on('message', async message => {
                                             } else {
                                                 await msg.edit({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         author: {
-                                                            name:
-                                                                globalUser.username,
-                                                            icon_url:
-                                                                globalUser.displayAvatarURL
+                                                            name: globalUser.username,
+                                                            icon_url: globalUser.displayAvatarURL
                                                         },
                                                         description: `There are no join/leave records for this user`,
                                                         timestamp: new Date(),
@@ -2676,7 +2595,7 @@ client.on('message', async message => {
                     connection.query(
                         'select * from users where userid = ? order by updated desc limit 1',
                         userID,
-                        async function(err, rows, results) {
+                        async function (err, rows, results) {
                             var cardUser = rows[0];
                             message.channel
                                 .send({
@@ -2734,7 +2653,7 @@ client.on('message', async message => {
                      )
                     order by timestamp desc
                     `,
-                                                async function(
+                                                async function (
                                                     err,
                                                     rows,
                                                     results
@@ -2752,9 +2671,7 @@ client.on('message', async message => {
                                                     }
 
                                                     for (
-                                                        var i = 0;
-                                                        i < max;
-                                                        i++
+                                                        var i = 0; i < max; i++
                                                     ) {
                                                         var row = rows[i];
                                                         if (
@@ -2810,8 +2727,7 @@ client.on('message', async message => {
                                                     if (!_.isEmpty(events)) {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_info,
+                                                                color: config.color_info,
                                                                 author: {
                                                                     name: `Warnings for ${
                                                                         cardUser.username
@@ -2836,11 +2752,9 @@ client.on('message', async message => {
                                                     } else {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_caution,
+                                                                color: config.color_caution,
                                                                 author: {
-                                                                    name:
-                                                                        cardUser.username,
+                                                                    name: cardUser.username,
                                                                     icon_url: `https://cdn.discordapp.com/avatars/${
                                                                         cardUser.userID
                                                                     }/${
@@ -2865,7 +2779,7 @@ client.on('message', async message => {
                                             connection.query(
                                                 'select * from log_mutes where userID = ? and isDeleted = 0 order by timestamp desc',
                                                 userID,
-                                                async function(
+                                                async function (
                                                     err,
                                                     rows,
                                                     results
@@ -2883,9 +2797,7 @@ client.on('message', async message => {
                                                     }
 
                                                     for (
-                                                        var i = 0;
-                                                        i < max;
-                                                        i++
+                                                        var i = 0; i < max; i++
                                                     ) {
                                                         var row = rows[i];
                                                         await mutes.push(
@@ -2913,8 +2825,7 @@ client.on('message', async message => {
                                                     if (!_.isEmpty(mutes)) {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_info,
+                                                                color: config.color_info,
                                                                 author: {
                                                                     name: `Mutes for ${
                                                                         cardUser.username
@@ -2939,11 +2850,9 @@ client.on('message', async message => {
                                                     } else {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_caution,
+                                                                color: config.color_caution,
                                                                 author: {
-                                                                    name:
-                                                                        cardUser.username,
+                                                                    name: cardUser.username,
                                                                     icon_url: `https://cdn.discordapp.com/avatars/${
                                                                         cardUser.userID
                                                                     }/${
@@ -2970,7 +2879,7 @@ client.on('message', async message => {
                                             connection.query(
                                                 'select * from log_note where userID = ? and isDeleted = 0 order by timestamp desc',
                                                 userID,
-                                                async function(
+                                                async function (
                                                     err,
                                                     rows,
                                                     results
@@ -2978,9 +2887,7 @@ client.on('message', async message => {
                                                     if (err) throw err;
                                                     var notes = [];
                                                     for (
-                                                        var i = 0;
-                                                        i < rows.length;
-                                                        i++
+                                                        var i = 0; i < rows.length; i++
                                                     ) {
                                                         var row = rows[i];
                                                         await notes.push(
@@ -2998,11 +2905,9 @@ client.on('message', async message => {
                                                     if (!_.isEmpty(notes)) {
                                                         msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_info,
+                                                                color: config.color_info,
                                                                 author: {
-                                                                    name:
-                                                                        cardUser.username,
+                                                                    name: cardUser.username,
                                                                     icon_url: `https://cdn.discordapp.com/avatars/${
                                                                         cardUser.userID
                                                                     }/${
@@ -3023,11 +2928,9 @@ client.on('message', async message => {
                                                     } else {
                                                         msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_caution,
+                                                                color: config.color_caution,
                                                                 author: {
-                                                                    name:
-                                                                        cardUser.username,
+                                                                    name: cardUser.username,
                                                                     icon_url: `https://cdn.discordapp.com/avatars/${
                                                                         cardUser.userID
                                                                     }/${
@@ -3080,7 +2983,7 @@ client.on('message', async message => {
                     ) a
                     order by timestamp desc`,
                                                 [userID, userID],
-                                                async function(
+                                                async function (
                                                     err,
                                                     rows,
                                                     results
@@ -3098,9 +3001,7 @@ client.on('message', async message => {
                                                     }
 
                                                     for (
-                                                        var i = 0;
-                                                        i < max;
-                                                        i++
+                                                        var i = 0; i < max; i++
                                                     ) {
                                                         var row = rows[i];
                                                         switch (row.Status) {
@@ -3135,8 +3036,7 @@ client.on('message', async message => {
                                                     if (!_.isEmpty(history)) {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_info,
+                                                                color: config.color_info,
                                                                 author: {
                                                                     name: `Join/Leave history for ${
                                                                         cardUser.username
@@ -3161,11 +3061,9 @@ client.on('message', async message => {
                                                     } else {
                                                         await msg.edit({
                                                             embed: {
-                                                                color:
-                                                                    config.color_caution,
+                                                                color: config.color_caution,
                                                                 author: {
-                                                                    name:
-                                                                        cardUser.username,
+                                                                    name: cardUser.username,
                                                                     icon_url: `https://cdn.discordapp.com/avatars/${
                                                                         cardUser.userID
                                                                     }/${
@@ -3202,9 +3100,7 @@ client.on('message', async message => {
 
     if (command === 'warn') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_WARN')) {
                 if (args[0]) {
@@ -3224,7 +3120,9 @@ client.on('message', async message => {
                         var content = tail.join(' ').trim();
 
                         if (tail.length > 0) {
-                            var identifier = cryptoRandomString({ length: 10 });
+                            var identifier = cryptoRandomString({
+                                length: 10
+                            });
                             var data = [
                                 user,
                                 message.author.id,
@@ -3237,7 +3135,7 @@ client.on('message', async message => {
                             connection.query(
                                 'INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total) ',
                                 data,
-                                function(err, results) {
+                                function (err, results) {
                                     if (err) throw err;
 
                                     message.channel.send({
@@ -3245,8 +3143,7 @@ client.on('message', async message => {
                                             color: config.color_success,
                                             author: {
                                                 name: client.user.username,
-                                                icon_url:
-                                                    client.user.displayAvatarURL
+                                                icon_url: client.user.displayAvatarURL
                                             },
                                             title: '[Action] Warning added',
                                             description: `A warning was added to ${client.users.get(
@@ -3256,8 +3153,7 @@ client.on('message', async message => {
                                             }. User now has **${
                                                 results[1][0].total
                                             }** records `,
-                                            fields: [
-                                                {
+                                            fields: [{
                                                     name: 'Reason',
                                                     value: content
                                                 },
@@ -3282,27 +3178,22 @@ client.on('message', async message => {
                                             await chnl
                                                 .send({
                                                     embed: {
-                                                        color:
-                                                            config.color_caution,
+                                                        color: config.color_caution,
                                                         title: `You have been warned in ${
                                                             guild.name
                                                         }`,
                                                         description: `Details about the warning can be found below:`,
-                                                        fields: [
-                                                            {
+                                                        fields: [{
                                                                 name: 'Reason',
                                                                 value: content
                                                             },
                                                             {
-                                                                name:
-                                                                    'Identifier',
+                                                                name: 'Identifier',
                                                                 value: `\`${identifier}\``
                                                             },
                                                             {
-                                                                name:
-                                                                    'Want to dispute?',
-                                                                value:
-                                                                    'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                                name: 'Want to dispute?',
+                                                                value: 'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                             }
                                                         ],
                                                         timestamp: new Date(),
@@ -3326,7 +3217,7 @@ client.on('message', async message => {
                                                     connection.query(
                                                         'INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',
                                                         data,
-                                                        function(err, results) {
+                                                        function (err, results) {
                                                             if (err) throw err;
                                                         }
                                                     );
@@ -3352,16 +3243,14 @@ client.on('message', async message => {
 
     if (command === 'cwarn') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_CWARN')) {
                 if (args[0].length == 10) {
                     connection.query(
                         'UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?',
                         args[0].trim(),
-                        function(err, results, rows) {
+                        function (err, results, rows) {
                             if (err) throw err;
                             if (results.affectedRows == 1) {
                                 message.channel.send(
@@ -3393,9 +3282,7 @@ client.on('message', async message => {
 
     if (command === 'help') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             var staffHelpCommands = `
       Commands in detail can be found here: https://github.com/FMWK/logbot/wiki/Commands-in-detail
@@ -3542,14 +3429,10 @@ client.on('message', async message => {
 
     if (command === 'commands') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators', 'Support'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
         ) {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 if (args[0] === 'add') {
                     if (args[1]) {
@@ -3640,9 +3523,7 @@ client.on('message', async message => {
 
     if (command === 'lock') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
                 var everyone = guild.roles.find(
@@ -3656,13 +3537,12 @@ client.on('message', async message => {
                     if (channelObj) {
                         if (
                             channelObj
-                                .permissionsFor(everyone)
-                                .has('SEND_MESSAGES')
+                            .permissionsFor(everyone)
+                            .has('SEND_MESSAGES')
                         ) {
                             await channelObj
                                 .overwritePermissions(
-                                    everyone,
-                                    {
+                                    everyone, {
                                         SEND_MESSAGES: false
                                     },
                                     'Servers are down for the update'
@@ -3672,8 +3552,7 @@ client.on('message', async message => {
                                         embed: {
                                             color: config.color_info,
                                             title: 'Maintenance has begun',
-                                            description:
-                                                'Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.',
+                                            description: 'Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.',
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${
@@ -3701,9 +3580,7 @@ client.on('message', async message => {
 
     if (command === 'unlock') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
                 var everyone = guild.roles.find(
@@ -3717,13 +3594,12 @@ client.on('message', async message => {
                     if (channelObj) {
                         if (
                             !channelObj
-                                .permissionsFor(everyone)
-                                .has('SEND_MESSAGES')
+                            .permissionsFor(everyone)
+                            .has('SEND_MESSAGES')
                         ) {
                             await channelObj
                                 .overwritePermissions(
-                                    everyone,
-                                    {
+                                    everyone, {
                                         SEND_MESSAGES: null
                                     },
                                     'Servers are down for the update'
@@ -3733,8 +3609,7 @@ client.on('message', async message => {
                                         embed: {
                                             color: config.color_info,
                                             title: 'Maintenance has ended',
-                                            description:
-                                                'Channel is now unlocked.',
+                                            description: 'Channel is now unlocked.',
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${
@@ -3763,9 +3638,7 @@ client.on('message', async message => {
     if (command === 'helper') {
         if (args[0] === 'clear') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators', 'Support'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
             ) {
                 if (modulesFile.get('COMMAND_HELPER_CLEAR')) {
                     if (args.length >= 4) {
@@ -3779,15 +3652,17 @@ client.on('message', async message => {
 
                         if (user && guild.member(user)) {
                             channel
-                                .fetchMessages({ limit: 100 })
+                                .fetchMessages({
+                                    limit: 100
+                                })
                                 .then(async a => {
                                     await channel
                                         .bulkDelete(
                                             a
-                                                .filter(
-                                                    b => b.author.id == user.id
-                                                )
-                                                .first(parseInt(amount))
+                                            .filter(
+                                                b => b.author.id == user.id
+                                            )
+                                            .first(parseInt(amount))
                                         )
                                         .then(result => (deleted = result.size))
                                         .catch(console.error);
@@ -3826,7 +3701,7 @@ client.on('message', async message => {
                                         connection.query(
                                             'INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)',
                                             data,
-                                            function(err, results) {
+                                            function (err, results) {
                                                 if (err) throw err;
                                             }
                                         );
@@ -3859,13 +3734,11 @@ client.on('message', async message => {
                 }
             }
         }
-      
+
         if (args[0] === 'mute') {
             //mute userid 5 why
             if (
-                message.member.roles.some(role =>
-                    ['Support'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Support'].includes(role.name))
             ) {
                 if (modulesFile.get('COMMAND_HELPER_MUTE')) {
                     var user = parseUserTag(args[1]);
@@ -3946,29 +3819,23 @@ client.on('message', async message => {
 
                                                 message.channel.send({
                                                     embed: {
-                                                        color:
-                                                            config.color_success,
+                                                        color: config.color_success,
                                                         author: {
-                                                            name:
-                                                                client.user
-                                                                    .username,
-                                                            icon_url:
-                                                                client.user
-                                                                    .displayAvatarURL
+                                                            name: client.user
+                                                                .username,
+                                                            icon_url: client.user
+                                                                .displayAvatarURL
                                                         },
-                                                        title:
-                                                            '[Action] User Muted',
+                                                        title: '[Action] User Muted',
                                                         description: `${member} was muted by ${
                                                             message.author
                                                         } for ${args[2]}m`,
-                                                        fields: [
-                                                            {
+                                                        fields: [{
                                                                 name: 'Reason',
                                                                 value: reason
                                                             },
                                                             {
-                                                                name:
-                                                                    'Identifier',
+                                                                name: 'Identifier',
                                                                 value: identifier,
                                                                 inline: true
                                                             },
@@ -3998,7 +3865,7 @@ client.on('message', async message => {
                                                 connection.query(
                                                     'INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)',
                                                     data,
-                                                    function(err, results) {
+                                                    function (err, results) {
                                                         if (err) throw err;
                                                     }
                                                 );
@@ -4009,37 +3876,30 @@ client.on('message', async message => {
                                                         await chnl
                                                             .send({
                                                                 embed: {
-                                                                    color:
-                                                                        config.color_caution,
+                                                                    color: config.color_caution,
                                                                     title: `You have been muted in ${
                                                                         guild.name
                                                                     }`,
                                                                     description: `Details regarding the mute can be found below:`,
-                                                                    fields: [
-                                                                        {
-                                                                            name:
-                                                                                'Reason',
+                                                                    fields: [{
+                                                                            name: 'Reason',
                                                                             value: reason,
                                                                             inline: true
                                                                         },
                                                                         {
-                                                                            name:
-                                                                                'Length',
+                                                                            name: 'Length',
                                                                             value: `${
                                                                                 args[2]
                                                                             }m`,
                                                                             inline: true
                                                                         },
                                                                         {
-                                                                            name:
-                                                                                'Identifier',
+                                                                            name: 'Identifier',
                                                                             value: `\`${identifier}\``
                                                                         },
                                                                         {
-                                                                            name:
-                                                                                'Want to dispute?',
-                                                                            value:
-                                                                                'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                                            name: 'Want to dispute?',
+                                                                            value: 'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                                         }
                                                                     ],
                                                                     timestamp: new Date(),
@@ -4053,14 +3913,14 @@ client.on('message', async message => {
                                                             .then(dm => {
                                                                 if (
                                                                     dm.embeds[0]
-                                                                        .type ===
+                                                                    .type ===
                                                                     'rich'
                                                                 ) {
                                                                     var data = [
                                                                         user,
                                                                         dm
-                                                                            .embeds[0]
-                                                                            .title,
+                                                                        .embeds[0]
+                                                                        .title,
                                                                         3,
                                                                         0,
                                                                         identifier,
@@ -4081,7 +3941,7 @@ client.on('message', async message => {
                                                                 connection.query(
                                                                     'INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',
                                                                     data,
-                                                                    function(
+                                                                    function (
                                                                         err,
                                                                         results
                                                                     ) {
@@ -4129,9 +3989,7 @@ client.on('message', async message => {
 
     if (command === 'voicelog') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_VOICELOG')) {
                 if (args[0]) {
@@ -4149,7 +4007,7 @@ client.on('message', async message => {
                     connection.query(
                         'select * from log_voice where userID = ? ORDER BY timestamp DESC LIMIT 22',
                         user,
-                        async function(err, rows, results) {
+                        async function (err, rows, results) {
                             if (err) throw err;
 
                             var times = [];
@@ -4167,8 +4025,7 @@ client.on('message', async message => {
                                     var next = rows[i - 1];
 
                                     if (
-                                        row.type !== 3 &&
-                                        [2, 3].indexOf(next.type) > -1
+                                        row.type !== 3 && [2, 3].indexOf(next.type) > -1
                                     ) {
                                         //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
                                         var time1 = row.timestamp;
@@ -4196,8 +4053,7 @@ client.on('message', async message => {
                                         );
                                     }
                                 } else if (
-                                    !rows[i - 1] &&
-                                    [1, 2].indexOf(row.type) > -1
+                                    !rows[i - 1] && [1, 2].indexOf(row.type) > -1
                                 ) {
                                     //No next event available AND current event is a fresh join or move. i.e, we can assume they are still here.
                                     current.push(row.newChannel);
@@ -4207,8 +4063,7 @@ client.on('message', async message => {
                                             row.timestamp.toUTCString()
                                         ).fromNow()})`
                                     );
-                                } else {
-                                }
+                                } else {}
                             }
                             times.reverse();
                             current.reverse();
@@ -4265,9 +4120,7 @@ client.on('message', async message => {
 
     if (command === 'disconnect') {
         if (
-            message.member.roles.some(role =>
-                ['Admins', 'Full Mods'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_DISCONNECT')) {
                 var user = parseUserTag(args[0]);
@@ -4314,9 +4167,7 @@ client.on('message', async message => {
     if (command === 'badwords') {
         if (args[0] === 'add') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 if (args[1]) {
                     var newWords = args.splice(1);
@@ -4362,9 +4213,7 @@ client.on('message', async message => {
         }
         if (args[0] === 'remove') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 if (args[1]) {
                     var newWords = args.splice(1);
@@ -4418,9 +4267,7 @@ client.on('message', async message => {
         }
         if (args[0] === 'clear') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 if (badWordsFile.get(`badWords`).length > 0) {
                     badWordsFile.unset(`badWords`);
@@ -4434,9 +4281,7 @@ client.on('message', async message => {
         }
         if (args[0] === 'list') {
             if (
-                message.member.roles.some(role =>
-                    ['Moderators'].includes(role.name)
-                )
+                message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
                 var currentWords = badWordsFile.get(`badWords`).join(`\n`);
                 if (currentWords) {
@@ -4482,9 +4327,7 @@ client.on('message', async message => {
 
     if (command === 'mute') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_MUTE')) {
                 var user = parseUserTag(args[0]);
@@ -4596,23 +4439,19 @@ client.on('message', async message => {
                                         connection.query(
                                             'INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?); CALL user_totalRecords(?, @total)',
                                             data,
-                                            function(err, results) {
+                                            function (err, results) {
                                                 if (err) throw err;
 
                                                 message.channel.send({
                                                     embed: {
-                                                        color:
-                                                            config.color_success,
+                                                        color: config.color_success,
                                                         author: {
-                                                            name:
-                                                                client.user
-                                                                    .username,
-                                                            icon_url:
-                                                                client.user
-                                                                    .displayAvatarURL
+                                                            name: client.user
+                                                                .username,
+                                                            icon_url: client.user
+                                                                .displayAvatarURL
                                                         },
-                                                        title:
-                                                            '[Action] User Muted',
+                                                        title: '[Action] User Muted',
                                                         description: `${member} was muted by ${
                                                             message.author
                                                         } for ${
@@ -4620,14 +4459,12 @@ client.on('message', async message => {
                                                         }. User now has **${
                                                             results[1][0].total
                                                         }** records`,
-                                                        fields: [
-                                                            {
+                                                        fields: [{
                                                                 name: 'Reason',
                                                                 value: reason
                                                             },
                                                             {
-                                                                name:
-                                                                    'Identifier',
+                                                                name: 'Identifier',
                                                                 value: identifier,
                                                                 inline: true
                                                             },
@@ -4654,36 +4491,28 @@ client.on('message', async message => {
                                                 await chnl
                                                     .send({
                                                         embed: {
-                                                            color:
-                                                                config.color_caution,
+                                                            color: config.color_caution,
                                                             title: `You have been muted in ${
                                                                 guild.name
                                                             }`,
                                                             description: `Details regarding the mute can be found below:`,
-                                                            fields: [
-                                                                {
-                                                                    name:
-                                                                        'Reason',
+                                                            fields: [{
+                                                                    name: 'Reason',
                                                                     value: reason,
                                                                     inline: true
                                                                 },
                                                                 {
-                                                                    name:
-                                                                        'Length',
-                                                                    value:
-                                                                        args[1],
+                                                                    name: 'Length',
+                                                                    value: args[1],
                                                                     inline: true
                                                                 },
                                                                 {
-                                                                    name:
-                                                                        'Identifier',
+                                                                    name: 'Identifier',
                                                                     value: `\`${identifier}\``
                                                                 },
                                                                 {
-                                                                    name:
-                                                                        'Want to dispute?',
-                                                                    value:
-                                                                        'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                                    name: 'Want to dispute?',
+                                                                    value: 'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                                 }
                                                             ],
                                                             timestamp: new Date(),
@@ -4697,12 +4526,12 @@ client.on('message', async message => {
                                                     .then(dm => {
                                                         if (
                                                             dm.embeds[0]
-                                                                .type === 'rich'
+                                                            .type === 'rich'
                                                         ) {
                                                             var data = [
                                                                 user,
                                                                 dm.embeds[0]
-                                                                    .title,
+                                                                .title,
                                                                 3,
                                                                 0,
                                                                 identifier,
@@ -4723,7 +4552,7 @@ client.on('message', async message => {
                                                         connection.query(
                                                             'INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',
                                                             data,
-                                                            function(
+                                                            function (
                                                                 err,
                                                                 results
                                                             ) {
@@ -4759,9 +4588,7 @@ client.on('message', async message => {
 
     if (command === 'remindme') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators', 'Support'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_REMINDME')) {
                 var user = message.author.id;
@@ -4827,9 +4654,7 @@ client.on('message', async message => {
 
     if (command === 'status') {
         if (
-            message.member.roles.some(role =>
-                ['Moderators', 'Support'].includes(role.name)
-            )
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
         ) {
             var client_PING = Math.floor(client.ping);
             var db_PING = connection.ping();
@@ -4867,7 +4692,7 @@ client.on('message', async message => {
     }
 });
 //discord events
-client.on('messageUpdate', function(oldMessage, newMessage) {
+client.on('messageUpdate', function (oldMessage, newMessage) {
     if (modulesFile.get('EVENT_MESSAGE_UPDATE')) {
         if (newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [
@@ -4882,14 +4707,14 @@ client.on('messageUpdate', function(oldMessage, newMessage) {
         connection.query(
             'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)',
             data,
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
             }
         );
     }
 });
 
-client.on('messageDelete', function(message) {
+client.on('messageDelete', function (message) {
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [
@@ -4904,14 +4729,14 @@ client.on('messageDelete', function(message) {
         connection.query(
             'INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)',
             data,
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
             }
         );
     }
 });
 
-client.on('guildMemberAdd', function(member) {
+client.on('guildMemberAdd', function (member) {
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         var params = [
             member.user.id,
@@ -4930,7 +4755,7 @@ client.on('guildMemberAdd', function(member) {
       INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);
       `,
             params,
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
             }
         );
@@ -4968,7 +4793,7 @@ client.on('guildMemberAdd', function(member) {
             connection.query(
                 'select * from log_guildbans where identifier in (?)',
                 data,
-                function(err, rows, results) {
+                function (err, rows, results) {
                     if (err) throw err;
                     for (var b = 0; b < rows.length; b++) {
                         var row = rows[b];
@@ -5006,7 +4831,7 @@ client.on('guildMemberAdd', function(member) {
     }
 });
 
-client.on('guildMemberRemove', function(member) {
+client.on('guildMemberRemove', function (member) {
     if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE')) {
         var data = [member.user.id, new Date()];
         var userLeave = [0, member.user.id];
@@ -5014,21 +4839,21 @@ client.on('guildMemberRemove', function(member) {
         connection.query(
             'INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)',
             data,
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
             }
         );
         connection.query(
             'UPDATE users SET exist = ? WHERE userID = ?',
             userLeave,
-            function(err, results) {
+            function (err, results) {
                 if (err) throw err;
             }
         );
     }
 });
 
-client.on('voiceStateUpdate', function(oldMember, newMember) {
+client.on('voiceStateUpdate', function (oldMember, newMember) {
     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES')) {
         var data = [];
         if (oldMember.voiceChannel) {
@@ -5084,7 +4909,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
             connection.query(
                 'INSERT INTO log_voice (userID, newChannelID, newChannel, oldChannelID, oldChannel, type, timestamp ) VALUES (?,?,?,?,?,?,?)',
                 data,
-                function(err, results) {
+                function (err, results) {
                     if (err) throw err;
 
                     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
@@ -5119,7 +4944,7 @@ client.on('voiceStateUpdate', function(oldMember, newMember) {
     }
 });
 
-client.on('userUpdate', function(oldUser, newUser) {
+client.on('userUpdate', function (oldUser, newUser) {
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {
@@ -5132,7 +4957,7 @@ client.on('userUpdate', function(oldUser, newUser) {
             connection.query(
                 'INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)',
                 data,
-                function(err, results) {
+                function (err, results) {
                     if (err) throw err;
                 }
             );
@@ -5144,7 +4969,7 @@ client.on('userUpdate', function(oldUser, newUser) {
             connection.query(
                 'UPDATE users SET avatar = ?, updated = ? WHERE userID = ?',
                 data,
-                function(err, results) {
+                function (err, results) {
                     if (err) throw err;
                 }
             );
@@ -5152,7 +4977,7 @@ client.on('userUpdate', function(oldUser, newUser) {
     }
 });
 
-client.on('guildMemberUpdate', function(oldMember, newMember) {
+client.on('guildMemberUpdate', function (oldMember, newMember) {
     if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE')) {
         //Checking for nickname changes for logging
         if (oldMember.displayName !== newMember.displayName) {
@@ -5165,7 +4990,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
             connection.query(
                 'INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)',
                 data,
-                function(err, results) {
+                function (err, results) {
                     if (err) throw err;
                 }
             );
@@ -5173,8 +4998,10 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
     }
 });
 
-client.on('guildBanAdd', function(guild, user) {
-    var identifier = cryptoRandomString({ length: 10 });
+client.on('guildBanAdd', function (guild, user) {
+    var identifier = cryptoRandomString({
+        length: 10
+    });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
 
@@ -5182,27 +5009,29 @@ client.on('guildBanAdd', function(guild, user) {
     connection.query(
         'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)',
         data,
-        function(err, results) {
+        function (err, results) {
             if (err) throw err;
         }
     );
 });
 
-client.on('guildBanRemove', function(guild, user) {
-  var identifier = cryptoRandomString({length: 10});
-  var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
-  connection.query(
-    'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-    function(err, results){
-      if(err) throw err;
-    }
-  );
-  connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', user.id, function(err, rows, results){
-    if(err) throw err;
+client.on('guildBanRemove', function (guild, user) {
+    var identifier = cryptoRandomString({
+        length: 10
+    });
+    var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
+    connection.query(
+        'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+        function (err, results) {
+            if (err) throw err;
+        }
+    );
+    connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', user.id, function (err, rows, results) {
+        if (err) throw err;
 
-    bannedUsersFile.set(rows[0].identifier, '');
-    bannedUsersFile.save();
-  });
+        bannedUsersFile.set(rows[0].identifier, '');
+        bannedUsersFile.save();
+    });
 });
 
 client.on('error', console.error);
