@@ -5199,25 +5199,6 @@ client.on('guildBanAdd', function(guild, user) {
     );
 });
 
-client.on('guildBanRemove', function (guild, user) {
-    var identifier = cryptoRandomString({
-        length: 10
-    });
-    var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
-    connection.query(
-        'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-        function (err, results) {
-            if (err) throw err;
-        }
-    );
-    connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', user.id, function (err, rows, results) {
-        if (err) throw err;
-
-        bannedUsersFile.set(rows[0].identifier, '');
-        bannedUsersFile.save();
-    });
-});
-
 client.on('guildBanRemove', function(guild, user) {
   var identifier = cryptoRandomString({length: 10});
   var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
