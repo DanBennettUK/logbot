@@ -1117,7 +1117,7 @@ client.on('message', async message => {
                     });
                   }).catch(console.error);
                 }
-                else{
+                else {
                   message.channel.send("Please provide a reason for the ban");
                 }
               } else message.channel.send("You can not ban a user with a higher role than yourself");
@@ -1191,6 +1191,8 @@ client.on('message', async message => {
                             bannedUsersFile.set(identifier, result.username);
                             bannedUsersFile.save();
                           }).catch(console.error);
+                        } else{
+                          message.channel.send("Please provide a reason for the ban");
                         }
                       } 
                       if (react.emoji.name == '❌') {
