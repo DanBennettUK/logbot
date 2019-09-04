@@ -4,7 +4,7 @@
     "cooldown": 15,
     "end": ""
   },
-  "chickendinner":{
+  "chickendinner": {
     "content": "https://cdn.discordapp.com/attachments/289467383507189761/332560346344718348/Screenshot_20170706-183532.jpg",
     "cooldown": 60,
     "end": ""
@@ -21,12 +21,12 @@
   },
   "np": {
     "content": "No problem!",
-    "cooldown":10,
+    "cooldown": 10,
     "end": ""
   },
   "dad": {
     "content": "https://i.imgur.com/KyMBEWQ.png",
-    "cooldown":15,
+    "cooldown": 15,
     "end": ""
   },
   "bugreport": {
