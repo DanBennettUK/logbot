@@ -1085,7 +1085,7 @@ client.on('message', async message => {
             message.channel.send(`That module (${command}) is disabled.`);
         }
     }
-
+  
     //utility commands
     if (command === 'module') {
         if (
@@ -3756,7 +3756,7 @@ client.on('message', async message => {
                 }
             }
         }
-
+      
         if (args[0] === 'mute') {
             //mute userid 5 why
             if (
@@ -5184,10 +5184,8 @@ client.on('guildMemberUpdate', function (oldMember, newMember) {
     }
 });
 
-client.on('guildBanAdd', function (guild, user) {
-    var identifier = cryptoRandomString({
-        length: 10
-    });
+client.on('guildBanAdd', function(guild, user) {
+    var identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
 
