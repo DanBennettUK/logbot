@@ -358,6 +358,25 @@ function setupTables() {
         }
     );
     connection.query(
+      `CREATE TABLE IF NOT EXISTS log_unmutes
+      (
+        ID INT                  NOT NULL AUTO_INCREMENT,
+        userID VARCHAR(25),
+        actioner VARCHAR(25),
+        description TEXT,
+        identifier VARCHAR(10),
+        isDeleted BIT,
+        timestamp DATETIME,
+        updated DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+      )
+      CHARACTER SET 'utf8mb4'
+      COLLATE 'utf8mb4_0900_ai_ci';`,
+      function (err, results) {
+          if (err) throw err;
+      }
+  );
+    connection.query(
         `INSERT IGNORE INTO messageTypes (id, type) VALUES (1, "create"), (2, "edit"), (3, "delete")`,
         function (err, results) {
             if (err) throw err;
@@ -1066,7 +1085,7 @@ client.on('message', async message => {
             message.channel.send(`That module (${command}) is disabled.`);
         }
     }
-
+  
     //utility commands
     if (command === 'module') {
         if (
@@ -3313,6 +3332,7 @@ client.on('message', async message => {
       ${config.prefix}badwords clear
       ${config.prefix}badwords list
       ${config.prefix}mute <user> <length> <reason>
+      ${config.prefix}unmute <user> <reason>
       ${config.prefix}remindme <length> <reminder>
       ${config.prefix}commands add <command> <content>
       ${config.prefix}commands remove <command>
@@ -3573,6 +3593,7 @@ client.on('message', async message => {
                             } could not be found/resolved.`
                         );
                 }
+                message.channel.send(':white_check_mark: LFG channels successfully locked');
             } else
                 message.channel.send(`That module (${command}) is disabled.`);
         }
@@ -3630,6 +3651,7 @@ client.on('message', async message => {
                             } could not be found/resolved.`
                         );
                 }
+                message.channel.send(':white_check_mark: LFG channels successfully unlocked');
             } else
                 message.channel.send(`That module (${command}) is disabled.`);
         }
@@ -3734,7 +3756,7 @@ client.on('message', async message => {
                 }
             }
         }
-
+      
         if (args[0] === 'mute') {
             //mute userid 5 why
             if (
@@ -4652,6 +4674,170 @@ client.on('message', async message => {
         }
     }
 
+    if (command === 'unmute') {
+      if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
+        if (modulesFile.get('COMMAND_UNMUTE')) {
+          var user = parseUserTag(args[0]);
+          var guildUser = guild.member(user);
+
+          if (user !== 'err' && guildUser) {
+            if ((mutedFile.get(user)) || (guild.members.get(user).roles.some(r => r.name === 'Muted'))) {
+              var reason = _.rest(args, 1).join(' ');
+
+              if (reason.length > 0) {
+                            
+                mutedFile.unset(`${user}`);
+                mutedFile.save();
+
+                var mutedRole = guild.roles.find(val => val.name === 'Muted');
+                var identifier = cryptoRandomString({ length: 10 });
+
+                guild.member(user).removeRole(mutedRole).then(member => {
+                  var data = [user, message.author.id, reason, identifier, 0, new Date(), user /*SP arg*/];
+                  connection.query('INSERT INTO log_unmutes(userID, actioner, description, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?);',
+                  data, function (err, results) {
+                    if (err) throw err;
+                    message.channel.send({embed: {
+                        color: config.color_success,
+                        author: {
+                          name: client.user.username,
+                          icon_url: client.user.displayAvatarURL
+                        },
+                        title: '[Action] User Unmuted',
+                        description: `${member} was unmuted by ${message.author}.`,
+                        fields: [
+                            {
+                            name: 'Reason',
+                            value: reason
+                            },
+                            {
+                          name: 'Identifier',
+                          value: identifier,
+                          inline: true
+                          }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                      }
+                    });
+                  });
+                member.createDM().then(async chnl => {
+                  await chnl.send({
+                    embed: {
+                      color: config.color_info,
+                      title: `You have been unmuted in ${guild.name}`,
+                      description: `Details regarding the mute can be found below:`,
+                      fields: [
+                          {
+                          name: 'Reason',
+                          value: reason,
+                          inline: true
+                          },
+                          {
+                          name: 'Identifier',
+                          value: `\`${identifier}\``
+                          }
+                      ],
+                      timestamp: new Date(),
+                      footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                      }
+                    }
+                  }).then(dm => {
+                    if (dm.embeds[0].type === 'rich') {
+                      var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                    } else {
+                      var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
+                    }
+                    connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
+                      if (err) throw err;
+                    });
+                  });
+                }).catch(console.error);
+              }).catch(console.error);
+            } else {
+                message.channel.send('Please provide a reason for the unmute.');
+            }
+          } else {
+            message.channel.send(`${client.users.get(user)} does not have an active mute.`);
+          }
+        } else {
+            message.channel.send('The user provided was not found.');
+        }
+      } else {
+          message.channel.send(`That module (${command}) is disabled.`);
+      }
+    }
+  }
+
+    if (command === 'remindme') {
+        if (
+            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
+        ) {
+            if (modulesFile.get('COMMAND_REMINDME')) {
+                var user = message.author.id;
+                var end;
+                var int = args[0].replace(/[a-zA-Z]$/g, '');
+                if (parseInt(int)) {
+                    switch (args[0].toLowerCase().charAt(args[0].length - 1)) {
+                        case 'd':
+                            end =
+                                Math.floor(Date.now() / 1000) +
+                                int * 24 * 60 * 60;
+                            seconds = int * 24 * 60 * 60;
+                            break;
+                        case 'h':
+                            end = Math.floor(Date.now() / 1000) + int * 60 * 60;
+                            seconds = int * 60 * 60;
+                            break;
+                        case 'm':
+                            end = Math.floor(Date.now() / 1000) + int * 60;
+                            seconds = int * 60;
+                            break;
+                        default:
+                            end = Math.floor(Date.now() / 1000) + int * 60 * 60;
+                            seconds = int * 60 * 60;
+                            break;
+                    }
+
+                    var reminder = _.rest(args, 1).join(' ');
+
+                    if (reminder.length > 0) {
+                        reminderFile.set(
+                            `${user}${end}.who`,
+                            message.author.id
+                        );
+                        reminderFile.set(`${user}${end}.end`, end);
+                        reminderFile.set(`${user}${end}.reminder`, reminder);
+                        reminderFile.set(`${user}${end}.length`, args[0]);
+                        reminderFile.save();
+
+                        message.channel.send({
+                            embed: {
+                                color: config.color_success,
+                                author: {
+                                    name: client.user.username,
+                                    icon_url: client.user.displayAvatarURL
+                                },
+                                title: `Reminder Set`,
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${
+                                        config.version
+                                    }`
+                                }
+                            }
+                        });
+                    } else {
+                        message.channel.send('Please provide a reminder note.');
+                    }
+                }
+            }
+        }
+    }
+
     if (command === 'status') {
         if (
             message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
@@ -4998,10 +5184,8 @@ client.on('guildMemberUpdate', function (oldMember, newMember) {
     }
 });
 
-client.on('guildBanAdd', function (guild, user) {
-    var identifier = cryptoRandomString({
-        length: 10
-    });
+client.on('guildBanAdd', function(guild, user) {
+    var identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
 
@@ -5015,23 +5199,21 @@ client.on('guildBanAdd', function (guild, user) {
     );
 });
 
-client.on('guildBanRemove', function (guild, user) {
-    var identifier = cryptoRandomString({
-        length: 10
-    });
-    var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
-    connection.query(
-        'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-        function (err, results) {
-            if (err) throw err;
-        }
-    );
-    connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', user.id, function (err, rows, results) {
-        if (err) throw err;
+client.on('guildBanRemove', function(guild, user) {
+  var identifier = cryptoRandomString({length: 10});
+  var data = [user.id, '001', "SYSTEM BAN", identifier, 0, new Date()];
+  connection.query(
+    'INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+    function(err, results){
+      if(err) throw err;
+    }
+  );
+  connection.query('select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', user.id, function(err, rows, results){
+    if(err) throw err;
 
-        bannedUsersFile.set(rows[0].identifier, '');
-        bannedUsersFile.save();
-    });
+    bannedUsersFile.set(rows[0].identifier, '');
+    bannedUsersFile.save();
+  });
 });
 
 client.on('error', console.error);
