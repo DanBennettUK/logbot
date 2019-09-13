@@ -3809,34 +3809,8 @@ client.on('message', async message => {
                                             .member(user)
                                             .addRole(mutedRole)
                                             .then(member => {
-                                                if (
-                                                    member.voiceChannel !==
-                                                    undefined
-                                                ) {
-                                                    client.channels
-                                                        .get(config.voice_AFK)
-                                                        .clone(
-                                                            'disconnecting..',
-                                                            false,
-                                                            false,
-                                                            `Disconnecting ${
-                                                                member.username
-                                                            }`
-                                                        )
-                                                        .then(async channel => {
-                                                            member
-                                                                .setVoiceChannel(
-                                                                    channel
-                                                                )
-                                                                .then(
-                                                                    async () => {
-                                                                        await channel.delete();
-                                                                    }
-                                                                )
-                                                                .catch(
-                                                                    console.error
-                                                                );
-                                                        })
+                                                if (member.voiceChannel !== undefined) {
+                                                    member.setVoiceChannel(null)
                                                         .catch(console.error);
                                                 }
 
@@ -4154,26 +4128,12 @@ client.on('message', async message => {
                     guildUser &&
                     guildUser.voiceChannel !== undefined
                 ) {
-                    client.channels
-                        .get(config.voice_AFK)
-                        .clone(
-                            'Disconnecting..',
-                            false,
-                            false,
-                            `Disconnecting ${guildUser.user.username}#${
-                                guildUser.user.discriminator
-                            }`
-                        )
-                        .then(async channel => {
-                            guildUser
-                                .setVoiceChannel(channel)
-                                .then(async member => {
-                                    await channel.delete();
-                                    message.channel.send(
-                                        `${member} was successfully removed from their voice channel.`
-                                    );
-                                })
-                                .catch(console.error);
+                    guildUser
+                        .setVoiceChannel(null)
+                        .then(member => {
+                            message.channel.send(
+                                `${member} was successfully removed from their voice channel.`
+                            );
                         })
                         .catch(console.error);
                 } else {
@@ -4426,27 +4386,7 @@ client.on('message', async message => {
                                     .addRole(mutedRole)
                                     .then(member => {
                                         if (member.voiceChannel !== undefined) {
-                                            client.channels
-                                                .get(config.voice_AFK)
-                                                .clone(
-                                                    'disconnecting..',
-                                                    false,
-                                                    false,
-                                                    `Disconnecting ${
-                                                        member.username
-                                                    }`
-                                                )
-                                                .then(async channel => {
-                                                    member
-                                                        .setVoiceChannel(
-                                                            channel
-                                                        )
-                                                        .then(async () => {
-                                                            await channel.delete();
-                                                        })
-                                                        .catch(console.error);
-                                                })
-                                                .catch(console.error);
+                                            member.setVoiceChannel(null)
                                         }
 
                                         var data = [
