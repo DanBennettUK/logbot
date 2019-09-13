@@ -407,6 +407,7 @@ function parseUserTag(tag) {
             obj => obj.username === split[0]
         );
 
+        if (usernameResolve == null) return 'err';
         if (usernameResolve.discriminator == split[1]) {
             return usernameResolve.id;
         } else {
@@ -1091,18 +1092,18 @@ client.on('message', async message => {
         if (
             message.member.roles.some(role => ['Admins', 'Full Mods'].includes(role.name))
         ) {
-            if (typeof modulesFile.get(args[0]) != 'undefined') {
+            if (typeof modulesFile.get(args[0].toUpperCase()) != 'undefined') {
                 //Checks if the module provided exists
                 if ([0, 1].includes(parseInt(args[1]))) {
                     //Parses the string as an int, then checks if the result is a valid <Int> & it's either a 0 or 1
-                    modulesFile.set(args[0], parseInt(args[1]));
+                    modulesFile.set(args[0].toUpperCase(), parseInt(args[1]));
                     modulesFile.save();
 
                     message.channel.send({
                         embed: {
                             color: config.color_info,
                             title: '🔶 A module was updated',
-                            description: args[0] + ' was set to status ' + args[1],
+                            description: args[0].toUpperCase() + ' was set to status ' + args[1],
                             timestamp: new Date(),
                             footer: {
                                 text: `Marvin's Little Brother | Current version: ${
@@ -1173,7 +1174,7 @@ client.on('message', async message => {
     }
 
     if (command === 'users') {
-        if (args[0] == 'count') {
+        if (args[0].toLowerCase() == 'count') {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
@@ -1218,7 +1219,7 @@ client.on('message', async message => {
                 }
             } //End of permission checking statement
         }
-        if (args[0] == 'update') {
+        if (args[0].toLowerCase() == 'update') {
             if (
                 message.member.roles.some(role => ['Admins'].includes(role.name))
             ) {
@@ -1233,197 +1234,197 @@ client.on('message', async message => {
         }
     }
 
-    if (command === 'ban') {
-        if (
-            message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))
-        ) {
-            if (modulesFile.get('COMMAND_BAN')) {
-                if (args[0]) {
-                    var user = parseUserTag(args[0]);
-
-                    if (user == 'err') {
-                        //Check if the user parameter is valid
-                        message.channel.send(
-                            'An invalid user was provided. Please try again'
-                        );
-                    } else {
-                        if (guild.member(user)) {
-                            //Check if the user exists in the guild
-                            if (
-                                message.member.highestRole.comparePositionTo(
-                                    guild.member(user).highestRole
-                                ) > 0
-                            ) {
-                                var tail = args.slice(1);
-                                var reason = tail.join(' ').trim();
-
-                                if (tail.length > 0) {
-                                    var identifier = cryptoRandomString({
-                                        length: 10
-                                    });
-                                    client.users
-                                        .get(user)
-                                        .createDM()
-                                        .then(async chnl => {
-                                            await chnl
-                                                .send({
-                                                    embed: {
-                                                        color: config.color_warning,
-                                                        title: `You have been banned from ${
-                                                            guild.name
-                                                        } for breaking one or more of the rules`,
-                                                        fields: [{
-                                                            name: 'Want to dispute?',
-                                                            value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
-                                                        }],
-                                                        timestamp: new Date(),
-                                                        footer: {
-                                                            text: `Marvin's Little Brother | Current version: ${
-                                                                config.version
-                                                            }`
-                                                        }
-                                                    }
-                                                })
-                                                .then(dm => {
-                                                    var data = [
-                                                        user,
-                                                        `Title: ${
-                                                            dm.embeds[0].title
-                                                        }`,
-                                                        2,
-                                                        0,
-                                                        identifier,
-                                                        new Date(),
-                                                        new Date()
-                                                    ];
-                                                    connection.query(
-                                                        'INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',
-                                                        data,
-                                                        function (err, results) {
-                                                            if (err) throw err;
-                                                        }
-                                                    );
-
-                                                    guild
-                                                        .ban(user, {
-                                                            days: 1,
-                                                            reason: reason
-                                                        })
-                                                        .then(async result => {
-                                                            await message.channel.send({
-                                                                embed: {
-                                                                    color: config.color_success,
-                                                                    author: {
-                                                                        name: client
-                                                                            .user
-                                                                            .username,
-                                                                        icon_url: client
-                                                                            .user
-                                                                            .displayAvatarURL
-                                                                    },
-                                                                    title: '[Action] Ban',
-                                                                    description: `${client.users.get(
-                                                                            user
-                                                                        )} has been successfully banned`,
-                                                                    fields: [{
-                                                                            name: 'User ID',
-                                                                            value: result.id,
-                                                                            inline: true
-                                                                        },
-                                                                        {
-                                                                            name: 'Username/Discrim',
-                                                                            value: `${
-                                                                                    result.username
-                                                                                }#${
-                                                                                    result.discriminator
-                                                                                }`,
-                                                                            inline: true
-                                                                        },
-                                                                        {
-                                                                            name: 'Reason',
-                                                                            value: reason
-                                                                        },
-                                                                        {
-                                                                            name: 'Banned by',
-                                                                            value: message
-                                                                                .author
-                                                                                .username
-                                                                        },
-                                                                        {
-                                                                            name: 'Identifier',
-                                                                            value: identifier
-                                                                        }
-                                                                    ],
-                                                                    timestamp: new Date(),
-                                                                    footer: {
-                                                                        text: `Marvin's Little Brother | Current version: ${
-                                                                                config.version
-                                                                            }`
-                                                                    }
-                                                                }
-                                                            });
-
-                                                            var data = [
-                                                                result.id,
-                                                                message.author
-                                                                .id,
-                                                                reason,
-                                                                identifier,
-                                                                0,
-                                                                new Date()
-                                                            ];
-                                                            connection.query(
-                                                                'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)',
-                                                                data,
-                                                                function (
-                                                                    err,
-                                                                    results
-                                                                ) {
-                                                                    if (err)
-                                                                        throw err;
-                                                                }
-                                                            );
-
-                                                            //Adding the user to our banned users JSON
-                                                            bannedUsersFile.set(
-                                                                identifier,
-                                                                result.username
-                                                            );
-                                                            bannedUsersFile.save();
-                                                        })
-                                                        .catch(console.error);
-                                                });
-                                        })
-                                        .catch(console.error);
-                                } else {
-                                    message.channel.send(
-                                        'Please provide a reason for the ban'
-                                    );
+    if(command === 'ban'){
+        if(message.member.roles.some(role=>['Moderators'].includes(role.name))){
+          if(modulesFile.get('COMMAND_BAN')){
+            if(args[0]){
+              var user = parseUserTag(args[0]);
+    
+              if(user == 'err'){ //Check if the user parameter is valid
+                message.channel.send('An invalid user was provided. Please try again');
+              } else {
+                if (guild.member(user)) { //Check if the user exists in the guild
+                  if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
+                    var tail = args.slice(1);
+                    var reason = tail.join(" ").trim();
+    
+                    if(tail.length > 0){
+                      var identifier = cryptoRandomString({length: 10});
+                      client.users.get(user).createDM().then(async chnl => {
+                        await chnl.send({embed: {
+                              color: config.color_warning,
+                              title:`You have been banned from ${guild.name} for breaking one or more of the rules` ,
+                              fields: [
+                                {
+                                  name: 'Want to dispute?',
+                                  value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
                                 }
-                            } else {
-                                message.channel.send(
-                                    'You can not ban a user with a higher role than yourself'
-                                );
+                              ],
+                              timestamp: new Date(),
+                              footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                              }
                             }
-                        } else {
-                            message.channel.send(
-                                'The user provided was not found in this guild'
-                            );
-                        }
+                        }).then(dm => {
+                          var data = [user, `Title: ${dm.embeds[0].title}`, 2, 0, identifier, new Date(), new Date()];
+                          connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function(err, results){if(err) throw err;})
+    
+                          guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                              await message.channel.send({embed: {
+                                    color: config.color_success,
+                                    author: {
+                                      name: client.user.username,
+                                      icon_url: client.user.displayAvatarURL
+                                    },
+                                    title: '[Action] Ban',
+                                    description: `${client.users.get(user)} has been successfully banned`,
+                                    fields: [{
+                                        name: 'User ID',
+                                        value: result.id,
+                                        inline: true
+                                      },
+                                      {
+                                        name: 'Username/Discrim',
+                                        value: `${result.username}#${result.discriminator}`,
+                                        inline: true
+                                      },
+                                      {
+                                        name: 'Reason',
+                                        value: reason
+                                      },
+                                      {
+                                        name: 'Banned by',
+                                        value: message.author.username
+                                      },
+                                      {
+                                        name: 'Identifier',
+                                        value: identifier
+                                      },
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                      text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                  }
+                              });
+    
+                              var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                              connection.query(
+                                'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                function(err, results){
+                                  if(err) throw err;
+                                }
+                              );
+    
+                              //Adding the user to our banned users JSON
+                              bannedUsersFile.set(identifier, result.username);
+                              bannedUsersFile.save();
+                            })
+                            .catch(console.error);
+                        });
+                      }).catch(console.error);
                     }
-                } else {
-                    syntaxErr(message, 'ban');
-                    return;
+                    else {
+                      message.channel.send('Please provide a reason for the ban');
+                    }
+                  } else message.channel.send('You can not ban a user with a higher role than yourself');
+                } else { // if the user isn't in the guild, have a confirmation message and proceed upon reacting
+                  if (client.fetchUser(user)) {
+                    await client.fetchUser(user).then(async userObj =>{
+    
+                      await message.channel.send(`User ${userObj} is not in the guild. Are you sure you want to proceed?`)
+                      .then(async msg => {
+                        await msg.react('✅');
+                        await msg.react('❌');
+    
+                        const filter = (reaction, user) => user == message.member.user;
+                        const collector = msg.createReactionCollector(filter);
+                        
+                        collector.on('collect', async react => {
+                          if (react.emoji.name == '✅') {
+                            await msg.delete();
+                            var tail = args.slice(1);
+                            var reason = tail.join(" ").trim();
+    
+                            if (tail.length > 0) {
+                              var identifier = cryptoRandomString({length: 10});
+                              guild.ban(user, { days: 1, reason: reason }).then(async result => {
+                                await message.channel.send({embed: {
+                                      color: config.color_success,
+                                      author: {
+                                        name: client.user.username,
+                                        icon_url: client.user.displayAvatarURL
+                                      },
+                                      title: '[Action] Ban' ,
+                                      description: `${client.users.get(user)} has been successfully banned`,
+                                      fields: [{
+                                          name: 'User ID',
+                                          value: result.id,
+                                          inline: true
+                                        },
+                                        {
+                                          name: 'Username/Discrim',
+                                          value: `${result.username}#${result.discriminator}`,
+                                          inline: true
+                                        },
+                                        {
+                                          name: 'Reason',
+                                          value: reason
+                                        },
+                                        {
+                                          name: 'Banned by',
+                                          value: message.author.username
+                                        },
+                                        {
+                                          name: 'Identifier',
+                                          value: identifier
+                                        },
+                                      ],
+                                      timestamp: new Date(),
+                                      footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                      }
+                                    }
+                                });
+                                var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                                connection.query(
+                                  'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                  function(err, results){
+                                    if(err) throw err;
+                                  }
+                                );
+    
+                                //Adding the user to our banned users JSON
+                                bannedUsersFile.set(identifier, result.username);
+                                bannedUsersFile.save();
+                              }).catch(console.error);
+                            }
+                          } 
+                          if (react.emoji.name == '❌') {
+                            await msg.delete();
+                            message.channel.send('Action cancelled').then(msg2 => {
+                              setTimeout(function() {msg2.delete();}, 5000);
+                            });
+                          }
+                        });
+                      });
+                    });
+                  }        
                 }
+              }
             } else {
-                message.channel.send(`That module (${command}) is disabled.`);
+              syntaxErr(message, 'ban');
+              return;
             }
+          } else {
+            message.channel.send(`That module (${command}) is disabled.`);;
+          }
         }
-    }
+      }
 
     if (command === 'unban') {
         if (
-            message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))
+            message.member.roles.some(role => ['Moderators'].includes(role.name))
         ) {
             if (modulesFile.get('COMMAND_UNBAN')) {
                 if (args[0]) {
@@ -3454,7 +3455,7 @@ client.on('message', async message => {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
-                if (args[0] === 'add') {
+                if (args[0].toLowerCase() === 'add') {
                     if (args[1]) {
                         var commandStr = _.rest(args, 2).join(' ');
                         customCommands.set(args[1] + '.content', commandStr);
@@ -3466,7 +3467,7 @@ client.on('message', async message => {
                         );
                     } else syntaxErr(message, `commands_add`);
                 }
-                if (args[0] === 'remove') {
+                if (args[0].toLowerCase() === 'remove') {
                     if (args[1]) {
                         customCommands.unset(args[1]);
                         customCommands.save();
@@ -3476,7 +3477,7 @@ client.on('message', async message => {
                     } else syntaxErr(message, `commands_remove`);
                 }
             }
-            if (args[0] === 'list') {
+            if (args[0].toLowerCase() === 'list') {
                 var cKeys = _.keys(customCommands.read());
                 var allCommands = '';
                 for (var i = 0; i < cKeys.length; i++) {
@@ -3508,14 +3509,14 @@ client.on('message', async message => {
     }
 
     if (command === 'lfgrooms') {
-        if (args[0] === 'add') {
+        if (args[0].toLowerCase() === 'add') {
             let next = _.keys(LFGRoomsFile.read()).length + 1;
             LFGRoomsFile.set(args[1], next);
             LFGRoomsFile.save();
 
             message.channel.send(`Added \`${args[1]}\``);
         }
-        if (args[0] === 'remove') {
+        if (args[0].toLowerCase() === 'remove') {
             LFGRoomsFile.unset(args[1]);
             LFGRoomsFile.save();
 
@@ -3658,7 +3659,7 @@ client.on('message', async message => {
     }
 
     if (command === 'helper') {
-        if (args[0] === 'clear') {
+        if (args[0].toLowerCase() === 'clear') {
             if (
                 message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
             ) {
@@ -3757,7 +3758,7 @@ client.on('message', async message => {
             }
         }
       
-        if (args[0] === 'mute') {
+        if (args[0].toLowerCase() === 'mute') {
             //mute userid 5 why
             if (
                 message.member.roles.some(role => ['Support'].includes(role.name))
@@ -4187,7 +4188,7 @@ client.on('message', async message => {
     }
 
     if (command === 'badwords') {
-        if (args[0] === 'add') {
+        if (args[0].toLowerCase() === 'add') {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
@@ -4233,7 +4234,7 @@ client.on('message', async message => {
                 }
             }
         }
-        if (args[0] === 'remove') {
+        if (args[0].toLowerCase() === 'remove') {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
@@ -4287,7 +4288,7 @@ client.on('message', async message => {
                 }
             }
         }
-        if (args[0] === 'clear') {
+        if (args[0].toLowerCase() === 'clear') {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
@@ -4301,7 +4302,7 @@ client.on('message', async message => {
                 } else message.channel.send(`:x: No bad words could be found.`);
             }
         }
-        if (args[0] === 'list') {
+        if (args[0].toLowerCase() === 'list') {
             if (
                 message.member.roles.some(role => ['Moderators'].includes(role.name))
             ) {
@@ -4604,72 +4605,6 @@ client.on('message', async message => {
                 }
             } else {
                 message.channel.send(`That module (${command}) is disabled.`);
-            }
-        }
-    }
-
-    if (command === 'remindme') {
-        if (
-            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
-        ) {
-            if (modulesFile.get('COMMAND_REMINDME')) {
-                var user = message.author.id;
-                var end;
-                var int = args[0].replace(/[a-zA-Z]$/g, '');
-                if (parseInt(int)) {
-                    switch (args[0].toLowerCase().charAt(args[0].length - 1)) {
-                        case 'd':
-                            end =
-                                Math.floor(Date.now() / 1000) +
-                                int * 24 * 60 * 60;
-                            seconds = int * 24 * 60 * 60;
-                            break;
-                        case 'h':
-                            end = Math.floor(Date.now() / 1000) + int * 60 * 60;
-                            seconds = int * 60 * 60;
-                            break;
-                        case 'm':
-                            end = Math.floor(Date.now() / 1000) + int * 60;
-                            seconds = int * 60;
-                            break;
-                        default:
-                            end = Math.floor(Date.now() / 1000) + int * 60 * 60;
-                            seconds = int * 60 * 60;
-                            break;
-                    }
-
-                    var reminder = _.rest(args, 1).join(' ');
-
-                    if (reminder.length > 0) {
-                        reminderFile.set(
-                            `${user}${end}.who`,
-                            message.author.id
-                        );
-                        reminderFile.set(`${user}${end}.end`, end);
-                        reminderFile.set(`${user}${end}.reminder`, reminder);
-                        reminderFile.set(`${user}${end}.length`, args[0]);
-                        reminderFile.save();
-
-                        message.channel.send({
-                            embed: {
-                                color: config.color_success,
-                                author: {
-                                    name: client.user.username,
-                                    icon_url: client.user.displayAvatarURL
-                                },
-                                title: `Reminder Set`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${
-                                        config.version
-                                    }`
-                                }
-                            }
-                        });
-                    } else {
-                        message.channel.send('Please provide a reminder note.');
-                    }
-                }
             }
         }
     }
