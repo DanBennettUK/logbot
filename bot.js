@@ -4974,29 +4974,38 @@ client.on('voiceStateUpdate', function (oldMember, newMember) {
                     if (err) throw err;
 
                     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
-                        switch (
-                            data[5] //Switch on the type
-                        ) {
-                            case 1: //join
-                                newMember.guild.channels
-                                    .get(config.channel_voicelog)
-                                    .send(
-                                        `<@${data[0]}> has joined **<#${
-                                            data[1]
-                                        }>** | ${data[6]}`
-                                    );
-                                break;
-                            case 2: //move
-                                newMember.guild.channels
-                                    .get(config.channel_voicelog)
-                                    .send(
-                                        `<@${data[0]}> has joined **<#${
-                                            data[1]
-                                        }>**, moving from **<#${data[3]}>** | ${
-                                            data[6]
-                                        }`
-                                    );
-                                break;
+                        var voiceLogChannel = newMember.guild.channels.get(config.channel_voicelog);
+                        if (voiceLogChannel.members.has(newMember.id)) {
+                            switch (data[5]) { //Switch on the type
+                                case 1: //join
+                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>** | ${data[6]}`);
+                                    break;
+                                case 2: //move
+                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
+                                    break;
+                            }
+                        }
+                        else {
+                            switch (
+                                data[5] //Switch on the type
+                            ) {
+                                case 1: //join
+                                        voiceLogChannel.send(
+                                            `<@${data[0]}> has joined **<#${
+                                                data[1]
+                                            }>** | ${data[6]}`
+                                        );
+                                    break;
+                                case 2: //move
+                                    voiceLogChannel.send(
+                                            `<@${data[0]}> has joined **<#${
+                                                data[1]
+                                            }>**, moving from **<#${data[3]}>** | ${
+                                                data[6]
+                                            }`
+                                        );
+                                    break;
+                            }
                         }
                     }
                 }
