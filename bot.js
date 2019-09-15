@@ -1016,16 +1016,17 @@ client.on('message', async message => {
         .split(/\s+/); //Result: ["<TAG>", "Bad", "person!"]
     const command = args.shift().toLowerCase(); //Result: "ban"
 
+    var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
+
     if (_.keys(customCommands.read()).includes(command)) {
-        var obj = customCommands.get(command);
-        if (obj.end < Math.floor(Date.now() / 1000)) {
-            message.channel.send(`${obj.content}`);
-            message.delete();
-            customCommands.set(
-                `${command}.end`,
-                Math.floor(Date.now() / 1000) + obj.cooldown
-            );
-            customCommands.save();
+        if (publicCommands.includes(command) || message.member.roles.some(role => role.name == 'Moderators')) {
+            var obj = customCommands.get(command);
+            if (obj.end < Math.floor(Date.now() / 1000)) {
+                message.channel.send(`${obj.content}`);
+                message.delete();
+                customCommands.set(`${command}.end`, Math.floor(Date.now() / 1000) + obj.cooldown);
+                customCommands.save();
+            }
         }
     }
 
@@ -3423,6 +3424,8 @@ client.on('message', async message => {
     ${config.prefix}forums
     ${config.prefix}invite
     ${config.prefix}official
+    ${config.prefix}mobile
+    ${config.prefix}lite
     ${config.prefix}report
     ${config.prefix}roc
     ${config.prefix}support
