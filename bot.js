@@ -4696,6 +4696,25 @@ client.on('message', async message => {
         }
     }
 
+    if (command === 'vc') {
+        if (message.member.roles.some(role => role.name === 'Moderators')) {
+            var user = parseUserTag(args[0]);
+            var guildUser = message.guild.member(user);
+            if (user !== 'err' && guildUser) {
+                var vc = guildUser.voiceChannel;
+                if (vc != undefined) {
+                    switch (vc.members.size) {
+                        case 1:
+                            message.channel.send(`User ${guildUser} is in voice channel **${vc.name}**`);
+                            break;
+                        default:
+                            message.channel.send(`User ${guildUser} is in voice channel **${vc.name}** with ${vc.members.size - 1} other users`);
+                    }
+                } else message.channel.send(`User ${guildUser} is not in a voice channel`);
+            } else message.channel.send('Thes user provided was not found');
+        }
+    }
+
     if (command === 'status') {
         if (
             message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
