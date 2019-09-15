@@ -1019,14 +1019,10 @@ client.on('message', async message => {
     var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
 
     if (_.keys(customCommands.read()).includes(command)) {
-        if (publicCommands.includes(command) || message.member.roles.some(role => role.name == 'Moderators')) {
+        if (publicCommands.includes(command) || message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
             var obj = customCommands.get(command);
-            if (obj.end < Math.floor(Date.now() / 1000)) {
-                message.channel.send(`${obj.content}`);
-                message.delete();
-                customCommands.set(`${command}.end`, Math.floor(Date.now() / 1000) + obj.cooldown);
-                customCommands.save();
-            }
+            message.channel.send(`${obj.content}`);
+            message.delete();
         }
     }
 
@@ -3452,31 +3448,21 @@ client.on('message', async message => {
     }
 
     if (command === 'commands') {
-        if (
-            message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))
-        ) {
-            if (
-                message.member.roles.some(role => ['Moderators'].includes(role.name))
-            ) {
+        if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
+            if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
                 if (args[0].toLowerCase() === 'add') {
                     if (args[1]) {
                         var commandStr = _.rest(args, 2).join(' ');
                         customCommands.set(args[1] + '.content', commandStr);
-                        customCommands.set(args[1] + '.cooldown', 15);
-                        customCommands.set(args[1] + '.end', '');
                         customCommands.save();
-                        message.channel.send(
-                            ':white_check_mark: Command added successfully.'
-                        );
+                        message.channel.send(':white_check_mark: Command added successfully.');
                     } else syntaxErr(message, `commands_add`);
                 }
                 if (args[0].toLowerCase() === 'remove') {
                     if (args[1]) {
                         customCommands.unset(args[1]);
                         customCommands.save();
-                        message.channel.send(
-                            ':white_check_mark: Command removed successfully.'
-                        );
+                        message.channel.send(':white_check_mark: Command removed successfully.');
                     } else syntaxErr(message, `commands_remove`);
                 }
             }
@@ -3484,11 +3470,7 @@ client.on('message', async message => {
                 var cKeys = _.keys(customCommands.read());
                 var allCommands = '';
                 for (var i = 0; i < cKeys.length; i++) {
-                    allCommands +=
-                        '\n **' +
-                        cKeys[i] +
-                        ':** ' +
-                        customCommands.get(cKeys[i]).content;
+                    allCommands +='\n **' + cKeys[i] + ':** ' + customCommands.get(cKeys[i]).content;
                 }
                 message.channel.send({
                     embed: {
@@ -3501,9 +3483,7 @@ client.on('message', async message => {
                         description: `${allCommands}`,
                         timestamp: new Date(),
                         footer: {
-                            text: `Marvin's Little Brother | Current version: ${
-                                config.version
-                            }`
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
                 });
