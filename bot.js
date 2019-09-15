@@ -1003,7 +1003,7 @@ client.on('message', async message => {
         checkMessageContent(message);
     }
 
-    if (message.content.indexOf(config.prefix) !== 0) return; //If the message content doesn't start with our prefix, return.
+    if ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `))) return; //If the message content doesn't start with our prefix, return.
 
     if (!(_.keys(badWordsFile.read()).length > 0)) {
         badWordsFile.set(`badWords`, []);
