@@ -3324,6 +3324,7 @@ client.on('message', async message => {
       ${config.prefix}helper clear <amount> <channel> <user>
       ${config.prefix}helper mute <user> <length> <reason>
       ${config.prefix}voicelog <user>
+      ${config.prefix}vc <user>
       ${config.prefix}disconnect <user>
       ${config.prefix}badwords add <word/s>
       ${config.prefix}badwords remove <word/s>
