@@ -2818,7 +2818,6 @@ client.on('message', async message => {
         }
       
         if (args[0].toLowerCase() === 'mute') {
-            //mute userid 5 why
             if (message.member.roles.some(role => ['Support'].includes(role.name))) {
                 if (modulesFile.get('COMMAND_HELPER_MUTE')) {
                     var user = parseUserTag(args[1]);
