@@ -2711,22 +2711,24 @@ client.on('message', async message => {
                         if (channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
                             await channelObj.overwritePermissions(everyone, {
                                         SEND_MESSAGES: false
-                                    }, 'Servers are down for the update').then(channel => channel.send({
-                                        embed: {
-                                            color: config.color_info,
-                                            title: 'Maintenance has begun',
-                                            description: 'Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.',
-                                            timestamp: new Date(),
-                                            footer: {
-                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }, 'Servers are down for the update').then(channel => {
+                                        channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Maintenance has begun',
+                                                description: 'Channel will be locked until maintenance ends. Keep an eye on <#289467450074988545> for more info.',
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
                                             }
-                                        }
-                                    })
+                                        });
+                                        message.channel.send(`Channel ${channel} successfully locked`);
+                                    }
                                 );
-                        } else message.channel.send(`Channel ${channels[i]} is already locked.`);
+                        } else message.channel.send(`Channel ${channelObj} is already locked.`);
                     } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
                 }
-                message.channel.send(':white_check_mark: LFG channels successfully locked');
             } else message.channel.send(`That module (${command}) is disabled.`);
         }
     }
@@ -2742,22 +2744,24 @@ client.on('message', async message => {
                         if (!channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
                             await channelObj.overwritePermissions(everyone, {
                                         SEND_MESSAGES: null
-                                    },'Servers are back up from the update').then(channel =>  channel.send({
-                                        embed: {
-                                            color: config.color_info,
-                                            title: 'Maintenance has ended',
-                                            description: 'Channel is now unlocked.',
-                                            timestamp: new Date(),
-                                            footer: {
-                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    },'Servers are back up from the update').then(channel => {
+                                        channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Maintenance has ended',
+                                                description: 'Channel is now unlocked.',
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
                                             }
-                                        }
-                                    })
+                                        });
+                                        message.channel.send(`Channel ${channel} successfully unlocked`);
+                                    } 
                                 );
-                        } else message.channel.send(`Channel ${channels[i]} is not locked.`);
+                        } else message.channel.send(`Channel ${channelObj} is not locked.`);
                     } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
                 }
-                message.channel.send(':white_check_mark: LFG channels successfully unlocked');
             } else message.channel.send(`That module (${command}) is disabled.`);
         }
     }
