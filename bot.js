@@ -871,13 +871,13 @@ client.on('ready', async () => {
     var react = guild.channels.get(config.reaction_channel);
 
     react.fetchMessage(config.reaction_message).then(async m => {
-        await m.react(guild.emojis.find(e => e.name == 'eu'));
-        await m.react(guild.emojis.find(e => e.name == 'na'));
-        await m.react(guild.emojis.find(e => e.name == 'SA'));
-        await m.react(guild.emojis.find(e => e.name == 'asia'));
-        await m.react(guild.emojis.find(e => e.name == 'sea'));
-        await m.react(guild.emojis.find(e => e.name == 'oce'));
-        await m.react(guild.emojis.find(e => e.name == 'kjp'));
+        await m.react(guild.emojis.find(e => e.name == 'eu')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'na')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'SA')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'asia')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'sea')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'oce')).catch(console.error);
+        await m.react(guild.emojis.find(e => e.name == 'kjp')).catch(console.error);
     });
 
     setInterval(checkExpiredMutes, 10000);
@@ -3936,7 +3936,7 @@ client.on('userUpdate', function (oldUser, newUser) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
 
@@ -3966,7 +3966,7 @@ client.on('userUpdate', function (oldUser, newUser) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
         if (oldUser.discriminator !== newUser.discriminator) {
@@ -4000,7 +4000,7 @@ client.on('userUpdate', function (oldUser, newUser) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }
@@ -4046,7 +4046,7 @@ client.on('guildMemberUpdate', async function (oldMember, newMember) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }  
         }
         if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_ROLES_LOG')) {
@@ -4076,8 +4076,8 @@ client.on('guildMemberUpdate', async function (oldMember, newMember) {
                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
                         }
-                    });
-                });
+                    }).catch(console.error);
+                }).catch(console.error);
             }
             if (newMember.roles.size > oldMember.roles.size) {
                 var role = newMember.roles.filter(r => !oldMember.roles.has(r.id)).first();
@@ -4105,8 +4105,8 @@ client.on('guildMemberUpdate', async function (oldMember, newMember) {
                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
                         }
-                    });
-                });
+                    }).catch(console.error);
+                }).catch(console.error);
             }
         }
     }
@@ -4141,7 +4141,7 @@ client.on('guildBanAdd', function (guild, user) {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 });
 
@@ -4177,7 +4177,7 @@ client.on('guildBanRemove', function (guild, user) {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 });
 
@@ -4209,7 +4209,7 @@ client.on('roleCreate', function (role) {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 });
 
@@ -4241,7 +4241,7 @@ client.on('roleDelete', function (role) {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 });
 
@@ -4278,7 +4278,7 @@ client.on('roleUpdate', async function (oldRole, newRole) {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                 }
-            });
+            }).catch(console.error);
         }
         if (oldRole.permissions !== newRole.permissions) { // credit to Gab
             const { Permissions } = require(`discord.js`);
@@ -4339,7 +4339,7 @@ client.on('roleUpdate', async function (oldRole, newRole) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             } else if (filteredNewPermissions.length !== 0 && filteredOldPermissions.length === 0) {
                 oldRole.guild.channels.get(config.channel_serverlog).send({
                     embed: {
@@ -4361,7 +4361,7 @@ client.on('roleUpdate', async function (oldRole, newRole) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             } else if (filteredNewPermissions.length === 0 && filteredOldPermissions.length !== 0) {
                 oldRole.guild.channels.get(config.channel_serverlog).send({
                     embed: {
@@ -4383,7 +4383,7 @@ client.on('roleUpdate', async function (oldRole, newRole) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }
@@ -4417,7 +4417,7 @@ client.on('guildUpdate', function (oldGuild, newGuild) {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                 }
-            });
+            }).catch(console.error);
         }
         if (oldGuild.iconURL != newGuild.iconURL) {
             oldGuild.channels.get(config.channel_serverlog).send({
@@ -4437,7 +4437,7 @@ client.on('guildUpdate', function (oldGuild, newGuild) {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                 }
-            });
+            }).catch(console.error);
         }
     }
 });
@@ -4483,7 +4483,7 @@ client.on('channelCreate', function (channel) {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                 }
-            });
+            }).catch(console.error);
         }
     }
 });
@@ -4529,7 +4529,7 @@ client.on('channelDelete', function (channel) {
                         text: `Marvin's Little Brother | Current version: ${config.version}`
                     }
                 }
-            });
+            }).catch(console.error);
         }
     }
 });
@@ -4580,7 +4580,7 @@ client.on('channelUpdate', function (oldChannel, newChannel) {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }
@@ -4590,25 +4590,25 @@ client.on('messageReactionAdd', function (messageReaction, user) {
     if (modulesFile.get('EVENT_MESSAGE_REACTION_ADD')) {
         switch (messageReaction.emoji.name) {
             case 'eu': 
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
                 break;
             case 'na':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[NA]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
                 break;
             case 'SA':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SA]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
                 break;
             case 'asia':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[ASIA]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
                 break;
             case 'sea':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SEA]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
                 break;
             case 'oce':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[OCE]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
                 break;
             case 'kjp':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[KR/JP]')));
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
                 break;
         }
     }
@@ -4618,25 +4618,25 @@ client.on('messageReactionRemove', function (messageReaction, user) {
     if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
         switch (messageReaction.emoji.name) {
             case 'eu': 
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
                 break;
             case 'na':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
                 break;
             case 'SA':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
                 break;
             case 'asia':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
                 break;
             case 'sea':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
                 break;
             case 'oce':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
                 break;
             case 'kjp':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]')));
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
                 break;
         }
     }
