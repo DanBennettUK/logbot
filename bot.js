@@ -846,7 +846,7 @@ function importUnbans() {
     );
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     setupTables();
 
     if (config.test) {
@@ -867,6 +867,18 @@ client.on('ready', () => {
 
     updateUserTable('system', null);
     guild = client.guilds.get(config.guildid);
+
+    var react = guild.channels.get(config.reaction_channel);
+
+    react.fetchMessage(config.reaction_message).then(async m => {
+        await m.react(guild.emojis.find(e => e.name == 'eu'));
+        await m.react(guild.emojis.find(e => e.name == 'na'));
+        await m.react(guild.emojis.find(e => e.name == 'SA'));
+        await m.react(guild.emojis.find(e => e.name == 'asia'));
+        await m.react(guild.emojis.find(e => e.name == 'sea'));
+        await m.react(guild.emojis.find(e => e.name == 'oce'));
+        await m.react(guild.emojis.find(e => e.name == 'kjp'));
+    });
 
     setInterval(checkExpiredMutes, 10000);
     setInterval(checkReminders, 15000);
@@ -3577,10 +3589,90 @@ client.on('messageUpdate', function (oldMessage, newMessage) {
                 if (err) throw err;
             }
         );
+        if (modulesFile.get('EVENT_MESSAGE_UPDATE_LOG')) {
+            if (oldMessage.content == newMessage.content) return;
+            if (oldMessage.content.length < 1024 && newMessage.content.length < 900) {
+                oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
+                            icon_url: oldMessage.author.displayAvatarURL,
+                        },
+                        title: 'Message edit',
+                        description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                        fields: [
+                            {
+                                name: 'Old message',
+                                value: `${oldMessage}`
+                            },
+                            {
+                                name: 'New message',
+                                value: `${newMessage}\n[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                 });
+            } else {
+                if (oldMessage.content.length < 1024 && newMessage.content.length > 900) {
+                    oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
+                                icon_url: oldMessage.author.displayAvatarURL,
+                            },
+                            title: 'Message edit',
+                            description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                            fields: [
+                                {
+                                    name: 'Old message',
+                                    value: `${oldMessage}`
+                                },
+                                {
+                                    name: 'New message',
+                                    value: `[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                                }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                     });
+                } else {
+                    oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
+                                icon_url: oldMessage.author.displayAvatarURL,
+                            },
+                            title: 'Message edit',
+                            description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                            fields: [
+                                {
+                                    name: 'New message',
+                                    value: `[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                                }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                     });
+                }
+            }
+        }
     }
 });
 
-client.on('messageDelete', function (message) {
+client.on('messageDelete', async function (message) {
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()];
@@ -3589,6 +3681,44 @@ client.on('messageDelete', function (message) {
                 if (err) throw err;
             }
         );
+        if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {
+            const entry = await message.guild.fetchAuditLogs({
+                type: 'MESSAGE_DELETE'
+            }).then(audit => audit.entries.first());
+            var user = '';
+            if (entry.extra.channel.id === message.channel.id &&
+            (entry.target.id == message.author.id) && (entry.createdTimestamp > (Date.now() - 5000))) {
+                user = entry.executor
+            } else user = message.author;
+            var messageContent = message.content;
+            if (message.content.length == 0) messageContent = message.attachments.first().filename;
+            if (message.content.lengt > 2000) messageContent = 'Message too long ( > 2000 characters)';
+            message.guild.channels.get(config.channel_serverlog).send({
+                embed: {
+                    color: config.color_warning,
+                    author: {
+                        name: `${message.author.username}#${message.author.discriminator}`,
+                        icon_url: message.author.displayAvatarURL
+                    },
+                    title: 'Message deletion',
+                    description: `Message sent by user ${message.author} deleted in ${message.channel}\n`,
+                    fields: [
+                        {
+                            name: 'Deleted by',
+                            value: `${user}`
+                        },
+                        {
+                            name: 'Deleted message',
+                            value: messageContent
+                        }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
+                }
+            });
+        }
     }
 });
 
@@ -3602,6 +3732,26 @@ client.on('guildMemberAdd', function (member) {
                 if (err) throw err;
             }
         );
+        if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
+            member.guild.channels.get(config.channel_serverlog).send({
+                embed: {
+                    color: config.color_success,
+                    author: {
+                        name: `${member.user.username}#${member.user.discriminator}`,
+                        icon_url: member.user.displayAvatarURL
+                    },
+                    title: 'User joined',
+                    thumbnail: {
+                        url: member.user.displayAvatarURL
+                    },
+                    description: `User ${member.user} has joined ${member.guild.name}`,
+                    timestamp: Date.now(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
+                }
+            });
+        }
     }
 
     if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
@@ -3638,7 +3788,7 @@ client.on('guildMemberAdd', function (member) {
                         message.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
                     }
 
-                    guild.channels.find(val => val.name === 'server-log').send({
+                    member.guild.channels.get(config.channel_serverlog).send({
                         embed: {
                             color: config.color_warning,
                             title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
@@ -3670,6 +3820,26 @@ client.on('guildMemberRemove', function (member) {
                 if (err) throw err;
             }
         );
+        if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE_LOG')) {
+            member.guild.channels.get(config.channel_serverlog).send({
+                embed: {
+                    color: config.color_warning,
+                    author: {
+                        name: `${member.user.username}#${member.user.discriminator}`,
+                        icon_url: member.user.displayAvatarURL
+                    },
+                    title: 'User left',
+                    description: `User ${member.user} has left ${member.guild.name}`,
+                    thumbnail: {
+                        url:member.user.displayAvatarURL
+                    },
+                    timestamp: new Date(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
+                }
+            });
+        }
     }
 });
 
@@ -3736,6 +3906,38 @@ client.on('userUpdate', function (oldUser, newUser) {
                     if (err) throw err;
                 }
             );
+            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: `${newUser.username}#${newUser.discriminator}`,
+                            icon_url: newUser.displayAvatarURL
+                        },
+                        title: 'Username change',
+                        thumbnail: {
+                            url: newUser.displayAvatarURL
+                        },
+                        description: `User ${newUser} has changed their username\n`,
+                        fields: [
+                            {
+                                name: 'Previous username',
+                                value: `${oldUser.username}`,
+                                inline: true
+                            },
+                            {
+                                name: 'New username',
+                                value: `${newUser.username}`,
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                });
+            }
         }
 
         //Checking for avatar changes to update user table
@@ -3746,11 +3948,65 @@ client.on('userUpdate', function (oldUser, newUser) {
                     if (err) throw err;
                 }
             );
+            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: `${newUser.username}#${newUser.discriminator}`,
+                            icon_url: newUser.displayAvatarURL
+                        },
+                        title: 'Avatar change',
+                        thumbnail: {
+                            url: newUser.displayAvatarURL
+                        },
+                        description: `User ${newUser} has changed their avatar`,
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                });
+            }
+        }
+        if (oldUser.discriminator !== newUser.discriminator) {
+            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: `${newUser.username}#${newUser.discriminator}`,
+                            icon_url: newUser.displayAvatarURL
+                        },
+                        title: 'Discriminator change',
+                        thumbnail: {
+                            url: newUser.displayAvatarURL
+                        },
+                        description: `User ${newUser} has changed their discriminator\n`,
+                        fields: [
+                            {
+                                name: 'Previous discriminator',
+                                value: `${oldUser.discriminator}`,
+                                inline: true
+                            },
+                            {
+                                name: 'New discriminator',
+                                value: `${newUser.discriminator}`,
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                });
+            }
         }
     }
 });
 
-client.on('guildMemberUpdate', function (oldMember, newMember) {
+client.on('guildMemberUpdate', async function (oldMember, newMember) {
     if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE')) {
         //Checking for nickname changes for logging
         if (oldMember.displayName !== newMember.displayName) {
@@ -3760,11 +4016,103 @@ client.on('guildMemberUpdate', function (oldMember, newMember) {
                     if (err) throw err;
                 }
             );
+            if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_LOG')) {
+                oldMember.guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: `${oldMember.user.username}#${oldMember.user.discriminator}`,
+                            icon_url: oldMember.user.displayAvatarURL
+                        },
+                        title: 'Nickname change',
+                        thumbnail: {
+                            url: oldMember.user.displayAvatarURL
+                        },
+                        description: `User ${oldMember.user} has changed their nickname\n`,
+                        fields: [
+                            {
+                                name: 'Old nickname',
+                                value: oldMember.displayName,
+                                inline: true
+                            },
+                            {
+                                name: 'New nickname',
+                                value: newMember.displayName,
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                });
+            }  
+        }
+        if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_ROLES_LOG')) {
+            if (oldMember.roles.size > newMember.roles.size) {
+                var role = oldMember.roles.filter(r => !newMember.roles.has(r.id)).first();
+                await oldMember.guild.fetchAuditLogs({
+                    type: 'MEMBER_ROLE_UPDATE'
+                }).then(audit => {
+                    var description = `Role ${role} removed from user ${oldMember.user}`;
+                    for (var i = 0; i < audit.entries.array().length; i++) {
+                        if (audit.entries.array()[i].target == oldMember.user) {
+                            description += ` by ${audit.entries.array()[i].executor}`;
+                            break;
+                        }
+                    }
+                    guild.channels.get(config.channel_serverlog).send({
+                        embed: {
+                            color: config.color_warning,
+                            author: {
+                                name: `${oldMember.user.username}#${oldMember.user.discriminator}`,
+                                icon_url: oldMember.user.displayAvatarURL
+                            },
+                            title: 'Role removal',
+                            description: description,
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                    });
+                });
+            }
+            if (newMember.roles.size > oldMember.roles.size) {
+                var role = newMember.roles.filter(r => !oldMember.roles.has(r.id)).first();
+                await newMember.guild.fetchAuditLogs({
+                    type: 'MEMBER_ROLE_UPDATE'
+                }).then(audit => {
+                    var description = `Role ${role} added to user ${newMember.user}`;
+                    for (var i = 0; i < audit.entries.array().length; i++) {
+                        if (audit.entries.array()[i].target == newMember.user) {
+                            description += ` by ${audit.entries.array()[i].executor}`;
+                            break;
+                        }
+                    }
+                    guild.channels.get(config.channel_serverlog).send({
+                        embed: {
+                            color: config.color_success,
+                            author: {
+                                name: `${newMember.user.username}#${newMember.user.discriminator}`,
+                                icon_url: newMember.user.displayAvatarURL
+                            },
+                            title: 'Role addition',
+                            description: description,
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                    });
+                });
+            }
         }
     }
 });
 
-client.on('guildBanAdd', function(guild, user) {
+client.on('guildBanAdd', function (guild, user) {
     var identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
@@ -3775,23 +4123,119 @@ client.on('guildBanAdd', function(guild, user) {
             if (err) throw err;
         }
     );
+    if (modulesFile.get('EVENT_GUILD_BAN_ADD_LOG')) {
+        guild.channels.get(config.channel_serverlog).send({
+            embed: {
+                color: config.color_success,
+                author: {
+                    name: `${user.username}#${user.discriminator}`,
+                    icon_url: user.displayAvatarURL
+                },
+                title: 'User banned',
+                thumbnail: {
+                    url: user.displayAvatarURL
+                },
+                description: `User ${user} has been banned`,
+                timestamp: new Date(),
+                footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                }
+            }
+        });
+    }
 });
 
-client.on('guildBanRemove', function(guild, user) {
-  var identifier = cryptoRandomString({length: 10});
-  var data = [user.id, '001', "SYSTEM UNBAN", identifier, 0, new Date()];
-  connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+client.on('guildBanRemove', function (guild, user) {
+    var identifier = cryptoRandomString({length: 10});
+    var data = [user.id, '001', "SYSTEM UNBAN", identifier, 0, new Date()];
+    connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
     function(err, results){
         if(err) throw err;
-    }
-  );
-  connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id, 
+    });
+    connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id, 
     function(err, rows, results){
         if(err) throw err;
 
         bannedUsersFile.set(rows[0].identifier, '');
         bannedUsersFile.save();
-  });
+    });
+    if (modulesFile.get('EVENT_GUILD_BAN_REMOVE_LOG')) {
+        guild.channels.get(config.channel_serverlog).send({
+            embed: {
+                color: config.color_success,
+                author: {
+                    name: `${user.username}#${user.discriminator}`,
+                    icon_url: user.displayAvatarURL
+                },
+                title: 'User unbanned',
+                thumbnail: {
+                    url: user.displayAvatarURL
+                },
+                description: `User ${user} has been unbanned`,
+                timestamp: new Date(),
+                footer: {
+                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                }
+            }
+        });
+    }
+});
+
+
+client.on('messageReactionAdd', function (messageReaction, user) {
+    if (modulesFile.get('EVENT_MESSAGE_REACTION_ADD')) {
+        switch (messageReaction.emoji.name) {
+            case 'eu': 
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]')));
+                break;
+            case 'na':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[NA]')));
+                break;
+            case 'SA':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SA]')));
+                break;
+            case 'asia':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[ASIA]')));
+                break;
+            case 'sea':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SEA]')));
+                break;
+            case 'oce':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[OCE]')));
+                break;
+            case 'kjp':
+                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[KR/JP]')));
+                break;
+        }
+    }
+});
+
+client.on('messageReactionRemove', function (messageReaction, user) {
+    if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
+        switch (messageReaction.emoji.name) {
+            case 'eu': 
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]')));
+                break;
+            case 'na':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]')));
+                break;
+            case 'SA':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]')));
+                break;
+            case 'asia':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]')));
+                break;
+            case 'sea':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]')));
+                break;
+            case 'oce':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]')));
+                break;
+            case 'kjp':
+                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]')));
+                break;
+        }
+    }
 });
 
 client.on('error', console.error);
