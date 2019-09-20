@@ -403,29 +403,23 @@ function parseUserTag(tag) {
         return trimMe.replace(/[^0-9.]/gi, '');
     } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
         var split = tag.split('#');
-        var usernameResolve = client.users.find(
-            obj => obj.username === split[0]
-        );
+        var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
 
-        if (usernameResolve == null) return 'err';
-        if (usernameResolve.discriminator == split[1]) {
-            return usernameResolve.id;
-        } else {
+        if (usernameResolve == null) {
             return 'err';
+        } else {
+            return usernameResolve.id;
         }
     } else if (/^[0-9]+$/.test(tag)) {
         return trimMe;
     } else {
         var usernameResolve = client.users.find(obj => obj.username === tag);
-        var nicknameResolve = client.users.find(obj => obj.nickname === tag);
-
-        if (usernameResolve) {
-            return usernameResolve.id;
-        } else if (nicknameResolve) {
-            return nicknameResolve.id;
-        } else {
-            return 'err';
-        }
+        if (usernameResolve == null) {
+            var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
+            if (nicknameResolve == null) {
+                return 'err';
+            } else return nicknameResolve.id;
+        } else return usernameResolve.id;
     }
 }
 
