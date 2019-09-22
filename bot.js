@@ -1102,7 +1102,7 @@ client.on('message', async message => {
                     var tail = args.slice(1);
                     var reason = tail.join(" ").trim();
     
-                    if(tail.length > 0){
+                    if (tail.length > 0) {
                       var identifier = cryptoRandomString({length: 10});
                       client.users.get(user).createDM().then(async chnl => {
                         await chnl.send({embed: {
@@ -3792,9 +3792,39 @@ client.on('guildMemberAdd', function (member) {
                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
                         }
-                    });
+                    }).catch(console.error);
                 }
             );
+        }
+    }
+    if (modulesFile.get('EVENT_NEWACC_DETEC')) {
+        if (member.user.createdTimestamp > (Date.now() - 1000 * 60 * 60 * 24 * 7)) {
+            member.guild.channels.get(config.channel_serverlog).send({
+                embed: {
+                    color: config.color_warning,
+                    author: {
+                        name: `${member.user.username}#${member.user.discriminator}`,
+                        icon_url: member.user.displayAvatarURL
+                    },
+                    title: '❗ new Discord account',
+                    fields: [
+                        {
+                            name: 'User',
+                            value: `${member}\nID:${member.id}`,
+                            inline: true
+                        },
+                        {
+                            name: 'Created',
+                            value: `${member.user.createdAt.toUTCString()}`,
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
+                }
+            }).catch(console.error);
         }
     }
 });
