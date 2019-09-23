@@ -607,7 +607,7 @@ function checkExpiredMutes() {
 
             if (actionee) {
                 actionee.removeRole(mutedRole).then(member => {
-                    guild.channels.find(val => val.name === 'server-log').send(`${member} has been unmuted`);
+                    guild.channels.get(config.channel_serverlog).send(`${member} has been unmuted`);
                     mutedFile.unset(key);
                     mutedFile.save();
                 }).catch(console.error);
@@ -1462,7 +1462,21 @@ client.on('message', async message => {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (modulesFile.get('COMMAND_USER')) {
                 var userID = parseUserTag(args[0]);
-                var globalUser = client.users.get(userID);
+                if (userID == 'err') {
+                    message.channel.send({
+                        embed: {
+                            color: config.color_warning,
+                            title: 'USER NOT FOUND',
+                            description: 'The provided user could not be found.\n Please ensure you have the correct ID/name.\n Usernames/nicknames are case sensitive.\n If the member is not in the guild, an ID is required.',
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                    }).catch(console.error);
+                    return;
+                }
+                var globalUser = await client.fetchUser(userID);
                 var userObject = guild.member(globalUser);
 
                 if (userObject) {
