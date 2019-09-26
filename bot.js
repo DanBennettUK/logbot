@@ -2667,6 +2667,24 @@ client.on('message', async message => {
                 var cKeys = _.keys(customCommands.read());
                 var allCommands = '';
                 for (var i = 0; i < cKeys.length; i++) {
+                    if (allCommands.length > 1900) {
+                        message.channel.send({
+                            embed: {
+                                color: config.color_info,
+                                title: `**Listing ${i + 1} custom commands:**`,
+                                author: {
+                                    name: client.user.username,
+                                    icon_url: client.user.displayAvatarURL
+                                },
+                                description: `${allCommands}`,
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        });
+                        allCommands = ``;
+                    }
                     allCommands +=`\n **${cKeys[i]}:** ${customCommands.get(cKeys[i]).content}`;
                 }
                 message.channel.send({
@@ -3921,7 +3939,7 @@ client.on('voiceStateUpdate', function (oldMember, newMember) {
                         else {
                             switch (data[5]) { //Switch on the type
                                 case 1: //join
-                                        voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6]}`);
+                                    voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6]}`);
                                     break;
                                 case 2: //move
                                     voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
