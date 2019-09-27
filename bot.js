@@ -855,6 +855,23 @@ function importUnbans() {
     );
 }
 
+function checkStreamers() {
+    var streamerRole = guild.roles.find(r => r.name == 'Streamers');
+    var spotlightRole = guild.roles.find(r => r.name == 'Streamer Spotlight');
+    var streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
+    var spotlighters = guild.members.filter(m => m.roles.has(spotlightRole.id));
+    streamers.forEach(s => {
+        if (s.user.presence.status != 'offline' && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.details == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
+            s.addRole(spotlightRole);
+        }
+    });
+    spotlighters.forEach(s => {
+        if (s.user.presence.status != 'offline' && (!(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS')) {
+            s.removeRole(spotlightRole);
+        }
+    });
+}
+
 client.on('ready', async () => {
     setupTables();
 
@@ -891,6 +908,7 @@ client.on('ready', async () => {
 
     setInterval(checkExpiredMutes, 10000);
     setInterval(checkReminders, 15000);
+    setInterval(checkStreamers, 60000);
 });
 
 client.on('message', async message => {
