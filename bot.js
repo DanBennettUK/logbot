@@ -435,6 +435,21 @@ function parseChannelTag(tag) {
         return trimMe.replace(/[^0-9.]/gi, '');
     } else if (/^[0-9]+$/.test(tag)) {
         return trimMe;
+    } else if (/#.+/.test(tag)) {
+        trimMe.replace('#', '');
+        var chnl = guild.channels.find(c => c.name === trimMe);
+        if (chnl == null) {
+            return 'err';
+        } else {
+            return chnl.id;
+        }
+    } else if (/.+/.test(tag)) {
+        var chnl = guild.channels.find(c => c.name === trimMe);
+        if (chnl == null) {
+            return 'err';
+        } else {
+            return chnl.id;
+        }
     } else {
         return 'err';
     }
