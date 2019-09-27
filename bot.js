@@ -1517,8 +1517,8 @@ client.on('message', async message => {
                     var voiceChannel;
                     var app;
 
-                    if (userObject.user.displayName) {
-                        nickname = userObject.user.displayName;
+                    if (userObject.nickname) {
+                        nickname = userObject.nickname;
                     } else {
                         nickname = 'No nickname';
                     }
@@ -1733,7 +1733,7 @@ client.on('message', async message => {
                                                 embed: {
                                                     color: config.color_caution,
                                                     author: {
-                                                        name: userObject.user.username,
+                                                        name: `${userObject.user.username} (${nickname})`,
                                                         icon_url: userObject.user.displayAvatarURL
                                                     },
                                                     description: `There are no recorded notes for this user`,
@@ -1821,7 +1821,7 @@ client.on('message', async message => {
                                                 embed: {
                                                     color: config.color_info,
                                                     author: {
-                                                        name: `Join/Leave history for ${userObject.user.username} (${nickname})`,
+                                                        name: `${userObject.user.username} (${nickname})`,
                                                         icon_url: userObject.user.displayAvatarURL
                                                     },
                                                     description: history.join(' '),
@@ -1836,7 +1836,7 @@ client.on('message', async message => {
                                                 embed: {
                                                     color: config.color_caution,
                                                     author: {
-                                                        name: userObject.user.username,
+                                                        name: `Join/Leave history for ${userObject.user.username} (${nickname})`,
                                                         icon_url: userObject.user.displayAvatarURL
                                                     },
                                                     description: `There are no join/leave records for this user`,
