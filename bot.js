@@ -404,7 +404,7 @@ function parseUserTag(tag) {
     } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
         var split = tag.split('#');
         var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
-
+      
         if (usernameResolve == null) {
             return 'err';
         } else {
@@ -1134,7 +1134,7 @@ client.on('message', async message => {
                   if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
                     var tail = args.slice(1);
                     var reason = tail.join(" ").trim();
-    
+                    
                     if (tail.length > 0) {
                       var identifier = cryptoRandomString({length: 10});
                       client.users.get(user).createDM().then(async chnl => {
@@ -1220,7 +1220,6 @@ client.on('message', async message => {
                 } else { // if the user isn't in the guild, have a confirmation message and proceed upon reacting
                   if (client.fetchUser(user)) {
                     await client.fetchUser(user).then(async userObj =>{
-    
                       await message.channel.send(`User ${userObj} is not in the guild. Are you sure you want to proceed?`).then(async msg => {
                         await msg.react('✅');
                         await msg.react('❌');
@@ -2647,7 +2646,7 @@ client.on('message', async message => {
             });
             return;
         }
-
+      
         var helpCommands = 
         `${config.prefix}bugreport
         ${config.prefix}forums
@@ -2934,7 +2933,7 @@ client.on('message', async message => {
                                             if (member.voiceChannel !== undefined) {
                                                 member.setVoiceChannel(null).catch(console.error);
                                             }
-
+                                          
                                             message.channel.send({
                                                 embed: {
                                                     color: config.color_success,
