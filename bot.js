@@ -404,7 +404,7 @@ function parseUserTag(tag) {
     } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
         var split = tag.split('#');
         var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
-      
+
         if (usernameResolve == null) {
             return 'err';
         } else {
@@ -861,12 +861,12 @@ function checkStreamers() {
     var streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
     var spotlighters = guild.members.filter(m => m.roles.has(spotlightRole.id));
     streamers.forEach(s => {
-        if (s.user.presence.status != 'offline' && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.details == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
+        if (s.user.presence.status != 'offline' && s.user.presence.game && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.details == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
             s.addRole(spotlightRole);
         }
     });
     spotlighters.forEach(s => {
-        if (s.user.presence.status != 'offline' && (!(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS')) {
+        if (s.user.presence.status != 'offline' && s.user.presence.game && (!(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS')) {
             s.removeRole(spotlightRole);
         }
     });
@@ -996,7 +996,7 @@ client.on('message', async message => {
             message.channel.send(`That module (${command}) is disabled.`);
         }
     }
-  
+
     //utility commands
     if (command === 'module') {
         if ( message.member.roles.some(role => ['Admins', 'Full Mods'].includes(role.name)) ) {
@@ -1126,7 +1126,7 @@ client.on('message', async message => {
           if(modulesFile.get('COMMAND_BAN')){
             if(args[0]){
               var user = parseUserTag(args[0]);
-    
+
               if(user == 'err'){ //Check if the user parameter is valid
                 message.channel.send('An invalid user was provided. Please try again');
               } else {
@@ -1134,7 +1134,7 @@ client.on('message', async message => {
                   if(message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
                     var tail = args.slice(1);
                     var reason = tail.join(" ").trim();
-                    
+
                     if (tail.length > 0) {
                       var identifier = cryptoRandomString({length: 10});
                       client.users.get(user).createDM().then(async chnl => {
@@ -1158,7 +1158,7 @@ client.on('message', async message => {
                           function(err, results) {
                               if(err) throw err;
                             });
-    
+
                           guild.ban(user, { days: 1, reason: reason }).then(async result => {
                               await message.channel.send({embed: {
                                     color: config.color_success,
@@ -1197,7 +1197,7 @@ client.on('message', async message => {
                                     }
                                   }
                               });
-    
+
                               var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                               connection.query(
                                 'INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
@@ -1205,7 +1205,7 @@ client.on('message', async message => {
                                   if(err) throw err;
                                 }
                               );
-    
+
                               //Adding the user to our banned users JSON
                               bannedUsersFile.set(identifier, result.username);
                               bannedUsersFile.save();
@@ -1223,16 +1223,16 @@ client.on('message', async message => {
                       await message.channel.send(`User ${userObj} is not in the guild. Are you sure you want to proceed?`).then(async msg => {
                         await msg.react('✅');
                         await msg.react('❌');
-    
+
                         const filter = (reaction, user) => user == message.member.user;
                         const collector = msg.createReactionCollector(filter);
-                        
+
                         collector.on('collect', async react => {
                           if (react.emoji.name == '✅') {
                             await msg.delete();
                             var tail = args.slice(1);
                             var reason = tail.join(' ').trim();
-    
+
                             if (tail.length > 0) {
                               var identifier = cryptoRandomString({length: 10});
                               guild.ban(user, { days: 1, reason: reason }).then(async result => {
@@ -1279,13 +1279,13 @@ client.on('message', async message => {
                                     if(err) throw err;
                                   }
                                 );
-    
+
                                 //Adding the user to our banned users JSON
                                 bannedUsersFile.set(identifier, result.username);
                                 bannedUsersFile.save();
                               }).catch(console.error);
                             }
-                          } 
+                          }
                           if (react.emoji.name == '❌') {
                             await msg.delete();
                             message.channel.send('Action cancelled').then(msg2 => {
@@ -1295,7 +1295,7 @@ client.on('message', async message => {
                         });
                       });
                     });
-                  }        
+                  }
                 }
               }
             } else {
@@ -2554,7 +2554,7 @@ client.on('message', async message => {
 
     if (command === 'help') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-            var staffHelpCommands = 
+            var staffHelpCommands =
             `[Commands in detail](https://github.com/FMWK/logbot/wiki/Commands-in-detail)
 
             **Fun commands:**
@@ -2646,8 +2646,8 @@ client.on('message', async message => {
             });
             return;
         }
-      
-        var helpCommands = 
+
+        var helpCommands =
         `${config.prefix}bugreport
         ${config.prefix}forums
         ${config.prefix}invite
@@ -2836,7 +2836,7 @@ client.on('message', async message => {
                                             }
                                         });
                                         message.channel.send(`Channel ${channel} successfully unlocked`);
-                                    } 
+                                    }
                                 );
                         } else message.channel.send(`Channel ${channelObj} is not locked.`);
                     } else message.channel.send(`Channel ${channels[i]} could not be found/resolved.`);
@@ -2899,7 +2899,7 @@ client.on('message', async message => {
                 }
             }
         }
-      
+
         if (args[0].toLowerCase() === 'mute') {
             if (message.member.roles.some(role => ['Support'].includes(role.name))) {
                 if (modulesFile.get('COMMAND_HELPER_MUTE')) {
@@ -2933,7 +2933,7 @@ client.on('message', async message => {
                                             if (member.voiceChannel !== undefined) {
                                                 member.setVoiceChannel(null).catch(console.error);
                                             }
-                                          
+
                                             message.channel.send({
                                                 embed: {
                                                     color: config.color_success,
@@ -3444,7 +3444,7 @@ client.on('message', async message => {
               var reason = _.rest(args, 1).join(' ');
 
               if (reason.length > 0) {
-                            
+
                 mutedFile.unset(`${user}`);
                 mutedFile.save();
 
@@ -3659,7 +3659,7 @@ client.on('messageUpdate', function (oldMessage, newMessage) {
         if (modulesFile.get('EVENT_MESSAGE_UPDATE_LOG')) {
             if (oldMessage.content == newMessage.content) return;
             if (oldMessage.content.length < 1024 && newMessage.content.length < 900) {
-                oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                oldMessage.guild.channels.get(config.channel_serverlog).send({
                     embed: {
                         color: config.color_info,
                         author: {
@@ -3686,7 +3686,7 @@ client.on('messageUpdate', function (oldMessage, newMessage) {
                  });
             } else {
                 if (oldMessage.content.length < 1024 && newMessage.content.length > 900) {
-                    oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                    oldMessage.guild.channels.get(config.channel_serverlog).send({
                         embed: {
                             color: config.color_info,
                             author: {
@@ -3712,7 +3712,7 @@ client.on('messageUpdate', function (oldMessage, newMessage) {
                         }
                      });
                 } else {
-                    oldMessage.guild.channels.get(config.channel_serverlog).send({ 
+                    oldMessage.guild.channels.get(config.channel_serverlog).send({
                         embed: {
                             color: config.color_info,
                             author: {
@@ -4144,7 +4144,7 @@ client.on('guildMemberUpdate', async function (oldMember, newMember) {
                         }
                     }
                 }).catch(console.error);
-            }  
+            }
         }
         if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_ROLES_LOG')) {
             if (oldMember.roles.size > newMember.roles.size) {
@@ -4249,7 +4249,7 @@ client.on('guildBanRemove', function (guild, user) {
     function(err, results){
         if(err) throw err;
     });
-    connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id, 
+    connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id,
     function(err, rows, results){
         if(err) throw err;
 
@@ -4379,7 +4379,7 @@ client.on('roleUpdate', async function (oldRole, newRole) {
         }
         if (oldRole.permissions !== newRole.permissions) { // credit to Gab
             const { Permissions } = require(`discord.js`);
-            const entry = await guild.fetchAuditLogs({ 
+            const entry = await guild.fetchAuditLogs({
                 type: 'ROLE_UPDATE'
             }).then(audit => audit.entries.first());
             const changes = entry.changes;
@@ -4686,7 +4686,7 @@ client.on('channelUpdate', function (oldChannel, newChannel) {
 client.on('messageReactionAdd', function (messageReaction, user) {
     if (modulesFile.get('EVENT_MESSAGE_REACTION_ADD')) {
         switch (messageReaction.emoji.name) {
-            case 'eu': 
+            case 'eu':
                 guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
                 break;
             case 'na':
@@ -4714,7 +4714,7 @@ client.on('messageReactionAdd', function (messageReaction, user) {
 client.on('messageReactionRemove', function (messageReaction, user) {
     if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
         switch (messageReaction.emoji.name) {
-            case 'eu': 
+            case 'eu':
                 guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
                 break;
             case 'na':
