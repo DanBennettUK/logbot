@@ -27,9 +27,10 @@ var stringSimilarity = require('string-similarity');
 const cryptoRandomString = require('crypto-random-string');
 const enmap = require('enmap');
 const fs = require(`fs`);
+const request = require('request');
+
 const functionsFile = require(`./functions.js`);
 var modulesFile = editJsonFile('./modules.json');
-
 var bannedUsers = require('./banned_users.json');
 var bannedUsersFile = editJsonFile('./banned_users.json');
 var badWordsFile = editJsonFile(`./bad_words.json`);
@@ -72,6 +73,7 @@ client.customCommands = customCommands;
 client.LFGRoomsFile = LFGRoomsFile;
 client.connection = connection;
 client.functionsFile = functionsFile;
+client.request = request;
 
 fs.readdir(`./events/`, (err, files) => {
     if (err) return console.error(err);
