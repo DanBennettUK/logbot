@@ -1,4 +1,7 @@
-module.exports = (oldMessage, newMessage) => {
+module.exports = (client, oldMessage, newMessage) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
     if (modulesFile.get('EVENT_MESSAGE_UPDATE')) {
         if (newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [newMessage.author.id, newMessage.id, newMessage.content, oldMessage.content, newMessage.channel.id, 2, new Date()];

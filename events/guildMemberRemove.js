@@ -1,4 +1,7 @@
-module.exports = member => {
+module.exports = (client, member) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
     if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE')) {
         var data = [member.user.id, new Date()];
         var userLeave = [0, member.user.id];

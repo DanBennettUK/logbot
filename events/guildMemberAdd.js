@@ -1,4 +1,8 @@
-module.exports = member => {
+module.exports = (client, member) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
+    const bannedUsersFile = client.bannedUsersFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         var params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
@@ -31,7 +35,7 @@ module.exports = member => {
     }
 
     if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
-        var guild = client.guilds.get(config.guildid);
+        var guild = member.guild;
         var banndUsers = bannedUsersFile.get();
         var usernames = _.values(banndUsers);
         var ids = _.keys(banndUsers);

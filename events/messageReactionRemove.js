@@ -1,4 +1,6 @@
-module.exports = (messageReaction, user) => {
+module.exports = (client, messageReaction, user) => {
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (user.bot) return;
     if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
         if (messageReaction.message.id == config.reaction_message && messageReaction.message.channel.id == config.reaction_channel) {

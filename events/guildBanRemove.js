@@ -1,4 +1,9 @@
-module.exports = (guild, user) => {
+module.exports = (client, guild, user) => {
+    const cryptoRandomString = client.cryptoRandomString;
+    const connection = client.connection;
+    const config = client.config;
+    const modulesFile = client.modulesFile;
+    const bannedUsersFile = client.bannedUsersFile;
     var identifier = cryptoRandomString({length: 10});
     var data = [user.id, '001', "SYSTEM UNBAN", identifier, 0, new Date()];
     connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,

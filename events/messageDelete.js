@@ -1,4 +1,7 @@
-module.exports = async message => {
+module.exports = async (client, message) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()];

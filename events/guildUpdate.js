@@ -1,4 +1,6 @@
-module.exports = (oldGuild, newGuild) => {
+module.exports = (client, oldGuild, newGuild) => {
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (modulesFile.get('EVENT_GUILD_UPDATE_LOG')) {
         if (oldGuild.name !== newGuild.name) {
             oldGuild.channels.get(config.channel_serverlog).send({

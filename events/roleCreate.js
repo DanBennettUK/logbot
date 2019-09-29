@@ -1,4 +1,6 @@
-module.exports = role => {
+module.exports = (client, role) => {
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (modulesFile.get('EVENT_ROLE_CREATE_LOG')) {
         role.guild.channels.get(config.channel_serverlog).send({
             embed: {

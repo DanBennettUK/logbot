@@ -1,4 +1,6 @@
-module.exports = channel => {
+module.exports = (client, channel) => {
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (modulesFile.get('EVENT_CHANNEL_CREATE_LOG')) {
         if (![`dm`, `group`].includes(channel.type)) {
             var channelType = 'Channel'

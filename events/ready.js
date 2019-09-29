@@ -1,5 +1,7 @@
 module.exports = client => {
-    setupTables();
+    const functionsFile = client.functionsFile;
+    const config = client.config;
+    functionsFile.setupTables(client);
 
     if (config.test) {
         console.log(`[TEST VERSION] [${new Date()}] Bot Active.`);
@@ -17,8 +19,8 @@ module.exports = client => {
     //importBans();
     //importUnbans();
 
-    updateUserTable('system', null);
-    guild = client.guilds.get(config.guildid);
+    functionsFile.updateUserTable(client, 'system', null);
+    const guild = client.guilds.get(config.guildid);
 
     var react = guild.channels.get(config.reaction_channel);
 
@@ -32,7 +34,7 @@ module.exports = client => {
         await m.react(guild.emojis.find(e => e.name == 'kjp')).catch(console.error);
     });
 
-    setInterval(checkExpiredMutes, 10000);
-    setInterval(checkReminders, 15000);
-    setInterval(checkStreamers, 60000);
+    setInterval(functionsFile.checkExpiredMutes(client), 10000);
+    setInterval(functionsFile.checkReminders(client), 15000);
+    setInterval(functionsFile.checkStreamers(client), 60000);
 }

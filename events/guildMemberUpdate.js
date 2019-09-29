@@ -1,4 +1,7 @@
-module.exports = (oldMember, newMember) => {
+module.exports = async (client, oldMember, newMember) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
     if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE')) {
         //Checking for nickname changes for logging
         if (oldMember.displayName !== newMember.displayName) {
@@ -54,7 +57,7 @@ module.exports = (oldMember, newMember) => {
                             break;
                         }
                     }
-                    guild.channels.get(config.channel_serverlog).send({
+                    oldMember.guild.channels.get(config.channel_serverlog).send({
                         embed: {
                             color: config.color_warning,
                             author: {
@@ -83,7 +86,7 @@ module.exports = (oldMember, newMember) => {
                             break;
                         }
                     }
-                    guild.channels.get(config.channel_serverlog).send({
+                    oldMember.guild.channels.get(config.channel_serverlog).send({
                         embed: {
                             color: config.color_success,
                             author: {

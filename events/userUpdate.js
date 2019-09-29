@@ -1,4 +1,8 @@
-module.exports = (oldUser, newUser) => {
+module.exports = (client, oldUser, newUser) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
+    const guild = client.guilds.get(config.guildid)
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {

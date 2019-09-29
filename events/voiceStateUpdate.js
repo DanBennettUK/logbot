@@ -1,4 +1,7 @@
-module.exports = (oldMember, newMember) => {
+module.exports = (client, oldMember, newMember) => {
+    const modulesFile = client.modulesFile;
+    const connection = client.connection;
+    const config = client.config;
     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES')) {
         var data = [];
         if (oldMember.voiceChannel) {

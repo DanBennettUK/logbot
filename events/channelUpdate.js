@@ -1,4 +1,6 @@
-module.exports = (oldChannel, newChannel) => {
+module.exports = (client, oldChannel, newChannel) => {
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (modulesFile.get('EVENT_CHANNEL_UPDATE_LOG')) {
         if (![`dm`, `group`].includes(oldChannel.type)) {
             var channelType = 'Channel'
