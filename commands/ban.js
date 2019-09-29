@@ -9,7 +9,7 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(role=>['Moderators'].includes(role.name))) {
         if(modulesFile.get('COMMAND_BAN')) {
             if(args[0]) {
-                var user = functionsFile.parseUserTag(guild, args[0]);
+                var user = functionsFile.parseUserTag(client, guild, args[0]);
 
                 if (user == 'err') { //Check if the user parameter is valid
                 message.channel.send('An invalid user was provided. Please try again');

@@ -3,7 +3,7 @@ exports.run = (client, message, args) => {
     const connection = client.connection;
     const config = client.config;
     const functionsFile = client.functionsFile;
-    if (args[0].toLowerCase() == 'count') {
+    if (args[0] && args[0].toLowerCase() == 'count') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (modulesFile.get('COMMAND_USER_COUNT')) {
                 connection.query('SELECT COUNT(*) AS TotalUsers FROM users',
@@ -42,7 +42,7 @@ exports.run = (client, message, args) => {
             }
         } //End of permission checking statement
     }
-    if (args[0].toLowerCase() == 'update') {
+    if (args[0] && args[0].toLowerCase() == 'update') {
         if (message.member.roles.some(role => ['Admins'].includes(role.name))) {
             if (modulesFile.get('COMMAND_USER_UPDATE')) {
                 functionsFile.updateUserTable(client, 'user', message.channel.id);

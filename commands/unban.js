@@ -9,7 +9,7 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNBAN')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(guild, args[0]);
+                var user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
                 message.channel.send(`Unban who?\n Format:\`${config.prefix}unban <UserTag> <Reason>\``);
                 return;

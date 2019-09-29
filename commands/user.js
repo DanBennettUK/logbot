@@ -4,9 +4,10 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     const connection = client.connection;
     const _ = client.underscore;
+    const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
-            var userID = functionsFile.parseUserTag(message.guild, args[0]);
+            var userID = functionsFile.parseUserTag(client, message.guild, args[0]);
             var globalUser;
             try {
                 globalUser = await client.fetchUser(userID);

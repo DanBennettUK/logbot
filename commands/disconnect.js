@@ -4,7 +4,7 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_DISCONNECT')) {
-            var user = functionsFile.parseUserTag(guild, args[0]);
+            var user = functionsFile.parseUserTag(client, guild, args[0]);
             var guildUser = guild.member(user);
 
             if (user !== 'err' && guildUser && guildUser.voiceChannel !== undefined) {

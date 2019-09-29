@@ -8,7 +8,7 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_WARN')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(guild, args[0]);
+                var user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
                 functionsFile.syntaxErr(message, 'warn');
                 return;

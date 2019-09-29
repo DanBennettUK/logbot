@@ -3,6 +3,7 @@ module.exports = (client, guild, user) => {
     const bannedUsersFile = client.bannedUsersFile;
     const connection = client.connection;
     const config = client.config;
+    const modulesFile = client.modulesFile;
     var identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();

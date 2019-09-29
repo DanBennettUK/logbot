@@ -5,7 +5,7 @@ exports.run = (client, message, args) => {
     const _ = client.underscore;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-            if (args[0].toLowerCase() === 'add') {
+            if (args[0] && args[0].toLowerCase() === 'add') {
                 if (args[1]) {
                     var commandStr = _.rest(args, 2).join(' ');
                     customCommands.set(args[1] + '.content', commandStr);
@@ -13,7 +13,7 @@ exports.run = (client, message, args) => {
                     message.channel.send(':white_check_mark: Command added successfully.');
                 } else functionsFile.syntaxErr(message, `commands_add`);
             }
-            if (args[0].toLowerCase() === 'remove') {
+            if (args[0] && args[0].toLowerCase() === 'remove') {
                 if (args[1]) {
                     customCommands.unset(args[1]);
                     customCommands.save();
@@ -21,7 +21,7 @@ exports.run = (client, message, args) => {
                 } else functionsFile.syntaxErr(message, `commands_remove`);
             }
         }
-        if (args[0].toLowerCase() === 'list') {
+        if (args[0] && args[0].toLowerCase() === 'list') {
             var cKeys = _.keys(customCommands.read());
             var numberOfCommands = 0;
             var allCommands = '';

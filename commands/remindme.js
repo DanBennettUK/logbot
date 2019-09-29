@@ -9,7 +9,7 @@ exports.run = (client, message, args) => {
             var end;
             var int = args[0].replace(/[a-zA-Z]$/g, '');
             if (parseInt(int)) {
-                switch (args[0].toLowerCase().charAt(args[0].length - 1)) {
+                switch (args[0] && args[0].toLowerCase().charAt(args[0].length - 1)) {
                     case 'd':
                         end = Math.floor(Date.now() / 1000) + int * 24 * 60 * 60;
                         seconds = int * 24 * 60 * 60;

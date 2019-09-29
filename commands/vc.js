@@ -3,7 +3,7 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VC')) {
-            var user = functionsFile.parseUserTag(message.guild, args[0]);
+            var user = functionsFile.parseUserTag(client, message.guild, args[0]);
             var guildUser = message.guild.member(user);
             if (user !== 'err' && guildUser) {
                 var vc = guildUser.voiceChannel;

@@ -7,34 +7,82 @@ exports.run = (client, message, args) => {
         var moduleNames = _.keys(file);
         var moduleValues = _.values(file);
 
-        message.channel.send({
-            embed: {
-                color: config.color_info,
-                author: {
-                    name: client.user.username,
-                    icon_url: client.user.displayAvatarURL
-                },
-                title: '[COMMAND] List Modules',
-                fields: [{
-                        name: 'Module',
-                        value: moduleNames.join('\n'),
-                        inline: true
-                    },
-                    {
-                        name: 'State',
-                        value: moduleValues.join('\n'),
-                        inline: true
-                    },
-                    {
-                        name: 'Note',
-                        value: 'If you would like a module enabling/disabling. Please ask an Admin.'
+        var joinedNames = '';
+        var joinedValues = '';
+        var amount = 0;
+
+        moduleNames.forEach((name, index) => {
+            if (joinedNames.length > 900) {
+                message.channel.send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                        },
+                        title: '[COMMAND] List Modules',
+                        description: `Listing ${amount} modules`,
+                        fields: [{
+                                name: 'Module',
+                                value: joinedNames,
+                                inline: true
+                            },
+                            {
+                                name: 'State',
+                                value: joinedValues,
+                                inline: true
+                            },
+                            {
+                                name: 'Note',
+                                value: 'If you would like a module enabling/disabling. Please ask an Admin.'
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
                     }
-                ],
-                timestamp: new Date(),
-                footer: {
-                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                }
+                });
+                joinedNames = '';
+                joinedValues = '';
+                amount = 0;
+            }
+            joinedNames += `\n${name}`;
+            joinedValues += `\n${moduleValues[index]}`
+            amount++;
+            if (index == moduleNames.length - 1) {
+                message.channel.send({
+                    embed: {
+                        color: config.color_info,
+                        author: {
+                            name: client.user.username,
+                            icon_url: client.user.displayAvatarURL
+                        },
+                        title: '[COMMAND] List Modules',
+                        description: `Listing ${amount} modules`,
+                        fields: [{
+                                name: 'Module',
+                                value: joinedNames,
+                                inline: true
+                            },
+                            {
+                                name: 'State',
+                                value: joinedValues,
+                                inline: true
+                            },
+                            {
+                                name: 'Note',
+                                value: 'If you would like a module enabling/disabling. Please ask an Admin.'
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                });
             }
         });
+        
     } //End of permission checking statement
 }

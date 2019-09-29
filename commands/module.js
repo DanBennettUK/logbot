@@ -2,9 +2,9 @@ exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const config = client.config;
     if (message.member.roles.some(role => ['Admins', 'Full Mods'].includes(role.name)) ) {
-        if (typeof modulesFile.get(args[0].toUpperCase()) != 'undefined') {
+        if (args[0] && typeof modulesFile.get(args[0].toUpperCase()) != 'undefined') {
             //Checks if the module provided exists
-            if ([0, 1].includes(parseInt(args[1]))) {
+            if (args[1] && [0, 1].includes(parseInt(args[1]))) {
                 //Parses the string as an int, then checks if the result is a valid <Int> & it's either a 0 or 1
                 modulesFile.set(args[0].toUpperCase(), parseInt(args[1]));
                 modulesFile.save();

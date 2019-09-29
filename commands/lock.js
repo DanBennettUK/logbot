@@ -3,6 +3,7 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     const LFGRoomsFile = client.LFGRoomsFile;
     const _ = client.underscore;
+    const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
             var everyone = guild.roles.find( role => role.name === '@everyone');

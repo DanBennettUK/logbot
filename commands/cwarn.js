@@ -4,7 +4,7 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_CWARN')) {
-            if (args[0].length == 10) {
+            if (args[0] && args[0].length == 10) {
                 connection.query('UPDATE log_warn SET isDeleted = 1 WHERE identifier = ?', args[0].trim(),
                     function (err, results, rows) {
                         if (err) throw err;

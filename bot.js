@@ -58,7 +58,7 @@ client.commands = new enmap();
 client.Discord = Discord;
 client.underscore = _;
 client.connection = connection;
-client.moment = moment; //why
+client.moment = moment;
 client.mysql = mysql;
 client.config = config;
 client.editJsonFile = editJsonFile;
@@ -74,6 +74,7 @@ client.LFGRoomsFile = LFGRoomsFile;
 client.connection = connection;
 client.functionsFile = functionsFile;
 client.request = request;
+client.cryptoRandomString = cryptoRandomString;
 
 fs.readdir(`./events/`, (err, files) => {
     if (err) return console.error(err);

@@ -1,6 +1,7 @@
 module.exports = async (client, oldRole, newRole) => {
     const modulesFile = client.modulesFile;
     const config = client.config;
+    const guild = oldRole.guild;
     if (modulesFile.get('EVENT_ROLE_UPDATE_LOG')) {
         if (oldRole.name !== newRole.name) {
             oldRole.guild.channels.get(config.channel_serverlog).send({

@@ -2,14 +2,14 @@ exports.run = (client, message, args) => {
     const LFGRoomsFile = client.LFGRoomsFile;
     const _ = client.underscore;
     const config = client.config;
-    if (args[0].toLowerCase() === 'add') {
+    if (args[0] && args[0].toLowerCase() === 'add') {
         let next = _.keys(LFGRoomsFile.read()).length + 1;
         LFGRoomsFile.set(args[1], next);
         LFGRoomsFile.save();
 
         message.channel.send(`Added \`${args[1]}\``);
     }
-    if (args[0].toLowerCase() === 'remove') {
+    if (args[0] && args[0].toLowerCase() === 'remove') {
         LFGRoomsFile.unset(args[1]);
         LFGRoomsFile.save();
 

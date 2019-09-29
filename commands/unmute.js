@@ -4,9 +4,12 @@ exports.run = (client, message, args) => {
     const guild = message.guild;
     const functionsFile = client.functionsFile;
     const config = client.config;
+    const _ = client.underscore;
+    const cryptoRandomString = client.cryptoRandomString;
+    const connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNMUTE')) {
-            var user = functionsFile.parseUserTag(guild, args[0]);
+            var user = functionsFile.parseUserTag(client, guild, args[0]);
             var guildUser = guild.member(user);
 
             if (user !== 'err' && guildUser) {

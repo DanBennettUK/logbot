@@ -6,9 +6,10 @@ exports.run = (client, message, args) => {
     const mutedFile = client.mutedFile;
     const _ = client.underscore;
     const config = client.config;
+    const connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_MUTE')) {
-            var user = functionsFile.parseUserTag(guild, args[0]);
+            var user = functionsFile.parseUserTag(client, guild, args[0]);
             var guildUser = guild.member(user);
 
             if (user !== 'err' && guildUser) {
@@ -21,7 +22,7 @@ exports.run = (client, message, args) => {
                     var int = args[1].replace(/[a-zA-Z]$/g, '');
 
                     if (parseInt(int)) {
-                        switch (args[1].toLowerCase().charAt(args[1].length - 1)) {
+                        switch (args[1] && args[1].toLowerCase().charAt(args[1].length - 1)) {
                             case 'd':
                                 end = Math.floor(Date.now() / 1000) + int * 24 * 60 * 60;
                                 seconds = int * 24 * 60 * 60;

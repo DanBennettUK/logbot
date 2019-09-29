@@ -6,13 +6,14 @@ exports.run = (client, message, args) => {
     const config = client.config;
     const guild = message.guild;
     const mutedFile = client.mutedFile;
-    if (args[0].toLowerCase() === 'clear') {
+    const _ = client.underscore;
+    if (args[0] && args[0].toLowerCase() === 'clear') {
         if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
             if (modulesFile.get('COMMAND_HELPER_CLEAR')) {
                 if (args.length >= 4) {
                     var amount = args[1];
-                    var channelid = functionsFile.parseChannelTag(guild, args[2]);
-                    var userid = functionsFile.parseUserTag(guild, args[3]);
+                    var channelid = functionsFile.parseChannelTag(client, guild, args[2]);
+                    var userid = functionsFile.parseUserTag(client, guild, args[3]);
 
                     var channel = guild.channels.get(channelid);
                     var user = client.users.get(userid);
@@ -59,10 +60,10 @@ exports.run = (client, message, args) => {
         }
     }
 
-    if (args[0].toLowerCase() === 'mute') {
+    if (args[0] && args[0].toLowerCase() === 'mute') {
         if (message.member.roles.some(role => ['Support'].includes(role.name))) {
             if (modulesFile.get('COMMAND_HELPER_MUTE')) {
-                var user = functionsFile.parseUserTag(guild, args[1]);
+                var user = functionsFile.parseUserTag(client, guild, args[1]);
                 var guildUser = guild.member(user);
 
                 if (user !== 'err' && guildUser) {

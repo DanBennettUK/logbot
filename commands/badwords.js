@@ -1,7 +1,7 @@
 exports.run = (client, message, args) => {
     const badWordsFile = client.badWordsFile;
     const config = client.config;
-    if (args[0].toLowerCase() === 'add') {
+    if (args[0] && args[0].toLowerCase() === 'add') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (args[1]) {
                 var newWords = args.splice(1);
@@ -34,7 +34,7 @@ exports.run = (client, message, args) => {
             }
         }
     }
-    if (args[0].toLowerCase() === 'remove') {
+    if (args[0] && args[0].toLowerCase() === 'remove') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (args[1]) {
                 var newWords = args.splice(1);
@@ -78,7 +78,7 @@ exports.run = (client, message, args) => {
             }
         }
     }
-    if (args[0].toLowerCase() === 'clear') {
+    if (args[0] && args[0].toLowerCase() === 'clear') {
         if (message.member.roles.some(role => ['Admins'].includes(role.name))) {
             if (badWordsFile.get(`badWords`).length > 0) {
                 badWordsFile.unset(`badWords`);
@@ -88,7 +88,7 @@ exports.run = (client, message, args) => {
             } else message.channel.send(`:x: No bad words could be found.`);
         }
     }
-    if (args[0].toLowerCase() === 'list') {
+    if (args[0] && args[0].toLowerCase() === 'list') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             var currentWords = badWordsFile.get(`badWords`).join(`\n`);
             if (currentWords) {
