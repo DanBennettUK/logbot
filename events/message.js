@@ -1,9 +1,11 @@
 module.exports = (client, message) => {
-    const _ = client.uncerscore;
+    const _ = client.underscore;
     const connection = client.connection;
     const functionsFile = client.functionsFile;
     const badWordsFile = client.badWordsFile;
     const customCommands = client.customCommands;
+    const modulesFile = client.modulesFile;
+    const config = client.config;
     if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
     if (_.indexOf(['dm', 'group'], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
 

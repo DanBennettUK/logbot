@@ -537,7 +537,7 @@ exports.isNull = function isNull(value, def) {
 }
 
 exports.checkMessageContent = function checkMessageContent(client, message) {
-    const badWordsFile = clinet.badWordsFile;
+    const badWordsFile = client.badWordsFile;
     const connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
