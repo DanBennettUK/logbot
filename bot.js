@@ -866,7 +866,7 @@ function checkStreamers() {
         }
     });
     spotlighters.forEach(s => {
-        if (s.user.presence.status != 'offline' && s.user.presence.game && (!(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS')) {
+        if (s.user.presence.status == 'offline' || !s.user.presence.game || !(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
             s.removeRole(spotlightRole);
         }
     });
@@ -1494,6 +1494,12 @@ client.on('message', async message => {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (modulesFile.get('COMMAND_USER')) {
                 var userID = parseUserTag(args[0]);
+                var globalUser;
+                try {
+                    globalUser = await client.fetchUser(userID);
+                } catch {
+                    userID = 'err';
+                }
                 if (userID == 'err') {
                     message.channel.send({
                         embed: {
@@ -1508,7 +1514,6 @@ client.on('message', async message => {
                     }).catch(console.error);
                     return;
                 }
-                var globalUser = await client.fetchUser(userID);
                 var userObject = guild.member(globalUser);
 
                 if (userObject) {
@@ -4684,57 +4689,63 @@ client.on('channelUpdate', function (oldChannel, newChannel) {
 });
 
 client.on('messageReactionAdd', function (messageReaction, user) {
+    if (user.bot) return;
     if (modulesFile.get('EVENT_MESSAGE_REACTION_ADD')) {
-        switch (messageReaction.emoji.name) {
-            case 'eu':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
-                break;
-            case 'na':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
-                break;
-            case 'SA':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
-                break;
-            case 'asia':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
-                break;
-            case 'sea':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
-                break;
-            case 'oce':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
-                break;
-            case 'kjp':
-                guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
-                break;
+            if (messageReaction.message.id == config.reaction_message && messageReaction.message.channel.id == config.reaction_channel) {
+            switch (messageReaction.emoji.name) {
+                case 'eu':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
+                    break;
+                case 'na':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
+                    break;
+                case 'SA':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
+                    break;
+                case 'asia':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
+                    break;
+                case 'sea':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
+                    break;
+                case 'oce':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
+                    break;
+                case 'kjp':
+                    guild.fetchMember(user).then(u => u.addRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
+                    break;
+            }
         }
     }
 });
 
 client.on('messageReactionRemove', function (messageReaction, user) {
+    if (user.bot) return;
     if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
-        switch (messageReaction.emoji.name) {
-            case 'eu':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
-                break;
-            case 'na':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
-                break;
-            case 'SA':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
-                break;
-            case 'asia':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
-                break;
-            case 'sea':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
-                break;
-            case 'oce':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
-                break;
-            case 'kjp':
-                guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
-                break;
+        if (messageReaction.message.id == config.reaction_message && messageReaction.message.channel.id == config.reaction_channel) {
+            switch (messageReaction.emoji.name) {
+                case 'eu':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
+                    break;
+                case 'na':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
+                    break;
+                case 'SA':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
+                    break;
+                case 'asia':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
+                    break;
+                case 'sea':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
+                    break;
+                case 'oce':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
+                    break;
+                case 'kjp':
+                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
+                    break;
+            }
         }
     }
 });
