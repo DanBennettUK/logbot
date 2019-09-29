@@ -1,6 +1,7 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const config = client.config;
+    const _ = client.underscore;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         var file = modulesFile.get();
         var moduleNames = _.keys(file);

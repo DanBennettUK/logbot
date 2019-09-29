@@ -7,7 +7,7 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_NOTE')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, args[0]);
+                var user = functionsFile.parseUserTag(message.guild, args[0]);
             } else {
                 message.channel.send(`Format: \`${config.prefix}note [User ID] [Note content]\``);
                 return;

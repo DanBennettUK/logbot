@@ -341,8 +341,7 @@ exports.setupTables = function setupTables(client) {
     );
 }
 
-exports.parseUserTag = function parseUserTag(client, tag) {
-    const guild = client.guilds.get(client.config.guildid);
+exports.parseUserTag = function parseUserTag(guild, tag) {
     /*
   - Function used for parsing multiple types of the <user> argument
   - Valid entries: <@number>, <@!number>, number, username/nickname (will attempt to resolve to a user)
@@ -375,8 +374,7 @@ exports.parseUserTag = function parseUserTag(client, tag) {
     }
 }
 
-exports.parseChannelTag = function parseChannelTag(client, tag) {
-    const guild = client.guilds.get(client.config.guildid);
+exports.parseChannelTag = function parseChannelTag(guild, tag) {
     /*
   - Function used for parsing multiple types of the <channel> argument
 
@@ -573,6 +571,7 @@ exports.checkExpiredMutes = function checkExpiredMutes(client) {
     const mutedFile = client.mutedFile;
     const config = client.config;
     const guild = client.guilds.get(config.guildid);
+    const _ = client.underscore;
     var mutes = mutedFile.read();
     var muteKeys = _.keys(mutes);
 
@@ -600,6 +599,7 @@ exports.checkExpiredMutes = function checkExpiredMutes(client) {
 exports.checkReminders = function checkReminders(client) {
     const config = client.config;
     const reminderFile = client.reminderFile;
+    const _ = client.underscore;
     var guild = client.guilds.get(config.guildid);
     var reminders = reminderFile.read();
     var reminderKeys = _.keys(reminders);

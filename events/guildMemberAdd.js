@@ -3,15 +3,16 @@ module.exports = (client, member) => {
     const connection = client.connection;
     const config = client.config;
     const bannedUsersFile = client.bannedUsersFile;
+    const stringSimilarity = client.stringSimilarity;
+    const _ = client.underscore;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         var params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
-            UPDATE users SET exist = 1 WHERE userID = ?;
-            INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);`, params,
-            function (err, results) {
-                if (err) throw err;
-            }
-        );
+        UPDATE users SET exist = 1 WHERE userID = ?;
+        INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);`, params,
+        function (err, results) {
+            if (err) throw err;
+        });
         if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
             member.guild.channels.get(config.channel_serverlog).send({
                 embed: {
@@ -35,7 +36,6 @@ module.exports = (client, member) => {
     }
 
     if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
-        var guild = member.guild;
         var banndUsers = bannedUsersFile.get();
         var usernames = _.values(banndUsers);
         var ids = _.keys(banndUsers);
