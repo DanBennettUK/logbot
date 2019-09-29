@@ -1,4 +1,5 @@
-exports.setupTables = function setupTables() {
+exports.setupTables = function setupTables(client) {
+    const connection = client.connection;
     connection.query(
         `CREATE TABLE IF NOT EXISTS users
         (
@@ -340,7 +341,8 @@ exports.setupTables = function setupTables() {
     );
 }
 
-exports.parseUserTag = function parseUserTag(tag) {
+exports.parseUserTag = function parseUserTag(client, tag) {
+    const guild = client.guilds.get(client.config.guildid);
     /*
   - Function used for parsing multiple types of the <user> argument
   - Valid entries: <@number>, <@!number>, number, username/nickname (will attempt to resolve to a user)
@@ -373,7 +375,8 @@ exports.parseUserTag = function parseUserTag(tag) {
     }
 }
 
-exports.parseChannelTag = function parseChannelTag(tag) {
+exports.parseChannelTag = function parseChannelTag(client, tag) {
+    const guild = client.guilds.get(client.config.guildid);
     /*
   - Function used for parsing multiple types of the <channel> argument
 
@@ -405,7 +408,9 @@ exports.parseChannelTag = function parseChannelTag(tag) {
     }
 }
 
-exports.updateUserTable = function updateUserTable(invoker, channel) {
+exports.updateUserTable = function updateUserTable(client, invoker, channel) {
+    const config = client.config;
+    const connection = client.connection;
     var memberArray = [];
     var guild = client.guilds.get(config.guildid);
 
@@ -459,7 +464,9 @@ exports.updateUserTable = function updateUserTable(invoker, channel) {
     });
 }
 
-exports.updateGuildBansTable = function updateGuildBansTable(invoker, channel) {
+exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, channel) {
+    const config = client.config;
+    const connection = client.connection;
     var banArray = [];
     var guild = client.guilds.get(config.guildid);
 
@@ -531,7 +538,9 @@ exports.isNull = function isNull(value, def) {
     }
 }
 
-exports.checkMessageContent = function checkMessageContent(message) {
+exports.checkMessageContent = function checkMessageContent(client, message) {
+    const badWordsFile = clinet.badWordsFile;
+    const connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
@@ -560,7 +569,10 @@ exports.checkMessageContent = function checkMessageContent(message) {
     }
 }
 
-exports.checkExpiredMutes = function checkExpiredMutes() {
+exports.checkExpiredMutes = function checkExpiredMutes(client) {
+    const mutedFile = client.mutedFile;
+    const config = client.config;
+    const guild = client.guilds.get(config.guildid);
     var mutes = mutedFile.read();
     var muteKeys = _.keys(mutes);
 
@@ -585,7 +597,9 @@ exports.checkExpiredMutes = function checkExpiredMutes() {
     }
 }
 
-exports.checkReminders = function checkReminders() {
+exports.checkReminders = function checkReminders(client) {
+    const config = client.config;
+    const reminderFile = client.reminderFile;
     var guild = client.guilds.get(config.guildid);
     var reminders = reminderFile.read();
     var reminderKeys = _.keys(reminders);
@@ -648,7 +662,10 @@ exports.checkReminders = function checkReminders() {
     loop();
 }
 
-exports.importWarnings = function importWarnings() {
+exports.importWarnings = function importWarnings(client) {
+    const connection = client.connection;
+    const usercardsFile = client.usercardsFile;
+    const cryptoRandomString = client.cryptoRandomString;
     var warnings = usercardsFile.get();
     var insert = [];
 
@@ -674,7 +691,10 @@ exports.importWarnings = function importWarnings() {
     );
 }
 
-exports.importMutes = function importMutes() {
+exports.importMutes = function importMutes(client) {
+    const usercardsFile = client.usercardsFile;
+    const connection = client.connection;
+    const cryptoRandomString = client.cryptoRandomString;
     var mutes = usercardsFile.get();
     var insert = [];
 
@@ -704,16 +724,8 @@ exports.importMutes = function importMutes() {
                             return;
                         }
                     }
-                    insert.push([
-                        userID,
-                        mutes[i].Records[a].AddedByUserId.$numberLong,
-                        mutes[i].Records[a].Reason,
-                        seconds,
-                        cryptoRandomString({ length: 10 }),
-                        0,
-                        mutes[i].Records[a].ActionTaken.$date,
-                        new Date()
-                    ]);
+                    insert.push([userID, mutes[i].Records[a].AddedByUserId.$numberLong, mutes[i].Records[a].Reason,
+                    seconds, cryptoRandomString({ length: 10 }), 0, mutes[i].Records[a].ActionTaken.$date, new Date()]);
                 }
             }
         }
@@ -729,7 +741,10 @@ exports.importMutes = function importMutes() {
     );
 }
 
-exports.importNotes = function importNotes() {
+exports.importNotes = function importNotes(client) {
+    const usercardsFile = client.usercardsFile;
+    const cryptoRandomString = client.cryptoRandomString;
+    const connection = client.connection;
     var notes = usercardsFile.get();
     var insert = [];
 
@@ -753,7 +768,10 @@ exports.importNotes = function importNotes() {
     );
 }
 
-exports.importBans = function importBans() {
+exports.importBans = function importBans(client) {
+    const usercardsFile = client.usercardsFile;
+    const cryptoRandomString = client.cryptoRandomString;
+    const connection = client.connection;
     var bans = usercardsFile.get();
     var insert = [];
 
@@ -779,7 +797,10 @@ exports.importBans = function importBans() {
     );
 }
 
-exports.importUnbans = function importUnbans() {
+exports.importUnbans = function importUnbans(client) {
+    const usercardsFile = client.usercardsFile;
+    const cryptoRandomString = client.cryptoRandomString;
+    const connection = client.connection;
     var unbans = usercardsFile.get();
     var insert = [];
 
@@ -805,7 +826,8 @@ exports.importUnbans = function importUnbans() {
     );
 }
 
-exports.checkStreamers = function checkStreamers() {
+exports.checkStreamers = function checkStreamers(client) {
+    const guild = client.guilds.get(client.config.guildid);
     var streamerRole = guild.roles.find(r => r.name == 'Streamers');
     var spotlightRole = guild.roles.find(r => r.name == 'Streamer Spotlight');
     var streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
