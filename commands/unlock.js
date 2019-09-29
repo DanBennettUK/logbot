@@ -1,4 +1,4 @@
-exports.run = (client, message, args) => {
+exports.run = async (client, message, args) => {
     const modulesFile = client.modulesFile;
     const LFGRoomsFile = client.LFGRoomsFile;
     const config = client.config;

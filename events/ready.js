@@ -34,7 +34,7 @@ module.exports = client => {
         await m.react(guild.emojis.find(e => e.name == 'kjp')).catch(console.error);
     });
 
-    setInterval(functionsFile.checkExpiredMutes(client), 10000);
-    setInterval(functionsFile.checkReminders(client), 15000);
-    setInterval(functionsFile.checkStreamers(client), 60000);
+    setInterval(() => functionsFile.checkExpiredMutes(client), 10000);
+    setInterval(() => functionsFile.checkReminders(client), 15000);
+    setInterval(() => functionsFile.checkStreamers(client), 60000);
 }
