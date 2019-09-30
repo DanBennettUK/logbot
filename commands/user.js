@@ -170,59 +170,67 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
 
-                            connection.query('SELECT * FROM log_mutes WHERE userID = ? AND isDeleted = 0 ORDER BY timestamp DESC', userID,
-                                async function (err, rows, results) {
-                                    if (err) throw err;
-                                    var mutes = [];
-                                    var max = 5;
-                                    var extra;
+                            connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
+                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                            gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
+                            async function (err, rows, results) {
+                                if (err) throw err;
+                                var events = [];
+                                var max = 5;
+                                var extra;
 
-                                    if (rows.length <= 5) {
-                                        max = rows.length;
-                                    } else {
-                                        extra = rows.length - max;
-                                    }
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
-                                        if (i == max - 1 && extra > 0) {
-                                            mutes.push(`...${extra} more`);
-                                        }
+                                for (var i = 0; i < max; i++) {
+                                    var row = rows[i];
+                                    switch(row.type) {
+                                        case 'mute':
+                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            break;
+                                        case 'unmute':
+                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            break;
                                     }
-                                    if (!_.isEmpty(mutes)) {
-                                        await msg.edit({
-                                            embed: {
-                                                color: config.color_info,
-                                                author: {
-                                                    name: `Mutes for ${userObject.user.username} (${nickname})`,
-                                                    icon_url: userObject.user.displayAvatarURL
-                                                },
-                                                description: mutes.join(' '),
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                }
-                                            }
-                                        });
-                                    } else {
-                                        await msg.edit({
-                                            embed: {
-                                                color: config.color_caution,
-                                                author: {
-                                                    name: userObject.user.username,
-                                                    icon_url: userObject.user.displayAvatarURL
-                                                },
-                                                description: `There are no recorded mutes for this user`,
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                }
-                                            }
-                                        });
+                                    if (i == max - 1 && extra > 0) {
+                                        events.push(`...${extra} more`);
                                     }
                                 }
-                            );
+                                if (!_.isEmpty(events)) {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `Mutes for ${userObject.user.username} (${nickname})`,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: events.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: userObject.user.username,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: `There are no recorded mutes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         } else if (r.emoji.name == '❌') {
                             msg.delete();
                             message.delete();
@@ -470,59 +478,67 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
 
-                            connection.query('SELECT * FROM log_mutes WHERE userID = ? AND isDeleted = 0 ORDER BY timestamp DESC', userID,
-                                async function (err, rows, results) {
-                                    if (err) throw err;
-                                    var mutes = [];
-                                    var max = 5;
-                                    var extra;
+                            connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
+                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                            gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
+                            async function (err, rows, results) {
+                                if (err) throw err;
+                                var events = [];
+                                var max = 5;
+                                var extra;
 
-                                    if (rows.length <= 5) {
-                                        max = rows.length;
-                                    } else {
-                                        extra = rows.length - max;
-                                    }
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
-                                        if (i == max - 1 && extra > 0) {
-                                            mutes.push(`...${extra} more`);
-                                        }
+                                for (var i = 0; i < max; i++) {
+                                    var row = rows[i];
+                                    switch(row.type) {
+                                        case 'mute':
+                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            break;
+                                        case 'unmute':
+                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            break;
                                     }
-                                    if (!_.isEmpty(mutes)) {
-                                        await msg.edit({
-                                            embed: {
-                                                color: config.color_info,
-                                                author: {
-                                                    name: `Mutes for ${globalUser.username}`,
-                                                    icon_url: globalUser.displayAvatarURL
-                                                },
-                                                description: mutes.join(' '),
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                }
-                                            }
-                                        });
-                                    } else {
-                                        await msg.edit({
-                                            embed: {
-                                                color: config.color_caution,
-                                                author: {
-                                                    name: globalUser.username,
-                                                    icon_url: globalUser.displayAvatarURL
-                                                },
-                                                description: `There are no recorded mutes for this user`,
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                }
-                                            }
-                                        });
+                                    if (i == max - 1 && extra > 0) {
+                                        events.push(`...${extra} more`);
                                     }
                                 }
-                            );
+                                if (!_.isEmpty(events)) {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `Mutes for ${globalUser.username}`,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: events.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: globalUser.username,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: `There are no recorded mutes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         } else if (r.emoji.name == '❌') {
                             msg.delete();
                             message.delete();
@@ -750,59 +766,67 @@ exports.run = async (client, message, args) => {
                             } else if (r.emoji.name == '🔈') {
                                 await r.remove(r.users.last());
 
-                                connection.query('SELECT * FROM log_mutes WHERE userID = ? AND isDeleted = 0 ORDER BY timestamp DESC', userID,
-                                    async function (err, rows, results) {
-                                        if (err) throw err;
-                                        var mutes = [];
-                                        var max = 5;
-                                        var extra;
+                                connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
+                                SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                                gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
+                                async function (err, rows, results) {
+                                    if (err) throw err;
+                                    var events = [];
+                                    var max = 5;
+                                    var extra;
 
-                                        if (rows.length <= 5) {
-                                            max = rows.length;
-                                        } else {
-                                            extra = rows.length - max;
-                                        }
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            await mutes.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
-                                            if (i == max - 1 && extra > 0) {
-                                                mutes.push(`...${extra} more`);
-                                            }
+                                    for (var i = 0; i < max; i++) {
+                                        var row = rows[i];
+                                        switch(row.type) {
+                                            case 'mute':
+                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                break;
+                                            case 'unmute':
+                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                break;
                                         }
-                                        if (!_.isEmpty(mutes)) {
-                                            await msg.edit({
-                                                embed: {
-                                                    color: config.color_info,
-                                                    author: {
-                                                        name: `Mutes for ${cardUser.username}`,
-                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
-                                                    },
-                                                    description: mutes.join(' '),
-                                                    timestamp: new Date(),
-                                                    footer: {
-                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                    }
-                                                }
-                                            });
-                                        } else {
-                                            await msg.edit({
-                                                embed: {
-                                                    color: config.color_caution,
-                                                    author: {
-                                                        name: cardUser.username,
-                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
-                                                    },
-                                                    description: `There are no recorded mutes for this user`,
-                                                    timestamp: new Date(),
-                                                    footer: {
-                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                    }
-                                                }
-                                            });
+                                        if (i == max - 1 && extra > 0) {
+                                            events.push(`...${extra} more`);
                                         }
                                     }
-                                );
+                                    if (!_.isEmpty(events)) {
+                                        await msg.edit({
+                                            embed: {
+                                                color: config.color_info,
+                                                author: {
+                                                    name: `Mutes for ${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: events.join(' '),
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        await msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: cardUser.username,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: `There are no recorded mutes for this user`,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
                             } else if (r.emoji.name == '❌') {
                                 msg.delete();
                                 message.delete();
