@@ -348,32 +348,30 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
 
     returns @id <int>
     */
-    if (tag) {
-        var trimMe = tag.trim();
+    var trimMe = tag.trim();
 
-        if (/(<@(!)*)+\w+(>)/.test(tag)) {
-            return trimMe.replace(/[^0-9.]/gi, '');
-        } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
-            var split = tag.split('#');
-            var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
+    if (/(<@(!)*)+\w+(>)/.test(tag)) {
+        return trimMe.replace(/[^0-9.]/gi, '');
+    } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
+        var split = tag.split('#');
+        var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
 
-            if (usernameResolve == null) {
-                return 'err';
-            } else {
-                return usernameResolve.id;
-            }
-        } else if (/^[0-9]+$/.test(tag)) {
-            return trimMe;
+        if (usernameResolve == null) {
+            return 'err';
         } else {
-            var usernameResolve = client.users.find(obj => obj.username === tag);
-            if (usernameResolve == null) {
-                var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
-                if (nicknameResolve == null) {
-                    return 'err';
-                } else return nicknameResolve.id;
-            } else return usernameResolve.id;
+            return usernameResolve.id;
         }
-    } else return 'err';
+    } else if (/^[0-9]+$/.test(tag)) {
+        return trimMe;
+    } else {
+        var usernameResolve = client.users.find(obj => obj.username === tag);
+        if (usernameResolve == null) {
+            var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
+            if (nicknameResolve == null) {
+                return 'err';
+            } else return nicknameResolve.id;
+        } else return usernameResolve.id;
+    }
 }
 
 exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
@@ -382,32 +380,30 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
 
     returns @id <int>
     */
-    if (tag) {
-        var trimMe = tag.trim();
+    var trimMe = tag.trim();
 
-        if (/(<#(!)*)+\w+(>)/.test(tag)) {
-            return trimMe.replace(/[^0-9.]/gi, '');
-        } else if (/^[0-9]+$/.test(tag)) {
-            return trimMe;
-        } else if (/#.+/.test(tag)) {
-            trimMe.replace('#', '');
-            var chnl = guild.channels.find(c => c.name === trimMe);
-            if (chnl == null) {
-                return 'err';
-            } else {
-                return chnl.id;
-            }
-        } else if (/.+/.test(tag)) {
-            var chnl = guild.channels.find(c => c.name === trimMe);
-            if (chnl == null) {
-                return 'err';
-            } else {
-                return chnl.id;
-            }
-        } else {
+    if (/(<#(!)*)+\w+(>)/.test(tag)) {
+        return trimMe.replace(/[^0-9.]/gi, '');
+    } else if (/^[0-9]+$/.test(tag)) {
+        return trimMe;
+    } else if (/#.+/.test(tag)) {
+        trimMe.replace('#', '');
+        var chnl = guild.channels.find(c => c.name === trimMe);
+        if (chnl == null) {
             return 'err';
+        } else {
+            return chnl.id;
         }
-    } else return 'err';
+    } else if (/.+/.test(tag)) {
+        var chnl = guild.channels.find(c => c.name === trimMe);
+        if (chnl == null) {
+            return 'err';
+        } else {
+            return chnl.id;
+        }
+    } else {
+        return 'err';
+    }
 }
 
 exports.updateUserTable = function updateUserTable(client, invoker, channel) {
@@ -523,8 +519,9 @@ exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, ch
     });
 }
 
-exports.syntaxErr = function syntaxErr(message, command) {
-    message.channel.send(`There is a problem in your syntax.`).then(msg => {
+exports.syntaxErr = function syntaxErr(client, message, command) {
+    const config = client.config;
+    message.channel.send(`There is a problem in your syntax for ${config.prefix}${command}. Try using ${config.prefix}help`).then(msg => {
         setTimeout(async () => {
             await message.delete();
             await msg.delete();

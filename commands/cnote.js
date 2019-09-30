@@ -20,7 +20,7 @@ exports.run = (client, message, args) => {
                     }
                 });
             } else {
-                functionsFile.syntaxErr(message, 'cnote');
+                functionsFile.syntaxErr(client, message, 'cnote');
             }
         } else {
             message.channel.send(`That module (${command}) is disabled.`);

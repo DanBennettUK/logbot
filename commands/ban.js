@@ -186,7 +186,7 @@ exports.run = async (client, message, args) => {
                     }
                 }
             } else {
-                functionsFile.syntaxErr(message, 'ban');
+                functionsFile.syntaxErr(client, message, 'ban');
                 return;
             }
         } else {

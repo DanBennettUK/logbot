@@ -11,14 +11,14 @@ exports.run = (client, message, args) => {
                     customCommands.set(args[1] + '.content', commandStr);
                     customCommands.save();
                     message.channel.send(':white_check_mark: Command added successfully.');
-                } else functionsFile.syntaxErr(message, `commands_add`);
+                } else functionsFile.syntaxErr(client, message, `commands add`);
             }
             if (args[0] && args[0].toLowerCase() === 'remove') {
                 if (args[1]) {
                     customCommands.unset(args[1]);
                     customCommands.save();
                     message.channel.send(':white_check_mark: Command removed successfully.');
-                } else functionsFile.syntaxErr(message, `commands_remove`);
+                } else functionsFile.syntaxErr(client, message, `commands remove`);
             }
         }
         if (args[0] && args[0].toLowerCase() === 'list') {

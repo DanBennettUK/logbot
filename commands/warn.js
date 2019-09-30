@@ -10,7 +10,7 @@ exports.run = (client, message, args) => {
             if (args[0]) {
                 var user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
-                functionsFile.syntaxErr(message, 'warn');
+                functionsFile.syntaxErr(client, message, 'warn');
                 return;
             }
 

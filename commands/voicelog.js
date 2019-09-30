@@ -8,7 +8,7 @@ exports.run = (client, message, args) => {
             if (args[0]) {
                 var user = functionsFile.parseUserTag(client, message.guild, args[0]);
             } else {
-                functionsFile.syntaxErr(message, 'voicelog');
+                functionsFile.syntaxErr(client, message, 'voicelog');
                 return;
             }
 

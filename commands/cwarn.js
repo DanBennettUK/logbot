@@ -21,7 +21,7 @@ exports.run = (client, message, args) => {
                     }
                 );
             } else {
-                functionsFile.syntaxErr(message, 'cwarn');
+                functionsFile.syntaxErr(client, message, 'cwarn');
             }
         } else {
             message.channel.send(`That module (${command}) is disabled.`);
