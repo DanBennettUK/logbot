@@ -117,7 +117,6 @@ module.exports = (client, member) => {
                 }
             }).catch(console.error);
             var s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
-            console.log(s);
             var d = 0;
             var h = 0;
             var m = 0;
