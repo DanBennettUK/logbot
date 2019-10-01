@@ -96,6 +96,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('👮');
                     await msg.react('🔈');
                     await msg.react('✍');
+                    await msg.react('🖥');
                     await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
@@ -237,7 +238,7 @@ exports.run = async (client, message, args) => {
                             message.delete();
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
-                            connection.query('SELECT * from log_note WHERE userID = ? and isDeleted = 0 ORDER BY timestamp DESC', userID,
+                            connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                 async function (err, rows, results) {
                                     if (err) throw err;
                                     var notes = [];
@@ -278,6 +279,48 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             );
+                        } else if (r.emoji.name == '🖥') {
+                            await r.remove(r.users.last());
+                            connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
+                            async function (err, rows, results) {
+                                if (err) throw err;
+                                var notes = [];
+                                for (var i = 0; i < rows.length; i++) {
+                                    var row = rows[i];
+                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                }
+                                if (!_.isEmpty(notes)) {
+                                    msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `${userObject.user.username} (${nickname})`,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: notes.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: `${userObject.user.username} (${nickname})`,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: `There are no recorded system notes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
                             msg.edit({
@@ -477,6 +520,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('👮');
                     await msg.react('🔈');
                     await msg.react('✍');
+                    await msg.react('🖥');
                     await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
@@ -619,7 +663,7 @@ exports.run = async (client, message, args) => {
                             message.delete();
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
-                            connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 ORDER BY timestamp DESC', userID,
+                            connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
@@ -659,7 +703,49 @@ exports.run = async (client, message, args) => {
                                     });
                                 }
                             });
-                        } else if (r.emoji.name == '📛') {
+                        } else if (r.emoji.name == '🖥') {
+                            await r.remove(r.users.last());
+                            connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
+                            async function (err, rows, results) {
+                                if (err) throw err;
+                                var notes = [];
+                                for (var i = 0; i < rows.length; i++) {
+                                    var row = rows[i];
+                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                }
+                                if (!_.isEmpty(notes)) {
+                                    msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `${globalUser.username}`,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: notes.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: `${globalUser.username}`,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: `There are no recorded system notes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }  else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
@@ -705,7 +791,7 @@ exports.run = async (client, message, args) => {
                                         embed: {
                                             color: config.color_info,
                                             author: {
-                                                name: `${globalUser.username} (${nickname})`,
+                                                name: `${globalUser.username}`,
                                                 icon_url: globalUser.displayAvatarURL
                                             },
                                             description: names.join(' '),
@@ -720,7 +806,7 @@ exports.run = async (client, message, args) => {
                                         embed: {
                                             color: config.color_caution,
                                             author: {
-                                                name: `Name history for ${globalUser.username} (${nickname})`,
+                                                name: `Name history for ${globalUser.username}`,
                                                 icon_url: globalUser.displayAvatarURL
                                             },
                                             description: `There are no recorded name changes for this user`,
@@ -840,6 +926,7 @@ exports.run = async (client, message, args) => {
                         await msg.react('👮');
                         await msg.react('🔈');
                         await msg.react('✍');
+                        await msg.react('🖥');
                         await msg.react('📛');
                         await msg.react('📥');
                         await msg.react('❌');
@@ -981,7 +1068,7 @@ exports.run = async (client, message, args) => {
                                 message.delete();
                             } else if (r.emoji.name == '✍') {
                                 await r.remove(r.users.last());
-                                connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 ORDER BY timestamp DESC', userID,
+                                connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                 async function (err, rows, results ) {
                                     if (err) throw err;
                                     var notes = [];
@@ -1021,7 +1108,49 @@ exports.run = async (client, message, args) => {
                                         });
                                     }
                                 });
-                            } else if (r.emoji.name == '📛') {
+                            } else if (r.emoji.name == '🖥') {
+                                await r.remove(r.users.last());
+                                connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
+                                async function (err, rows, results) {
+                                    if (err) throw err;
+                                    var notes = [];
+                                    for (var i = 0; i < rows.length; i++) {
+                                        var row = rows[i];
+                                        await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    }
+                                    if (!_.isEmpty(notes)) {
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_info,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: notes.join(' '),
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        await msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: `There are no recorded system notes for this user`,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }  else if (r.emoji.name == '📛') {
                                 await r.remove(r.users.last());
                                 connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                                 SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
@@ -1067,7 +1196,7 @@ exports.run = async (client, message, args) => {
                                             embed: {
                                                 color: config.color_info,
                                                 author: {
-                                                    name: `${cardUser.username} (${nickname})`,
+                                                    name: `${cardUser.username}`,
                                                     icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                                 },
                                                 description: names.join(' '),
@@ -1082,7 +1211,7 @@ exports.run = async (client, message, args) => {
                                             embed: {
                                                 color: config.color_caution,
                                                 author: {
-                                                    name: `Name history for ${cardUser.username} (${nickname})`,
+                                                    name: `Name history for ${cardUser.username}`,
                                                     icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                                 },
                                                 description: `There are no recorded name changes for this user`,

@@ -5,6 +5,7 @@ module.exports = (client, member) => {
     const bannedUsersFile = client.bannedUsersFile;
     const stringSimilarity = client.stringSimilarity;
     const _ = client.underscore;
+    const cryptoRandomString = client.cryptoRandomString;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         var params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
@@ -42,7 +43,8 @@ module.exports = (client, member) => {
         var hits = [];
         var identifiers = [];
         var data = [];
-        var message = [];
+        var msg = [];
+        var description;
 
         var match = stringSimilarity.findBestMatch(member.user.username, usernames);
 
@@ -61,26 +63,29 @@ module.exports = (client, member) => {
             data.push(identifiers); //If this work - ew.....you motherfucker, it did.
 
             connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?)', data,
-                function (err, rows, results) {
-                    if (err) throw err;
-                    for (var b = 0; b < rows.length; b++) {
-                        var row = rows[b];
-                        message.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
-                    }
-
-                    member.guild.channels.get(config.channel_serverlog).send({
-                        embed: {
-                            color: config.color_warning,
-                            title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
-                            description: message.join(''),
-                            timestamp: new Date(),
-                            footer: {
-                                text: `Marvin's Little Brother | Current version: ${config.version}`
-                            }
-                        }
-                    }).catch(console.error);
+            function (err, rows, results) {
+                if (err) throw err;
+                for (var b = 0; b < rows.length; b++) {
+                    var row = rows[b];
+                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
                 }
-            );
+                member.guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_warning,
+                        title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
+                        description: msg.join(' '),
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                }).catch(console.error);
+                var identifier = cryptoRandomString({length: 10});
+                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' '), identifier, 0, new Date()],
+                function(err, results){
+                    if (err) throw err;
+                });
+            });
         }
     }
     if (modulesFile.get('EVENT_NEWACC_DETEC')) {
@@ -96,7 +101,7 @@ module.exports = (client, member) => {
                     fields: [
                         {
                             name: 'User',
-                            value: `${member}\nID:${member.id}`,
+                            value: `${member}\nID: ${member.id}`,
                             inline: true
                         },
                         {
@@ -111,6 +116,52 @@ module.exports = (client, member) => {
                     }
                 }
             }).catch(console.error);
+            var s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
+            console.log(s);
+            var d = 0;
+            var h = 0;
+            var m = 0;
+            while (s >= 60) {
+                while (m >= 60) {
+                    while (h >= 24) {
+                        h -= 24;
+                        d++;
+                    }
+                    m -= 60;
+                    h++;
+                }
+                s -= 60;
+                m++;
+            }
+            var time = '';
+            switch (d) {
+                case 0:
+                    switch (h) {
+                        case 0: 
+                            switch (m) {
+                                case 0:
+                                    time = `${s}s`;
+                                    break;
+                                default:
+                                    time = `${m}m${s}s`
+                                    break;
+                            }
+                            break;
+                        default: 
+                            time = `${h}h${m}m${s}s`
+                            break;
+                    }
+                    break;
+                default:
+                    time = `${d}d${h}h${m}m${s}s`
+                    break;
+            }
+            var message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
+            var identifier = cryptoRandomString({length: 10});
+            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', message, identifier, 0, new Date()],
+            function(err, results){
+                if (err) throw err;
+            });
         }
     }
 }
