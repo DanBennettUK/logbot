@@ -15,7 +15,7 @@ exports.run = async (client, message, args) => {
             var globalUser;
             try {
                 globalUser = await client.fetchUser(userID);
-            } catch {
+            } catch (e) {
                 userID = 'err';
             }
             if (userID == 'err') {
