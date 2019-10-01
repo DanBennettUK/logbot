@@ -31,20 +31,20 @@ module.exports = (client, oldMember, newMember) => {
                         if (voiceLogChannel.members.has(newMember.id)) {
                             switch (data[5]) { //Switch on the type
                                 case 1: //join
-                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>** | ${data[6]}`);
+                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>** | ${data[6].toUTCString()}`);
                                     break;
                                 case 2: //move
-                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
+                                    voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6].toUTCString()}`);
                                     break;
                             }
                         }
                         else {
                             switch (data[5]) { //Switch on the type
                                 case 1: //join
-                                    voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6]}`);
+                                    voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>** | ${data[6].toUTCString()}`);
                                     break;
                                 case 2: //move
-                                    voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6]}`);
+                                    voiceLogChannel.send(`<@${data[0]}> has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6].toUTCString()}`);
                                     break;
                             }
                         }
