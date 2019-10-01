@@ -67,7 +67,7 @@ module.exports = (client, member) => {
                 if (err) throw err;
                 for (var b = 0; b < rows.length; b++) {
                     var row = rows[b];
-                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned for: ${row.description} \n\n`);
+                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
                 }
                 member.guild.channels.get(config.channel_serverlog).send({
                     embed: {
