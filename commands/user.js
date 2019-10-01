@@ -62,14 +62,14 @@ exports.run = async (client, message, args) => {
                             name: `${userObject.user.username} (${nickname})`,
                             icon_url: userObject.user.displayAvatarURL
                         },
-                        description: `${userObject.user} joined the guild on ${userObject.joinedAt}`,
+                        description: `${userObject.user} joined the guild on ${userObject.joinedAt.toUTCString()}`,
                         thumbnail: {
                             url: userObject.user.displayAvatarURL
                         },
                         fields: [
                             {
                                 name: 'Created',
-                                value: userObject.user.createdAt
+                                value: userObject.user.createdAt.toUTCString()
                             },
                             {
                                 name: 'Status',
@@ -96,6 +96,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('👮');
                     await msg.react('🔈');
                     await msg.react('✍');
+                    await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
 
@@ -124,11 +125,11 @@ exports.run = async (client, message, args) => {
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         if (row.type == 'warn') {
-                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                         } else if (row.type == 'ban') {
-                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                         } else {
-                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                         }
                                         if (i == max - 1 && extra > 0) {
                                             events.push(`...${extra} more`);
@@ -189,10 +190,10 @@ exports.run = async (client, message, args) => {
                                     var row = rows[i];
                                     switch(row.type) {
                                         case 'mute':
-                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                             break;
                                         case 'unmute':
-                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -242,7 +243,7 @@ exports.run = async (client, message, args) => {
                                     var notes = [];
                                     for (var i = 0; i < rows.length; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -286,7 +287,7 @@ exports.run = async (client, message, args) => {
                                         name: `${userObject.user.username} (${nickname})`,
                                         icon_url: userObject.user.displayAvatarURL
                                     },
-                                    description: `${userObject.user} joined the guild on ${userObject.joinedAt}`,
+                                    description: `${userObject.user} joined the guild on ${userObject.joinedAt.toUTCString()}`,
                                     thumbnail: {
                                         url: userObject.user.displayAvatarURL
                                     },
@@ -316,6 +317,79 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             });
+                        } else if (r.emoji.name == '📛') {
+                            await r.remove(r.users.last());
+                            connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
+                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                            [userID, userID], async function (err, rows, results) {
+                                if (err) throw err;
+                                var names = [];
+                                var validRows = [];
+                                var max = 0;
+                                var extra;
+
+                                for (var i = 0; i < rows.length; i++) {
+                                    var row = rows[i];
+                                    if (names.includes(row.new)) continue;
+                                    names.push(row.new);
+                                    validRows.push(row);
+                                }
+
+                                if (validRows.length <= 5) {
+                                    max = validRows.length;
+                                } else {
+                                    extra = validRows.length - max;
+                                }
+
+                                names = [];
+
+                                for (var i = 0; i < max; i++) {
+                                    var row = validRows[i];
+                                    switch(row.type) {
+                                        case 'user':
+                                            names.push(`📛${userObject.user.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            break;
+                                        case 'nick':
+                                            names.push(`${userObject.user.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            break;
+                                    }
+                                    if (i == max - 1 && extra > 0) {
+                                        names.push(`...${extra} more`);
+                                    }
+                                }
+
+                                if (!_.isEmpty(names)) {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `${userObject.user.username} (${nickname})`,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: names.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: `Name history for ${userObject.user.username} (${nickname})`,
+                                                icon_url: userObject.user.displayAvatarURL
+                                            },
+                                            description: `There are no recorded name changes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -335,10 +409,10 @@ exports.run = async (client, message, args) => {
                                     var row = rows[i];
                                     switch (row.Status) {
                                         case 'join':
-                                            history.push(`📥 ${userObject.user.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                                            history.push(`📥 ${userObject.user.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'leave':
-                                            history.push(`📤 ${userObject.user.username} left at \`${new Date(row.timestamp)}\`\n\n`);
+                                            history.push(`📤 ${userObject.user.username} left at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -403,6 +477,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('👮');
                     await msg.react('🔈');
                     await msg.react('✍');
+                    await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
 
@@ -431,12 +506,12 @@ exports.run = async (client, message, args) => {
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         if (row.type == 'warn') {
-                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`
+                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`
                                             );
                                         } else if (row.type == 'ban') {
-                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                         } else {
-                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                         }
                                         if (i == max - 1 && extra > 0) {
                                             events.push(`...${extra} more`);
@@ -497,10 +572,10 @@ exports.run = async (client, message, args) => {
                                     var row = rows[i];
                                     switch(row.type) {
                                         case 'mute':
-                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                             break;
                                         case 'unmute':
-                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -550,7 +625,7 @@ exports.run = async (client, message, args) => {
                                 var notes = [];
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -576,6 +651,79 @@ exports.run = async (client, message, args) => {
                                                 icon_url: globalUser.displayAvatarURL
                                             },
                                             description: `There are no recorded notes for this user`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        } else if (r.emoji.name == '📛') {
+                            await r.remove(r.users.last());
+                            connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
+                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                            [userID, userID], async function (err, rows, results) {
+                                if (err) throw err;
+                                var names = [];
+                                var validRows = [];
+                                var max = 0;
+                                var extra;
+
+                                for (var i = 0; i < rows.length; i++) {
+                                    var row = rows[i];
+                                    if (names.includes(row.new)) continue;
+                                    names.push(row.new);
+                                    validRows.push(row);
+                                }
+
+                                if (validRows.length <= 5) {
+                                    max = validRows.length;
+                                } else {
+                                    extra = validRows.length - max;
+                                }
+
+                                names = [];
+
+                                for (var i = 0; i < max; i++) {
+                                    var row = validRows[i];
+                                    switch(row.type) {
+                                        case 'user':
+                                            names.push(`📛${globalUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            break;
+                                        case 'nick':
+                                            names.push(`${globalUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            break;
+                                    }
+                                    if (i == max - 1 && extra > 0) {
+                                        names.push(`...${extra} more`);
+                                    }
+                                }
+
+                                if (!_.isEmpty(names)) {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: `${globalUser.username} (${nickname})`,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: names.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    await msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: `Name history for ${globalUser.username} (${nickname})`,
+                                                icon_url: globalUser.displayAvatarURL
+                                            },
+                                            description: `There are no recorded name changes for this user`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -620,10 +768,10 @@ exports.run = async (client, message, args) => {
                                     var row = rows[i];
                                     switch (row.Status) {
                                         case 'join':
-                                            history.push(`📥 ${globalUser.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                                            history.push(`📥 ${globalUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'leave':
-                                            history.push(`📤 ${globalUser.username} left at \`${new Date(row.timestamp)}\`\n\n`
+                                            history.push(`📤 ${globalUser.username} left at \`${new Date(row.timestamp).toUTCString()}\`\n\n`
                                             );
                                             break;
                                     }
@@ -692,6 +840,7 @@ exports.run = async (client, message, args) => {
                         await msg.react('👮');
                         await msg.react('🔈');
                         await msg.react('✍');
+                        await msg.react('📛');
                         await msg.react('📥');
                         await msg.react('❌');
 
@@ -720,11 +869,11 @@ exports.run = async (client, message, args) => {
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             if (row.type == 'warn') {
-                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             } else if (row.type == 'ban') {
-                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             } else {
-                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             }
                                             if (i == max - 1 && extra > 0) {
                                                 events.push(`...${extra} more`);
@@ -785,10 +934,10 @@ exports.run = async (client, message, args) => {
                                         var row = rows[i];
                                         switch(row.type) {
                                             case 'mute':
-                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                             case 'unmute':
-                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
@@ -838,7 +987,7 @@ exports.run = async (client, message, args) => {
                                     var notes = [];
                                     for ( var i = 0; i < rows.length; i++ ) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -872,7 +1021,80 @@ exports.run = async (client, message, args) => {
                                         });
                                     }
                                 });
-                            } else if (r.emoji.name == '👥') {
+                            } else if (r.emoji.name == '📛') {
+                                await r.remove(r.users.last());
+                                connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
+                                SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                                [userID, userID], async function (err, rows, results) {
+                                    if (err) throw err;
+                                    var names = [];
+                                    var validRows = [];
+                                    var max = 0;
+                                    var extra;
+    
+                                    for (var i = 0; i < rows.length; i++) {
+                                        var row = rows[i];
+                                        if (names.includes(row.new)) continue;
+                                        names.push(row.new);
+                                        validRows.push(row);
+                                    }
+    
+                                    if (validRows.length <= 5) {
+                                        max = validRows.length;
+                                    } else {
+                                        extra = validRows.length - max;
+                                    }
+    
+                                    names = [];
+    
+                                    for (var i = 0; i < max; i++) {
+                                        var row = validRows[i];
+                                        switch(row.type) {
+                                            case 'user':
+                                                names.push(`📛${cardUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                break;
+                                            case 'nick':
+                                                names.push(`${cardUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                break;
+                                        }
+                                        if (i == max - 1 && extra > 0) {
+                                            names.push(`...${extra} more`);
+                                        }
+                                    }
+    
+                                    if (!_.isEmpty(names)) {
+                                        await msg.edit({
+                                            embed: {
+                                                color: config.color_info,
+                                                author: {
+                                                    name: `${cardUser.username} (${nickname})`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: names.join(' '),
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        await msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `Name history for ${cardUser.username} (${nickname})`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                description: `There are no recorded name changes for this user`,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }  else if (r.emoji.name == '👥') {
                                 await r.remove(r.users.last());
                                 msg.edit({
                                     embed: {
@@ -908,10 +1130,10 @@ exports.run = async (client, message, args) => {
                                         var row = rows[i];
                                         switch (row.Status) {
                                             case 'join':
-                                                history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp)}\`\n\n`);
+                                                history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                             case 'leave':
-                                                history.push(`📤 ${cardUser.username} left at \`${new Date(row.timestamp)}\`\n\n`);
+                                                history.push(`📤 ${cardUser.username} left at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
