@@ -55,7 +55,7 @@ exports.run = (client, message, args) => {
                                 var mutedRole = guild.roles.find(val => val.name === 'Muted');
                                 var identifier = cryptoRandomString({ length: 10 });
 
-                                guild.member(user).addRole(mutedRole).then(member => {
+                                guild.member(user).addRole(mutedRole).then(async member => {
                                     if (member.voiceChannel !== undefined) {
                                         member.setVoiceChannel(null)
                                     }
@@ -98,50 +98,53 @@ exports.run = (client, message, args) => {
                                         });
                                     });
 
-                                    member.createDM().then(async chnl => {
-                                        await chnl.send({
-                                            embed: {
-                                                color: config.color_caution,
-                                                title: `You have been muted in ${guild.name}`,
-                                                description: `Details regarding the mute can be found below:`,
-                                                fields: [
-                                                    {
-                                                        name: 'Reason',
-                                                        value: reason,
-                                                        inline: true
-                                                    },
-                                                    {
-                                                        name: 'Length',
-                                                        value: args[1],
-                                                        inline: true
-                                                    },
-                                                    {
-                                                        name: 'Identifier',
-                                                        value: `\`${identifier}\``
-                                                    },
-                                                    {
-                                                        name: 'Want to dispute?',
-                                                        value: 'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                    try {
+                                        var chnl = await member.createDM();
+                                            await chnl.send({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    title: `You have been muted in ${guild.name}`,
+                                                    description: `Details regarding the mute can be found below:`,
+                                                    fields: [
+                                                        {
+                                                            name: 'Reason',
+                                                            value: reason,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Length',
+                                                            value: args[1],
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Identifier',
+                                                            value: `\`${identifier}\``
+                                                        },
+                                                        {
+                                                            name: 'Want to dispute?',
+                                                            value: 'This mute can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
-                                                ],
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
-                                            }
-                                        }).then(dm => {
-                                            if (dm.embeds[0].type === 'rich') {
-                                                var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
-                                            } else {
-                                                var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
-                                            }
-                                            connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
-                                                function (err, results) {
-                                                    if (err) throw err;
+                                            }).then(dm => {
+                                                if (dm.embeds[0].type === 'rich') {
+                                                    var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                                                } else {
+                                                    var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
                                                 }
-                                            );
-                                        });
-                                    }).catch(console.error);
+                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
+                                                    function (err, results) {
+                                                        if (err) throw err;
+                                                    }
+                                                );
+                                            });
+                                    } catch (e) {
+                                        message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
+                                    }
                                 }).catch(console.error);
                             } else {
                                 message.channel.send('Please provide a reason for the mute.');

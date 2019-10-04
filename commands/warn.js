@@ -25,7 +25,7 @@ exports.run = (client, message, args) => {
                         var identifier = cryptoRandomString({ length: 10 });
                         var data = [user, message.author.id, content, identifier, 0, new Date(), user /*SP arg*/];
                         connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total) ', data,
-                        function (err, results) {
+                        async function (err, results) {
                             if (err) throw err;
 
                             message.channel.send({
@@ -53,40 +53,42 @@ exports.run = (client, message, args) => {
                                     }
                                 }
                             });
-
-                            client.users.get(user).createDM().then(async chnl => {
-                                await chnl.send({
-                                        embed: {
-                                            color: config.color_caution,
-                                            title: `You have been warned in ${guild.name}`,
-                                            description: `Details about the warning can be found below:`,
-                                            fields: [{
-                                                    name: 'Reason',
-                                                    value: content
-                                                },
-                                                {
-                                                    name: 'Identifier',
-                                                    value: `\`${identifier}\``
-                                                },
-                                                {
-                                                    name: 'Want to dispute?',
-                                                    value: 'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                            try {
+                                var chnl = await client.users.get(user).createDM();
+                                    await chnl.send({
+                                            embed: {
+                                                color: config.color_caution,
+                                                title: `You have been warned in ${guild.name}`,
+                                                description: `Details about the warning can be found below:`,
+                                                fields: [{
+                                                        name: 'Reason',
+                                                        value: content
+                                                    },
+                                                    {
+                                                        name: 'Identifier',
+                                                        value: `\`${identifier}\``
+                                                    },
+                                                    {
+                                                        name: 'Want to dispute?',
+                                                        value: 'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
-                                            ],
-                                            timestamp: new Date(),
-                                            footer: {
-                                                text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
-                                        }
-                                    }).then(dm => {
-                                        var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
-                                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
-                                            function (err, results) {
-                                                if (err) throw err;
-                                            }
-                                        );
-                                    });
-                            }).catch(console.error);
+                                        }).then(dm => {
+                                            var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
+                                            connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
+                                                function (err, results) {
+                                                    if (err) throw err;
+                                                }
+                                            );
+                                        });
+                            } catch (e) {
+                                message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
+                            }
                         });
                     } else {
                         message.channel.send('The warning needs a reason!');
