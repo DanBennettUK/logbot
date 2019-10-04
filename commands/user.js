@@ -173,7 +173,7 @@ exports.run = async (client, message, args) => {
                             await r.remove(r.users.last());
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
-                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                             gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                             async function (err, rows, results) {
                                 if (err) throw err;
@@ -363,7 +363,7 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
-                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
@@ -598,7 +598,7 @@ exports.run = async (client, message, args) => {
                             await r.remove(r.users.last());
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
-                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                            SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                             gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                             async function (err, rows, results) {
                                 if (err) throw err;
@@ -748,7 +748,7 @@ exports.run = async (client, message, args) => {
                         }  else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
-                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                            SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
@@ -837,7 +837,7 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
-                            connection.query(`SELETC Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
+                            connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var history = [];
@@ -1003,7 +1003,7 @@ exports.run = async (client, message, args) => {
                                 await r.remove(r.users.last());
 
                                 connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
-                                SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp, 
+                                SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                 gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                                 async function (err, rows, results) {
                                     if (err) throw err;
@@ -1153,29 +1153,29 @@ exports.run = async (client, message, args) => {
                             }  else if (r.emoji.name == '📛') {
                                 await r.remove(r.users.last());
                                 connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
-                                SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`, 
+                                SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                 [userID, userID], async function (err, rows, results) {
                                     if (err) throw err;
                                     var names = [];
                                     var validRows = [];
                                     var max = 0;
                                     var extra;
-    
+
                                     for (var i = 0; i < rows.length; i++) {
                                         var row = rows[i];
                                         if (names.includes(row.new)) continue;
                                         names.push(row.new);
                                         validRows.push(row);
                                     }
-    
+
                                     if (validRows.length <= 5) {
                                         max = validRows.length;
                                     } else {
                                         extra = validRows.length - max;
                                     }
-    
+
                                     names = [];
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = validRows[i];
                                         switch(row.type) {
@@ -1190,7 +1190,7 @@ exports.run = async (client, message, args) => {
                                             names.push(`...${extra} more`);
                                         }
                                     }
-    
+
                                     if (!_.isEmpty(names)) {
                                         await msg.edit({
                                             embed: {
