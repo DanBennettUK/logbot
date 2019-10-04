@@ -3,6 +3,7 @@ exports.run = (client, message, args) => {
     const connection = client.connection;
     const functionsFile = client.functionsFile;
     const config = client.config;
+    const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
       if (modulesFile.get('COMMAND_IDENTIFIER')) {
         if(args[0] && args[0].length == 10){
@@ -10,7 +11,7 @@ exports.run = (client, message, args) => {
               connection.query('CALL identifier_locate(?, @where)', id,
               function (err, rows, result) {
                   if (err) throw err;
-                  if (rows) {
+                  if (rows[0].length > 0) {
                     switch(rows[0][0].type){
                       case "warn":
                         connection.query('select * from log_warn where identifier = ?', id,
@@ -169,12 +170,12 @@ exports.run = (client, message, args) => {
                       break;
                     }
                   }else{
-                    message.channel.send("That identifier couldn't be found. Please review and try again.");
+                    message.channel.send(":x: That identifier couldn't be found. Please review and try again.");
                   }
               }
           );
         }else{
-          message.channel.send("That identifier doesn't look right. Try again.")
+          message.channel.send(":x: That identifier doesn't look right. Try again.")
         }
       }
     }
