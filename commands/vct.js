@@ -51,7 +51,7 @@ exports.run = async (client, message, args) => {
                         }
                     });
                 } else message.channel.send('Thes user provided was not found');
-            } else functionsFile.syntaxErr(client, message, 'vc');
+            } else functionsFile.syntaxErr(client, message, 'vct');
         }
     }
 }

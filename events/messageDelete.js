@@ -21,7 +21,7 @@ module.exports = async (client, message) => {
             } else user = message.author;
             var messageContent = message.content;
             if (message.content.length == 0) messageContent = message.attachments.first().filename;
-            if (message.content.lengt > 2000) messageContent = 'Message too long ( > 2000 characters)';
+            if (message.content.length > 2000) messageContent = 'Message too long ( > 2000 characters)';
             message.guild.channels.get(config.channel_serverlog).send({
                 embed: {
                     color: config.color_warning,
