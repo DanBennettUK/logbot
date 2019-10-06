@@ -357,7 +357,12 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
         var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
 
         if (usernameResolve == null) {
-            return 'err';
+            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split[0]) && (obj.discriminator == split[1]));
+            if (usernameResolve == null) {
+                return 'err';
+            } else {
+                return usernameResolve.id;
+            }
         } else {
             return usernameResolve.id;
         }
@@ -366,10 +371,16 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
     } else {
         var usernameResolve = client.users.find(obj => obj.username === tag);
         if (usernameResolve == null) {
-            var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
-            if (nicknameResolve == null) {
-                return 'err';
-            } else return nicknameResolve.id;
+            usernameResolve = client.users.find(obj => obj.username.toLowerCase() === tag);
+            if (usernameResolve == null) {
+                var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
+                if (nicknameResolve == null) {
+                    nicknameResolve = guild.members.find(obj => obj.nickname.toLowerCase() === tag);
+                    if (nicknameResolve == null) {
+                        return 'err';
+                    } else return nicknameResolve.id;
+                } else return nicknameResolve.id;
+            } else return usernameResolve.id;
         } else return usernameResolve.id;
     }
 }
