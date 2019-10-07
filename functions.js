@@ -585,10 +585,7 @@ exports.checkExpiredMutes = function checkExpiredMutes(client) {
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
     var mutes = mutedFile.read();
-    var muteKeys = _.keys(mutes);
-
-    for (var a = 0; a < muteKeys.length; a++) {
-        let key = muteKeys[a];
+    for (key in mutes) {
         if (mutes[key].end < Math.floor(Date.now() / 1000)) {
             var actionee = guild.member(key);
             var mutedRole = guild.roles.find(val => val.name === 'Muted');
@@ -614,64 +611,54 @@ exports.checkReminders = function checkReminders(client) {
     const _ = client.underscore;
     var guild = client.guilds.get(config.guildid);
     var reminders = reminderFile.read();
-    var reminderKeys = _.keys(reminders);
 
-    var a = 0;
-
-    function loop() {
-        setTimeout(function () {
-            var current = reminderFile.get(reminderKeys[a]);
-            if (current.end < Math.floor(Date.now() / 1000)) {
-                var member = guild.member(current.who);
-                var time = current.length;
-                var unit = time.replace(/[0-9]+/g, ``);
-                time = time.replace(/[a-z]$/i, ``);
-                switch (unit) {
-                    case `m`:
-                        if (parseInt(time) == 1) unit = `minute`;
-                        else unit = `minutes`;
-                        break;
-                    case `h`:
-                        if (parseInt(time) == 1) unit = `hour`;
-                        else unit = `hours`;
-                        break;
-                    case `d`:
-                        if (parseInt(time) == 1) unit = `day`;
-                        else unit = `days`;
-                        break;
-                    default:
-                        if (parseInt(time) == 1) unit = `hour`;
-                        else unit = `hours`;
-                }
-                if (member) {
-                    member.createDM().then(chnl => {
-                        chnl.send({
-                            embed: {
-                                color: config.color_info,
-                                author: {
-                                    name: client.user.username,
-                                    icon_url: client.user.displayAvatarURL
-                                },
-                                title: `You set a reminder ${time} ${unit} ago.`,
-                                description: current.reminder,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                }
+    for (key in reminders) {
+        var current = reminders[key];
+        if (current.end < Math.floor(Date.now() / 1000)) {
+            var member = guild.member(current.who);
+            var time = current.length;
+            var unit = time.replace(/[0-9]+/g, ``);
+            time = time.replace(/[a-z]$/i, ``);
+            switch (unit) {
+                case `m`:
+                    if (parseInt(time) == 1) unit = `minute`;
+                    else unit = `minutes`;
+                    break;
+                case `h`:
+                    if (parseInt(time) == 1) unit = `hour`;
+                    else unit = `hours`;
+                    break;
+                case `d`:
+                    if (parseInt(time) == 1) unit = `day`;
+                    else unit = `days`;
+                    break;
+                default:
+                    if (parseInt(time) == 1) unit = `hour`;
+                    else unit = `hours`;
+            }
+            if (member) {
+                member.createDM().then(chnl => {
+                    chnl.send({
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: client.user.username,
+                                icon_url: client.user.displayAvatarURL
+                            },
+                            title: `You set a reminder ${time} ${unit} ago.`,
+                            description: current.reminder,
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
-                        });
-                    }).catch(console.error);
-                }
-                reminderFile.unset(reminderKeys[a]);
-                reminderFile.save();
+                        }
+                    });
+                }).catch(console.error);
             }
-            a++;
-            if (a < reminderKeys.length) {
-                loop();
-            }
-        }, 100);
-    }
-    loop();
+            reminderFile.unset(key);
+            reminderFile.save();
+        }
+    }   
 }
 
 exports.importWarnings = function importWarnings(client) {
