@@ -25,6 +25,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}helper mute <user> <length> <reason>
         ${config.prefix}voicelog <user>
         ${config.prefix}vc <user>
+        ${config.prefix}vct <user>
         ${config.prefix}disconnect <user>
         ${config.prefix}badwords add <word/s>
         ${config.prefix}badwords remove <word/s>
