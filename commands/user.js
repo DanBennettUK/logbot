@@ -323,6 +323,16 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            if (userObject.voiceChannel) {
+                                voiceChannel = userObject.voiceChannel.name;
+                            } else {
+                                voiceChannel = 'Not in a voice channel';
+                            }
+                            if (userObject.user.presence.game) {
+                                app = userObject.user.presence.game.name;
+                            } else {
+                                app = 'None';
+                            }
                             msg.edit({
                                 embed: {
                                     color: config.color_info,
@@ -337,7 +347,7 @@ exports.run = async (client, message, args) => {
                                     fields: [
                                         {
                                             name: 'Created',
-                                            value: userObject.user.createdAt
+                                            value: userObject.user.createdAt.toUTCString()
                                         },
                                         {
                                             name: 'Status',
