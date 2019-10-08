@@ -579,7 +579,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     }
 }
 
-exports.checkExpiredMutes = function checkExpiredMutes(client) {
+exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const mutedFile = client.mutedFile;
     const config = client.config;
     const guild = client.guilds.get(config.guildid);
@@ -591,21 +591,21 @@ exports.checkExpiredMutes = function checkExpiredMutes(client) {
             var mutedRole = guild.roles.find(val => val.name === 'Muted');
 
             if (actionee) {
-                actionee.removeRole(mutedRole).then(member => {
-                    guild.channels.get(config.channel_serverlog).send(`${member} has been unmuted`);
+                actionee.removeRole(mutedRole).then(async member => {
+                    await guild.channels.get(config.channel_serverlog).send(`${member} has been unmuted`);
                     mutedFile.unset(key);
-                    mutedFile.save();
+                    await mutedFile.save();
                 }).catch(console.error);
             } else {
                 console.log(`Actionee could not be found ${key}`);
                 mutedFile.unset(key);
-                mutedFile.save();
+                await mutedFile.save();
             }
         }
     }
 }
 
-exports.checkReminders = function checkReminders(client) {
+exports.checkReminders = async function checkReminders(client) {
     const config = client.config;
     const reminderFile = client.reminderFile;
     const _ = client.underscore;
@@ -637,8 +637,8 @@ exports.checkReminders = function checkReminders(client) {
                     else unit = `hours`;
             }
             if (member) {
-                member.createDM().then(chnl => {
-                    chnl.send({
+                await member.createDM().then(async chnl => {
+                    await chnl.send({
                         embed: {
                             color: config.color_info,
                             author: {
@@ -656,7 +656,7 @@ exports.checkReminders = function checkReminders(client) {
                 }).catch(console.error);
             }
             reminderFile.unset(key);
-            reminderFile.save();
+            await reminderFile.save();
         }
     }   
 }
