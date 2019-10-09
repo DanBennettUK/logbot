@@ -20,7 +20,10 @@ module.exports = (client, message) => {
         functionsFile.checkMessageContent(client, message);
     }
 
-    if ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `))) return; //If the message content doesn't start with our prefix, return.
+    var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
+
+    if ((!message.content.startsWith('!') || !message.content.length > 1 || !publicCommands.includes(message.content.slice(1).toLowerCase())) && //Allow usage of '!' for general commands (invite, report...)
+    ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `)))) return; //If the message content doesn't start with our prefix, return.
 
     if (!(_.keys(badWordsFile.read()).length > 0)) {
         badWordsFile.set(`badWords`, []);
@@ -31,8 +34,6 @@ module.exports = (client, message) => {
     let command = args.shift().toLowerCase(); //Result: "ban"
 
     const cmd = client.commands.get(command);
-
-    var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
 
     if (_.keys(customCommands.read()).includes(command)) {
         if (publicCommands.includes(command) || message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
