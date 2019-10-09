@@ -221,7 +221,7 @@ exports.run = async (client, message, args) => {
                                         embed: {
                                             color: config.color_caution,
                                             author: {
-                                                name: userObject.user.username,
+                                                name: `${userObject.user.username} (${nickname})`,
                                                 icon_url: userObject.user.displayAvatarURL
                                             },
                                             description: `There are no recorded mutes for this user`,
@@ -383,8 +383,8 @@ exports.run = async (client, message, args) => {
 
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    if (names.includes(row.new)) continue;
-                                    names.push(row.new);
+                                    if (names.includes(row.old)) continue;
+                                    names.push(row.old);
                                     validRows.push(row);
                                 }
 
@@ -400,10 +400,10 @@ exports.run = async (client, message, args) => {
                                     var row = validRows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${userObject.user.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${userObject.user.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${userObject.user.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${userObject.user.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -768,8 +768,8 @@ exports.run = async (client, message, args) => {
 
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    if (names.includes(row.new)) continue;
-                                    names.push(row.new);
+                                    if (names.includes(row.old)) continue;
+                                    names.push(row.old);
                                     validRows.push(row);
                                 }
 
@@ -785,10 +785,10 @@ exports.run = async (client, message, args) => {
                                     var row = validRows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${globalUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${globalUser.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${globalUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${globalUser.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -1172,8 +1172,8 @@ exports.run = async (client, message, args) => {
                                     var extra;
                                     for (var i = 0; i < rows.length; i++) {
                                         var row = rows[i];
-                                        if (names.includes(row.new)) continue;
-                                        names.push(row.new);
+                                        if (names.includes(row.old)) continue;
+                                        names.push(row.old);
                                         validRows.push(row);
                                     }
                                     if (validRows.length <= 5) {
@@ -1188,10 +1188,10 @@ exports.run = async (client, message, args) => {
                                         var row = validRows[i];
                                         switch(row.type) {
                                             case 'user':
-                                                names.push(`📛${cardUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`📛${cardUser.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                             case 'nick':
-                                                names.push(`${cardUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`${cardUser.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
