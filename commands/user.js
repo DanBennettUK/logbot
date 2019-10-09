@@ -400,10 +400,10 @@ exports.run = async (client, message, args) => {
                                     var row = validRows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${userObject.user.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${userObject.user.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${userObject.user.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${userObject.user.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -785,10 +785,10 @@ exports.run = async (client, message, args) => {
                                     var row = validRows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${globalUser.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${globalUser.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${globalUser.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${globalUser.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -1188,10 +1188,10 @@ exports.run = async (client, message, args) => {
                                         var row = validRows[i];
                                         switch(row.type) {
                                             case 'user':
-                                                names.push(`📛${cardUser.username} changed username to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`📛${cardUser.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                             case 'nick':
-                                                names.push(`${cardUser.username} changed nickname to ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`${cardUser.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
