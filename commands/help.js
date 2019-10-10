@@ -37,6 +37,13 @@ exports.run = (client, message, args) => {
         ${config.prefix}commands add <command> <content>
         ${config.prefix}commands remove <command>
         ${config.prefix}commands list
+        ${config.prefix}reactions add <channel> <message_id> <emoji> <role>
+        ${config.prefix}reactions remove [channel] [message_id] [emoji]
+        ${config.prefix}reactions list
+        ${config.prefix}reactions reset
+        ${config.prefix}lfgrooms add <channel>
+        ${config.prefix}lfgrooms remove <channel>
+        ${config.prefix}lfgrooms list
         ${config.prefix}lock
         ${config.prefix}unlock`;
 

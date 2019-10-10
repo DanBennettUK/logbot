@@ -236,6 +236,8 @@ exports.run = async (client, message, args) => {
                     message.channel.send('Are you sure you want to unset all reactions in all channels?').then(async m => {
                         const filter = (rection, user) => !user.bot;
                         const collector = m.createReactionCollector(filter);
+                        await m.react('✅');
+                        await m.react('❌');
                         collector.on('collect', r =>{
                             if (r.emoji.name == '✅') {
                                 m.delete();
@@ -250,8 +252,6 @@ exports.run = async (client, message, args) => {
                                 message.channel.send('Action cancelled.');
                             }
                         });
-                        await m.react('✅');
-                        await m.react('❌');
                     });
                 }
             } else if (args[0].toLowerCase() == 'list') {

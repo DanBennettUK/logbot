@@ -31,6 +31,8 @@ exports.run = (client, message, args) => {
             message.channel.send('Are you sure you want to remove all LFG rooms?').then(async msg => {
                 const filter = (reaction, user) => !user.bot;
                 const collector = msg.createReactionCollector(filter);
+                await msg.react('✅');
+                await msg.react('❌');
                 collector.on('collect', r => {
                     if (r.emoji.name == '✅') {
                         msg.delete();
@@ -46,8 +48,6 @@ exports.run = (client, message, args) => {
                         message.channel.send('Action cancelled.');
                     }
                 });
-                await msg.react('✅');
-                await msg.react('❌');
             });
         }
     }
