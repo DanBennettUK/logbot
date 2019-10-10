@@ -238,7 +238,7 @@ exports.run = async (client, message, args) => {
                         const collector = m.createReactionCollector(filter);
                         await m.react('✅');
                         await m.react('❌');
-                        collector.on('collect', r =>{
+                        collector.on('collect', r => {
                             if (r.emoji.name == '✅') {
                                 m.delete();
                                 const reactObject = reactionsFile.read();
