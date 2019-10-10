@@ -532,7 +532,7 @@ exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, ch
 
 exports.syntaxErr = function syntaxErr(client, message, command) {
     const config = client.config;
-    message.channel.send(`There is a problem in your syntax for ${config.prefix}${command}. Try using ${config.prefix}help`).then(msg => {
+    message.channel.send(`There is a problem in your syntax for \`${config.prefix}${command}\`. Try using \`${config.prefix}help\``).then(msg => {
         setTimeout(async () => {
             await message.delete();
             await msg.delete();
@@ -841,4 +841,47 @@ exports.checkStreamers = function checkStreamers(client) {
             s.removeRole(spotlightRole);
         }
     });
+}
+
+exports.setReactionRoles = async function setReactionRoles (client) {
+    const guild = client.guilds.get(client.config.guildid);
+    const reactionsFile = client.reactionsFile;
+    const reactionsObject = reactionsFile.read();
+    for (cKey in reactionsObject) {
+        var chnl = guild.channels.get(cKey);
+        if (chnl) {
+            const channelsObject = reactionsObject[cKey];
+            for (mKey in channelsObject) {
+                try {
+                    var msg = await chnl.fetchMessage(mKey);
+                } catch (e) {}
+                if (msg) {
+                    const messagesObjecct = channelsObject[mKey];
+                    for (rKey in messagesObjecct) {
+                        if (/[0-9]+/.test(rKey)) var emoji = client.emojis.get(rKey);
+                        else var emoji = rKey;
+                        if (emoji) {
+                            const roleId = messagesObjecct[rKey];
+                            var role = guild.roles.get(roleId);
+                            if (role) {
+                                await msg.react(emoji);
+                            } else {
+                                reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                reactionsFile.save();
+                            }
+                        } else {
+                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                            reactionsFile.save();
+                        }
+                    }
+                } else {
+                    reactionsFile.unset(`${cKey}.${mKey}`);
+                    reactionsFile.save();
+                }
+            }
+        } else {
+            reactionsFile.unset(`${cKey}`);
+            reactionsFile.save();
+        }
+    }
 }

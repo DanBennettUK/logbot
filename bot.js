@@ -1,4 +1,3 @@
-``;
 /*
 #############################################################
 ##             Logger - Marvin's Younger Brother           ##
@@ -39,6 +38,7 @@ var reminderFile = editJsonFile('./reminders.json');
 var usercardsFile = editJsonFile('./usercards.json');
 var customCommands = editJsonFile('./customCommands.json');
 var LFGRoomsFile = editJsonFile('./LFGRooms.json');
+var reactionsFile = editJsonFile('./reactions.json');
 
 console.log(`[${new Date().toUTCString()}] Initializing...`);
 
@@ -75,6 +75,7 @@ client.connection = connection;
 client.functionsFile = functionsFile;
 client.request = request;
 client.cryptoRandomString = cryptoRandomString;
+client.reactionsFile = reactionsFile;
 
 fs.readdir(`./events/`, (err, files) => {
     if (err) return console.error(err);

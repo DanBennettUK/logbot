@@ -1,5 +1,9 @@
 config.json
 customCommands.json
+reactions.json
+muted.json
+LFGRooms.json
+badwords.txt
 node_modules
 
 
