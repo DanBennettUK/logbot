@@ -19,7 +19,7 @@ module.exports = (client, messageReaction, user) => {
                     else var emoji = r;
                     if (emoji) emojis.push(emoji);
                 });
-                if (emojis.includes(messageReaction.emoji)) {
+                if (emojis.includes(messageReaction.emoji) || emojis.includes(messageReaction.emoji.id) || emojis.includes(messageReaction.emoji.name)) {
                     if (messageReaction.emoji.id) {
                         var role = guild.roles.get(messageObject[`${messageReaction.emoji.id}`]);
                     } else var role = guild.roles.get(messageObject[`${messageReaction.emoji.name}`]);

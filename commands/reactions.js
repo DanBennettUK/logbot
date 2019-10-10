@@ -29,7 +29,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -40,7 +65,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });                                        
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -57,7 +107,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });                                        
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -68,7 +143,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -86,7 +186,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -97,7 +222,32 @@ exports.run = async (client, message, args) => {
                                             reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                             reactionsFile.save();
                                             await msg.react(emoji);
-                                            message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'Reaction successfully set',
+                                                    fields: [
+                                                        {
+                                                            name: 'Reaction => Role',
+                                                            value: `${emoji} => ${role}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Channel => Message',
+                                                            value: `${channl} => [Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });                                        
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -113,7 +263,32 @@ exports.run = async (client, message, args) => {
                                         reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                         reactionsFile.save();
                                         await msg.react(emoji);
-                                        message.channel.send(`Reaction on [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                author: {
+                                                    name: client.user.username,
+                                                    icon_url: client.user.displayAvatarURL
+                                                },
+                                                title: 'Reaction successfully set',
+                                                fields: [
+                                                    {
+                                                        name: 'Reaction => Role',
+                                                        value: `${emoji} => ${role}`,
+                                                        inline: true
+                                                    },
+                                                    {
+                                                        name: 'Channel => Message',
+                                                        value: `${channl} => [Message](${msg.url})`,
+                                                        inline: true
+                                                    }
+                                                ],
+                                                timestamp: Date.now(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        });                                  
                                     } else {
                                         message.channel.send(':x: An invalid role was provided.');
                                     }
@@ -124,7 +299,32 @@ exports.run = async (client, message, args) => {
                                         reactionsFile.set(`${chnl}.${args[2]}.${args[3]}`, args[4]);
                                         reactionsFile.save();
                                         await msg.react(emoji);
-                                        message.channel.send(`Reaction [this message](${msg.url} in ${client.channels.get(chnl)} successfully set!`);
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                author: {
+                                                    name: client.user.username,
+                                                    icon_url: client.user.displayAvatarURL
+                                                },
+                                                title: 'Reaction successfully set',
+                                                fields: [
+                                                    {
+                                                        name: 'Reaction => Role',
+                                                        value: `${emoji} => ${role}`,
+                                                        inline: true
+                                                    },
+                                                    {
+                                                        name: 'Channel => Message',
+                                                        value: `${channl} => [Message](${msg.url})`,
+                                                        inline: true
+                                                    }
+                                                ],
+                                                timestamp: Date.now(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }); 
                                     } else {
                                         message.channel.send(':x: An invalid role was provided.');
                                     }
@@ -150,7 +350,26 @@ exports.run = async (client, message, args) => {
                             if (!args[2]) {
                                 reactionsFile.unset(`${chnl}`);
                                 reactionsFile.save();
-                                message.channel.send(`Reactions in channel ${client.channels.get(chnl)} have been unset`);
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: client.user.username,
+                                            icon_url: client.user.displayAvatarURL
+                                        },
+                                        title: 'All reactions in the channel have been unset',
+                                        fields: [
+                                            {
+                                                name: 'Channel',
+                                                value: `${channl}`
+                                            }
+                                        ],
+                                        timestamp: Date.now(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                });                            
                             } else {
                                 try {
                                     var msg = chnl.fetchMessage(args[2]);
@@ -161,7 +380,32 @@ exports.run = async (client, message, args) => {
                                         if (!args[3]) {
                                             reactionsFile.unset(`${chnl}.${args[2]}`);
                                             reactionsFile.save();
-                                            message.channel.send(`Reactions on [this message](${msg.url} in channel ${client.channels.get(chnl)} have been unset`);
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: 'All reactions on the message have been unset',
+                                                    fields: [
+                                                        {
+                                                            name: 'Channel',
+                                                            value: `${channl}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Message',
+                                                            value: `[Message](${msg.url})`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: Date.now(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            });                                        
                                         } else {
                                             if (/^<a?:[a-z0-9]+:[0-9]+>$/i.test(args[3])) {
                                                 var emo = args[3].replace(/<|>/g, '');
@@ -172,7 +416,32 @@ exports.run = async (client, message, args) => {
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(emo[2])) {
                                                         reactionsFile.unset(`${chnl}.${args[2]}.${emo[2]}`);
                                                         reactionsFile.save();
-                                                        message.channel.send(`${emoji} reaction on [this message](${msg.url} in channel ${client.channels.get(chnl)} has been unset`);
+                                                        message.channel.send({
+                                                            embed: {
+                                                                color: config.color_info,
+                                                                author: {
+                                                                    name: client.user.username,
+                                                                    icon_url: client.user.displayAvatarURL
+                                                                },
+                                                                title: 'Reaction successfully unset',
+                                                                fields: [
+                                                                    {
+                                                                        name: 'Reaction',
+                                                                        value: `${emoji}`,
+                                                                        inline: true
+                                                                    },
+                                                                    {
+                                                                        name: 'Channel => Message',
+                                                                        value: `${channl} => [Message](${msg.url})`,
+                                                                        inline: true
+                                                                    }
+                                                                ],
+                                                                timestamp: Date.now(),
+                                                                footer: {
+                                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                                }
+                                                            }
+                                                        });                                                    
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -186,7 +455,32 @@ exports.run = async (client, message, args) => {
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(args[3])) {
                                                         reactionsFile.unset(`${chnl}.${args[2]}.${args[3]}`);
                                                         reactionsFile.save();
-                                                        message.channel.send(`${emoji} reaction on [this message](${msg.url} in channel ${client.channels.get(chnl)} has been unset`);
+                                                        message.channel.send({
+                                                            embed: {
+                                                                color: config.color_info,
+                                                                author: {
+                                                                    name: client.user.username,
+                                                                    icon_url: client.user.displayAvatarURL
+                                                                },
+                                                                title: 'Reaction successfully unset',
+                                                                fields: [
+                                                                    {
+                                                                        name: 'Reaction',
+                                                                        value: `${emoji}`,
+                                                                        inline: true
+                                                                    },
+                                                                    {
+                                                                        name: 'Channel => Message',
+                                                                        value: `${channl} => [Message](${msg.url})`,
+                                                                        inline: true
+                                                                    }
+                                                                ],
+                                                                timestamp: Date.now(),
+                                                                footer: {
+                                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                                }
+                                                            }
+                                                        });                                                    
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -201,7 +495,32 @@ exports.run = async (client, message, args) => {
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(args[3])) {
                                                         reactionsFile.unset(`${chnl}.${args[2]}.${args[3]}`);
                                                         reactionsFile.save();
-                                                        message.channel.send(`${emoji} reaction on [this message](${msg.url} in channel ${client.channels.get(chnl)} has been unset`);
+                                                        message.channel.send({
+                                                            embed: {
+                                                                color: config.color_info,
+                                                                author: {
+                                                                    name: client.user.username,
+                                                                    icon_url: client.user.displayAvatarURL
+                                                                },
+                                                                title: 'Reaction successfully unset',
+                                                                fields: [
+                                                                    {
+                                                                        name: 'Reaction',
+                                                                        value: `${emoji}`,
+                                                                        inline: true
+                                                                    },
+                                                                    {
+                                                                        name: 'Channel => Message',
+                                                                        value: `${channl} => [Message](${msg.url})`,
+                                                                        inline: true
+                                                                    }
+                                                                ],
+                                                                timestamp: Date.now(),
+                                                                footer: {
+                                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                                }
+                                                            }
+                                                        });                                                    
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -213,14 +532,39 @@ exports.run = async (client, message, args) => {
                                                 if (emojiKeys.length > 0 && emojiKeys.includes(args[3])) {
                                                     reactionsFile.unset(`${chnl}.${args[2]}.${args[3]}`);
                                                     reactionsFile.save();
-                                                    message.channel.send(`${emoji} reaction on [this message](${msg.url} in channel ${client.channels.get(chnl)} has been unset`);
+                                                    message.channel.send({
+                                                        embed: {
+                                                            color: config.color_info,
+                                                            author: {
+                                                                name: client.user.username,
+                                                                icon_url: client.user.displayAvatarURL
+                                                            },
+                                                            title: 'Reaction successfully unset',
+                                                            fields: [
+                                                                {
+                                                                    name: 'Reaction',
+                                                                    value: `${emoji}`,
+                                                                    inline: true
+                                                                },
+                                                                {
+                                                                    name: 'Channel => Message',
+                                                                    value: `${channl} => [Message](${msg.url})`,
+                                                                    inline: true
+                                                                }
+                                                            ],
+                                                            timestamp: Date.now(),
+                                                            footer: {
+                                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                            }
+                                                        }
+                                                    });                                                
                                                 } else {
                                                     message.channel.send(`${emoji} is not set.`);
                                                 }
                                             }
                                         }
                                     } else {
-                                        message.channel.send(`No reaction is set on [this message](${msg.url}`);
+                                        message.channel.send(`No reaction is set on the message provided.`);
                                     }
                                 } else {
                                     message.channel.send('An invalid message ID was provided.');
@@ -345,7 +689,7 @@ exports.run = async (client, message, args) => {
                             color: config.color_info,
                             author: {
                                 name: client.user.username,
-                                icon_url: client.user.displazAvatarURL
+                                icon_url: client.user.displayAvatarURL
                             },
                             title: 'There are no reactions set',
                             timestamp: new Date(),
