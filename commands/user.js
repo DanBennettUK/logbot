@@ -156,7 +156,7 @@ exports.run = async (client, message, args) => {
                                             embed: {
                                                 color: config.color_caution,
                                                 author: {
-                                                    name: userObject.user.username,
+                                                    name: `${userObject.user.username} (${nickname})`,
                                                     icon_url: userObject.user.displayAvatarURL
                                                 },
                                                 description: `There are no recorded warnings for this user`,
