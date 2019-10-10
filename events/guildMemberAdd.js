@@ -90,32 +90,6 @@ module.exports = (client, member) => {
     }
     if (modulesFile.get('EVENT_NEWACC_DETEC')) {
         if (member.user.createdTimestamp > (Date.now() - 1000 * 60 * 60 * 24 * 7)) {
-            member.guild.channels.get(config.channel_serverlog).send({
-                embed: {
-                    color: config.color_warning,
-                    author: {
-                        name: `${member.user.username}#${member.user.discriminator}`,
-                        icon_url: member.user.displayAvatarURL
-                    },
-                    title: '❗ new Discord account',
-                    fields: [
-                        {
-                            name: 'User',
-                            value: `${member}\nID: ${member.id}`,
-                            inline: true
-                        },
-                        {
-                            name: 'Created',
-                            value: `${member.user.createdAt.toUTCString()}`,
-                            inline: true
-                        }
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                    }
-                }
-            }).catch(console.error);
             var s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
             var d = 0;
             var h = 0;
@@ -155,6 +129,32 @@ module.exports = (client, member) => {
                     time = `${d}d${h}h${m}m${s}s`
                     break;
             }
+            member.guild.channels.get(config.channel_serverlog).send({
+                embed: {
+                    color: config.color_warning,
+                    author: {
+                        name: `${member.user.username}#${member.user.discriminator}`,
+                        icon_url: member.user.displayAvatarURL
+                    },
+                    title: '❗ new Discord account',
+                    fields: [
+                        {
+                            name: 'User',
+                            value: `${member}\nID: ${member.id}`,
+                            inline: true
+                        },
+                        {
+                            name: 'Created',
+                            value: `${member.user.createdAt.toUTCString()},\njoined the guild ${time} after creation`,
+                            inline: true
+                        }
+                    ],
+                    timestamp: new Date(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
+                }
+            }).catch(console.error);
             var message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
             var identifier = cryptoRandomString({length: 10});
             connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', message, identifier, 0, new Date()],
