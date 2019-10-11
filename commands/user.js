@@ -287,7 +287,7 @@ exports.run = async (client, message, args) => {
                                 var notes = [];
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -377,33 +377,23 @@ exports.run = async (client, message, args) => {
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
-                                var validRows = [];
                                 var max = 0;
                                 var extra;
 
-                                for (var i = 0; i < rows.length; i++) {
-                                    var row = rows[i];
-                                    if (names.includes(row.old)) continue;
-                                    names.push(row.old);
-                                    validRows.push(row);
-                                }
-
-                                if (validRows.length <= 5) {
-                                    max = validRows.length;
+                                if (rows.length <= 5) {
+                                    max = rows.length;
                                 } else {
-                                    extra = validRows.length - max;
+                                    extra = rows.length - max;
                                 }
-
-                                names = [];
 
                                 for (var i = 0; i < max; i++) {
-                                    var row = validRows[i];
+                                    var row = rows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${userObject.user.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${userObject.user.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${userObject.user.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${userObject.user.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -721,7 +711,7 @@ exports.run = async (client, message, args) => {
                                 var notes = [];
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -762,33 +752,23 @@ exports.run = async (client, message, args) => {
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
-                                var validRows = [];
                                 var max = 0;
                                 var extra;
 
-                                for (var i = 0; i < rows.length; i++) {
-                                    var row = rows[i];
-                                    if (names.includes(row.old)) continue;
-                                    names.push(row.old);
-                                    validRows.push(row);
-                                }
-
-                                if (validRows.length <= 5) {
-                                    max = validRows.length;
+                                if (rows.length <= 5) {
+                                    max = rows.length;
                                 } else {
-                                    extra = validRows.length - max;
+                                    extra = rows.length - max;
                                 }
-
-                                names = [];
 
                                 for (var i = 0; i < max; i++) {
-                                    var row = validRows[i];
+                                    var row = rows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${globalUser.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${globalUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${globalUser.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${globalUser.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -1126,7 +1106,7 @@ exports.run = async (client, message, args) => {
                                     var notes = [];
                                     for (var i = 0; i < rows.length; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -1167,31 +1147,23 @@ exports.run = async (client, message, args) => {
                                 [userID, userID], async function (err, rows, results) {
                                     if (err) throw err;
                                     var names = [];
-                                    var validRows = [];
                                     var max = 0;
                                     var extra;
-                                    for (var i = 0; i < rows.length; i++) {
-                                        var row = rows[i];
-                                        if (names.includes(row.old)) continue;
-                                        names.push(row.old);
-                                        validRows.push(row);
-                                    }
-                                    if (validRows.length <= 5) {
-                                        max = validRows.length;
-                                    } else {
-                                        extra = validRows.length - max;
-                                    }
 
-                                    names = [];
+                                    if (rows.length <= 5) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
 
                                     for (var i = 0; i < max; i++) {
-                                        var row = validRows[i];
+                                        var row = rows[i];
                                         switch(row.type) {
                                             case 'user':
-                                                names.push(`📛${cardUser.username} changed username from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                             case 'nick':
-                                                names.push(`${cardUser.username} changed nickname from ${row.old} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`${cardUser.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
