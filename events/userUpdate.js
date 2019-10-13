@@ -3,6 +3,10 @@ module.exports = (client, oldUser, newUser) => {
     const connection = client.connection;
     const config = client.config;
     const guild = client.guilds.get(config.guildid)
+    const bannedUsersFile = client.bannedUsersFile;
+    const stringSimilarity = client.stringSimilarity;
+    const _ = client.underscore;
+    const cryptoRandomString = client.cryptoRandomString;
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {
@@ -42,6 +46,58 @@ module.exports = (client, oldUser, newUser) => {
                         }
                     }
                 }).catch(console.error);
+            }
+            if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
+                var banndUsers = bannedUsersFile.get();
+                var usernames = _.values(banndUsers);
+                var ids = _.keys(banndUsers);
+                var hits = [];
+                var identifiers = [];
+                var data = [];
+                var msg = [];
+                var description;
+        
+                var match = stringSimilarity.findBestMatch(newUser.username, usernames);
+        
+                for (var a = 0; a < match['ratings'].length; a++) {
+                    if (match['ratings'][a].rating >= 0.5) {
+                        hits.push({
+                            username: match['ratings'][a].target, //Username of the ban
+                            rating: match['ratings'][a].rating, //decimal of the similarity
+                            identifier: ids[a] //<identifier> of the ban
+                        });
+                        identifiers.push(ids[a]);
+                    }
+                }
+        
+                if (identifiers.length > 0) {
+                    data.push(identifiers); //If this work - ew.....you motherfucker, it did.
+        
+                    connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
+                    function (err, rows, results) {
+                        if (err) throw err;
+                        for (var b = 0; b < rows.length; b++) {
+                            var row = rows[b];
+                            msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                        }
+                        guild.channels.get(config.channel_serverlog).send({
+                            embed: {
+                                color: config.color_warning,
+                                title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
+                                description: msg.join(' '),
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                        var identifier = cryptoRandomString({length: 10});
+                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' '), identifier, 0, new Date()],
+                        function(err, results){
+                            if (err) throw err;
+                        });
+                    });
+                }
             }
         }
 

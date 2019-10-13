@@ -62,7 +62,7 @@ module.exports = (client, member) => {
         if (identifiers.length > 0) {
             data.push(identifiers); //If this work - ew.....you motherfucker, it did.
 
-            connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?)', data,
+            connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
             function (err, rows, results) {
                 if (err) throw err;
                 for (var b = 0; b < rows.length; b++) {
