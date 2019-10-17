@@ -84,6 +84,7 @@ module.exports = (client, oldUser, newUser) => {
                     connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
                     function (err, rows, results) {
                         if (err) throw err;
+                        if (rows.length == 0) return;
                         for (var b = 0; b < rows.length; b++) {
                             var row = rows[b];
                             msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
