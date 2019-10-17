@@ -561,6 +561,7 @@ exports.isNull = function isNull(value, def) {
 exports.checkMessageContent = function checkMessageContent(client, message) {
     const badWordsFile = client.badWordsFile;
     const connection = client.connection;
+    const channelsFile = client.channelsFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
@@ -582,6 +583,43 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                 connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                     function (err, results) {
                         if (err) throw err;
+                        if (channelsFile.get('action_log')) {
+                            if (!message.guild.channels.get(channelsFile.get('action_log'))) {
+                                channelsFile.set('action_log', '');
+                                channelsFile.save();
+                                return;
+                            }
+                            message.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: client.config.color_info,
+                                    author: {
+                                        name: `${message.author.username}#${message.author.discriminator}`,
+                                        icon_url: message.author.displayAvatarURL
+                                    },
+                                    title: 'Removed message containing banned word',
+                                    fields: [
+                                        {
+                                            name: 'Author',
+                                            value: `${message.author}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Channel',
+                                            value: `${message.channel}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Content',
+                                            value: `${message.content}`
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            })
+                        }
                     }
                 );
             }).catch(console.error);

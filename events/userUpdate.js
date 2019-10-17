@@ -7,6 +7,7 @@ module.exports = (client, oldUser, newUser) => {
     const stringSimilarity = client.stringSimilarity;
     const _ = client.underscore;
     const cryptoRandomString = client.cryptoRandomString;
+    const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {
@@ -15,37 +16,44 @@ module.exports = (client, oldUser, newUser) => {
                     if (err) throw err;
                 }
             );
-            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
-                guild.channels.get(config.channel_serverlog).send({
-                    embed: {
-                        color: config.color_info,
-                        author: {
-                            name: `${newUser.username}#${newUser.discriminator}`,
-                            icon_url: newUser.displayAvatarURL
-                        },
-                        title: 'Username change',
-                        thumbnail: {
-                            url: newUser.displayAvatarURL
-                        },
-                        description: `User ${newUser} has changed their username\n`,
-                        fields: [
-                            {
-                                name: 'Previous username',
-                                value: `${oldUser.username}`,
-                                inline: true
+            if (channelsFile.get('server_log')) {
+                if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    channelsFile.set('server_log', '');
+                    channelsFile.save();
+                    return;
+                }
+                if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                    guild.channels.get(channelsFile.get('server_log')).send({
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: `${newUser.username}#${newUser.discriminator}`,
+                                icon_url: newUser.displayAvatarURL
                             },
-                            {
-                                name: 'New username',
-                                value: `${newUser.username}`,
-                                inline: true
+                            title: 'Username change',
+                            thumbnail: {
+                                url: newUser.displayAvatarURL
+                            },
+                            description: `User ${newUser} has changed their username\n`,
+                            fields: [
+                                {
+                                    name: 'Previous username',
+                                    value: `${oldUser.username}`,
+                                    inline: true
+                                },
+                                {
+                                    name: 'New username',
+                                    value: `${newUser.username}`,
+                                    inline: true
+                                }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
-                    }
-                }).catch(console.error);
+                    }).catch(console.error);
+                }
             }
             if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
                 var banndUsers = bannedUsersFile.get();
@@ -80,17 +88,24 @@ module.exports = (client, oldUser, newUser) => {
                             var row = rows[b];
                             msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
                         }
-                        guild.channels.get(config.channel_serverlog).send({
-                            embed: {
-                                color: config.color_warning,
-                                title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
-                                description: msg.join(' '),
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                }
+                        if (channelsFile.get('action_log')) {
+                            if (!guild.channels.get(channelsFile.get('action_log'))) {
+                                channelsFile.set('action_log', '');
+                                channelsFile.save();
+                                return;
                             }
-                        }).catch(console.error);
+                            guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: config.color_warning,
+                                    title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
+                                    description: msg.join(' '),
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                        }
                         var identifier = cryptoRandomString({length: 10});
                         connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' '), identifier, 0, new Date()],
                         function(err, results){
@@ -109,59 +124,63 @@ module.exports = (client, oldUser, newUser) => {
                     if (err) throw err;
                 }
             );
-            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
-                guild.channels.get(config.channel_serverlog).send({
-                    embed: {
-                        color: config.color_info,
-                        author: {
-                            name: `${newUser.username}#${newUser.discriminator}`,
-                            icon_url: newUser.displayAvatarURL
-                        },
-                        title: 'Avatar change',
-                        thumbnail: {
-                            url: newUser.displayAvatarURL
-                        },
-                        description: `User ${newUser} has changed their avatar`,
-                        timestamp: new Date(),
-                        footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
+            if (channelsFile.get('server_log')) {
+                if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                    guild.channels.get(channelsFile.get('server_log')).send({
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: `${newUser.username}#${newUser.discriminator}`,
+                                icon_url: newUser.displayAvatarURL
+                            },
+                            title: 'Avatar change',
+                            thumbnail: {
+                                url: newUser.displayAvatarURL
+                            },
+                            description: `User ${newUser} has changed their avatar`,
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
                         }
-                    }
-                }).catch(console.error);
+                    }).catch(console.error);
+                }
             }
         }
         if (oldUser.discriminator !== newUser.discriminator) {
-            if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
-                guild.channels.get(config.channel_serverlog).send({
-                    embed: {
-                        color: config.color_info,
-                        author: {
-                            name: `${newUser.username}#${newUser.discriminator}`,
-                            icon_url: newUser.displayAvatarURL
-                        },
-                        title: 'Discriminator change',
-                        thumbnail: {
-                            url: newUser.displayAvatarURL
-                        },
-                        description: `User ${newUser} has changed their discriminator\n`,
-                        fields: [
-                            {
-                                name: 'Previous discriminator',
-                                value: `${oldUser.discriminator}`,
-                                inline: true
+            if (channelsFile.get('server_log')) {
+                if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
+                    guild.channels.get(channelsFile.get('server_log')).send({
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: `${newUser.username}#${newUser.discriminator}`,
+                                icon_url: newUser.displayAvatarURL
                             },
-                            {
-                                name: 'New discriminator',
-                                value: `${newUser.discriminator}`,
-                                inline: true
+                            title: 'Discriminator change',
+                            thumbnail: {
+                                url: newUser.displayAvatarURL
+                            },
+                            description: `User ${newUser} has changed their discriminator\n`,
+                            fields: [
+                                {
+                                    name: 'Previous discriminator',
+                                    value: `${oldUser.discriminator}`,
+                                    inline: true
+                                },
+                                {
+                                    name: 'New discriminator',
+                                    value: `${newUser.discriminator}`,
+                                    inline: true
+                                }
+                            ],
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
-                        ],
-                        timestamp: new Date(),
-                        footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
-                    }
-                }).catch(console.error);
+                    }).catch(console.error);
+                }
             }
         }
     }

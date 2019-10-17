@@ -29,6 +29,7 @@ const fs = require(`fs`);
 const request = require('request');
 
 const functionsFile = require(`./functions.js`);
+const channelsFile = editJsonFile('./channels.json');
 var modulesFile = editJsonFile('./modules.json');
 var bannedUsers = require('./banned_users.json');
 var bannedUsersFile = editJsonFile('./banned_users.json');
@@ -76,6 +77,7 @@ client.functionsFile = functionsFile;
 client.request = request;
 client.cryptoRandomString = cryptoRandomString;
 client.reactionsFile = reactionsFile;
+client.channelsFile = channelsFile;
 
 fs.readdir(`./events/`, (err, files) => {
     if (err) return console.error(err);
@@ -110,5 +112,7 @@ client.on('warn', warn => {
 process.on('unhandledRejection', (reason, p) => {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
+
+
 
 client.login(config.token);

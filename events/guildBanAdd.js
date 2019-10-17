@@ -4,6 +4,7 @@ module.exports = (client, guild, user) => {
     const connection = client.connection;
     const config = client.config;
     const modulesFile = client.modulesFile;
+    const channelsFile = client.channelsFile;
     var identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
@@ -14,24 +15,31 @@ module.exports = (client, guild, user) => {
             if (err) throw err;
         }
     );
-    if (modulesFile.get('EVENT_GUILD_BAN_ADD_LOG')) {
-        guild.channels.get(config.channel_serverlog).send({
-            embed: {
-                color: config.color_success,
-                author: {
-                    name: `${user.username}#${user.discriminator}`,
-                    icon_url: user.displayAvatarURL
-                },
-                title: 'User banned',
-                thumbnail: {
-                    url: user.displayAvatarURL
-                },
-                description: `User ${user} has been banned`,
-                timestamp: new Date(),
-                footer: {
-                    text: `Marvin's Little Brother | Current version: ${config.version}`
+    if (channelsFile.get('server_log')) {
+        if (!guild.channels.get(channelsFile.get('server_log'))) {
+            channelsFile.set('server_log', '');
+            channelsFile.save();
+            return;
+        }
+        if (modulesFile.get('EVENT_GUILD_BAN_ADD_LOG')) {
+            guild.channels.get(channelsFile.get('server_log')).send({
+                embed: {
+                    color: config.color_success,
+                    author: {
+                        name: `${user.username}#${user.discriminator}`,
+                        icon_url: user.displayAvatarURL
+                    },
+                    title: 'User banned',
+                    thumbnail: {
+                        url: user.displayAvatarURL
+                    },
+                    description: `User ${user} has been banned`,
+                    timestamp: new Date(),
+                    footer: {
+                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                    }
                 }
-            }
-        }).catch(console.error);
+            }).catch(console.error);
+        }
     }
 }

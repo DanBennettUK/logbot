@@ -44,6 +44,9 @@ exports.run = (client, message, args) => {
         ${config.prefix}lfgrooms add <channel>
         ${config.prefix}lfgrooms remove <channel>
         ${config.prefix}lfgrooms list
+        ${config.prefix}channels set <server/action/voice_log> [channel]
+        ${config.prefix}channels unset <server/action/voice_log>
+        ${config.prefix}channels list
         ${config.prefix}lock
         ${config.prefix}unlock`;
 

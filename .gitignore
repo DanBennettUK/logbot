@@ -2,6 +2,7 @@ config.json
 reactions.json
 muted.json
 LFGRooms.json
+channels.json
 badwords.txt
 node_modules
 
