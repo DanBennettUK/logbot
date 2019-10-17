@@ -591,7 +591,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                             }
                             message.guild.channels.get(channelsFile.get('action_log')).send({
                                 embed: {
-                                    color: client.config.color_info,
+                                    color: client.config.color_warning,
                                     author: {
                                         name: `${message.author.username}#${message.author.discriminator}`,
                                         icon_url: message.author.displayAvatarURL
