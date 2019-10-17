@@ -53,7 +53,7 @@ exports.run = async (client, message, args) => {
                                                         name: client.user.username,
                                                         icon_url: client.user.displayAvatarURL
                                                     },
-                                                    title: '[Action] Ban',
+                                                    title: `[Action] Ban`,
                                                     description: `${client.users.get(user)} has been successfully banned`,
                                                     fields: [
                                                         {
@@ -106,7 +106,7 @@ exports.run = async (client, message, args) => {
                                                     name: client.user.username,
                                                     icon_url: client.user.displayAvatarURL
                                                 },
-                                                title: '[Action] Ban',
+                                                title: `[Action] Ban`,
                                                 description: `${client.users.get(user)} has been successfully banned`,
                                                 fields: [
                                                     {
@@ -185,7 +185,7 @@ exports.run = async (client, message, args) => {
                                                             name: client.user.username,
                                                             icon_url: client.user.displayAvatarURL
                                                             },
-                                                            title: '[Action] Ban' ,
+                                                            title: `[Action] Ban` ,
                                                             description: `${client.users.get(user)} has been successfully banned`,
                                                             fields: [
                                                                 {

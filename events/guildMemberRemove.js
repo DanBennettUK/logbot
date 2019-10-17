@@ -31,8 +31,8 @@ module.exports = (client, member) => {
                             name: `${member.user.username}#${member.user.discriminator}`,
                             icon_url: member.user.displayAvatarURL
                         },
-                        title: 'User left',
-                        description: `User ${member.user} has left ${member.guild.name}`,
+                        title: `User left`,
+                        description: `User ${member.user} (${member.user.username}#${member.user.discriminator} ${member.user.id}) has left ${member.guild.name}`,
                         thumbnail: {
                             url:member.user.displayAvatarURL
                         },

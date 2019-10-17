@@ -52,8 +52,8 @@ module.exports = async (client, message) => {
                             name: `${message.author.username}#${message.author.discriminator}`,
                             icon_url: message.author.displayAvatarURL
                         },
-                        title: 'Message deletion',
-                        description: `Message sent by user ${message.author} deleted in ${message.channel}\n`,
+                        title: `Message deletion`,
+                        description: `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}\n`,
                         fields: [
                             {
                                 name: 'Deleted by',

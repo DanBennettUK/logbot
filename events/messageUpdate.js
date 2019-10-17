@@ -27,8 +27,8 @@ module.exports = (client, oldMessage, newMessage) => {
                                 name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
                                 icon_url: oldMessage.author.displayAvatarURL,
                             },
-                            title: 'Message edit',
-                            description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                            title: `Message edit`,
+                            description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n`,
                             fields: [
                                 {
                                     name: 'Old message',
@@ -55,7 +55,7 @@ module.exports = (client, oldMessage, newMessage) => {
                                     icon_url: oldMessage.author.displayAvatarURL,
                                 },
                                 title: 'Message edit',
-                                description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                                description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n`,
                                 fields: [
                                     {
                                         name: 'Old message',
@@ -81,7 +81,7 @@ module.exports = (client, oldMessage, newMessage) => {
                                     icon_url: oldMessage.author.displayAvatarURL,
                                 },
                                 title: 'Message edit',
-                                description: `Message sent by ${oldMessage.author} edited in ${oldMessage.channel}\n`,
+                                description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n`,
                                 fields: [
                                     {
                                         name: 'New message',

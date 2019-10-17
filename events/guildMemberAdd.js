@@ -29,11 +29,11 @@ module.exports = (client, member) => {
                             name: `${member.user.username}#${member.user.discriminator}`,
                             icon_url: member.user.displayAvatarURL
                         },
-                        title: 'User joined',
+                        title: `User joined`,
                         thumbnail: {
                             url: member.user.displayAvatarURL
                         },
-                        description: `User ${member.user} has joined ${member.guild.name}`,
+                        description: `User ${member.user} (${member.user.username}#${member.user.discriminator} ${member.user.id}) has joined ${member.guild.name}`,
                         timestamp: Date.now(),
                         footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`

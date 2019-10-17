@@ -30,11 +30,11 @@ module.exports = (client, oldUser, newUser) => {
                                 name: `${newUser.username}#${newUser.discriminator}`,
                                 icon_url: newUser.displayAvatarURL
                             },
-                            title: 'Username change',
+                            title: `Username change`,
                             thumbnail: {
                                 url: newUser.displayAvatarURL
                             },
-                            description: `User ${newUser} has changed their username\n`,
+                            description: `User ${newUser} (${newUser.username}#${newUser.discriminator} ${newUser.id}) has changed their username\n`,
                             fields: [
                                 {
                                     name: 'Previous username',
@@ -134,11 +134,11 @@ module.exports = (client, oldUser, newUser) => {
                                 name: `${newUser.username}#${newUser.discriminator}`,
                                 icon_url: newUser.displayAvatarURL
                             },
-                            title: 'Avatar change',
+                            title: `Avatar change`,
                             thumbnail: {
                                 url: newUser.displayAvatarURL
                             },
-                            description: `User ${newUser} has changed their avatar`,
+                            description: `User ${newUser} (${newUser.username}#${newUser.discriminator} ${newUser.id}) has changed their avatar`,
                             timestamp: new Date(),
                             footer: {
                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -158,11 +158,11 @@ module.exports = (client, oldUser, newUser) => {
                                 name: `${newUser.username}#${newUser.discriminator}`,
                                 icon_url: newUser.displayAvatarURL
                             },
-                            title: 'Discriminator change',
+                            title: `Discriminator change`,
                             thumbnail: {
                                 url: newUser.displayAvatarURL
                             },
-                            description: `User ${newUser} has changed their discriminator\n`,
+                            description: `User ${newUser} (${newUser.username}#${newUser.discriminator} ${newUser.id}) has changed their discriminator\n`,
                             fields: [
                                 {
                                     name: 'Previous discriminator',

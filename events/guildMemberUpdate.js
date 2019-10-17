@@ -30,11 +30,11 @@ module.exports = async (client, oldMember, newMember) => {
                                 name: `${oldMember.user.username}#${oldMember.user.discriminator}`,
                                 icon_url: oldMember.user.displayAvatarURL
                             },
-                            title: 'Nickname change',
+                            title: `Nickname change`,
                             thumbnail: {
                                 url: oldMember.user.displayAvatarURL
                             },
-                            description: `User ${oldMember.user} has changed their nickname\n`,
+                            description: `User ${oldMember.user} (${oldMember.user.username}#${oldMember.user.discriminator} ${oldMember.user.id}) has changed their nickname\n`,
                             fields: [
                                 {
                                     name: 'Old nickname',
@@ -128,7 +128,7 @@ module.exports = async (client, oldMember, newMember) => {
                     await oldMember.guild.fetchAuditLogs({
                         type: 'MEMBER_ROLE_UPDATE'
                     }).then(audit => {
-                        var description = `Role ${role} removed from user ${oldMember.user}`;
+                        var description = `Role ${role} removed from user ${oldMember.user} (${oldMember.user.username}#${oldMember.user.discriminator} ${oldMember.user.id})`;
                         for (var i = 0; i < audit.entries.array().length; i++) {
                             if (audit.entries.array()[i].target == oldMember.user) {
                                 description += ` by ${audit.entries.array()[i].executor}`;
@@ -142,7 +142,7 @@ module.exports = async (client, oldMember, newMember) => {
                                     name: `${oldMember.user.username}#${oldMember.user.discriminator}`,
                                     icon_url: oldMember.user.displayAvatarURL
                                 },
-                                title: 'Role removal',
+                                title: `Role removal`,
                                 description: description,
                                 timestamp: new Date(),
                                 footer: {
@@ -157,7 +157,7 @@ module.exports = async (client, oldMember, newMember) => {
                     await newMember.guild.fetchAuditLogs({
                         type: 'MEMBER_ROLE_UPDATE'
                     }).then(audit => {
-                        var description = `Role ${role} added to user ${newMember.user}`;
+                        var description = `Role ${role} added to user ${newMember.user} (${newMember.user.username}#${newMember.user.discriminator} ${newMember.user.id})`;
                         for (var i = 0; i < audit.entries.array().length; i++) {
                             if (audit.entries.array()[i].target == newMember.user) {
                                 description += ` by ${audit.entries.array()[i].executor}`;
@@ -171,7 +171,7 @@ module.exports = async (client, oldMember, newMember) => {
                                     name: `${newMember.user.username}#${newMember.user.discriminator}`,
                                     icon_url: newMember.user.displayAvatarURL
                                 },
-                                title: 'Role addition',
+                                title: `Role addition`,
                                 description: description,
                                 timestamp: new Date(),
                                 footer: {

@@ -29,11 +29,11 @@ module.exports = (client, guild, user) => {
                         name: `${user.username}#${user.discriminator}`,
                         icon_url: user.displayAvatarURL
                     },
-                    title: 'User banned',
+                    title: `User banned`,
                     thumbnail: {
                         url: user.displayAvatarURL
                     },
-                    description: `User ${user} has been banned`,
+                    description: `User ${user} (${user.username}#${user.discriminator} ${user.id}) has been banned`,
                     timestamp: new Date(),
                     footer: {
                         text: `Marvin's Little Brother | Current version: ${config.version}`

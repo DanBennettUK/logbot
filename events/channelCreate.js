@@ -3,13 +3,13 @@ module.exports = (client, channel) => {
     const config = client.config;
     const channelsFile = client.channelsFile;
     if (channelsFile.get('server_log')) {
-        if (!channel.guild.channels.get(channelsFile.get('server_log'))) {
-            channelsFile.set('server_log', '');
-            channelsFile.save();
-            return;
-        }
         if (modulesFile.get('EVENT_CHANNEL_CREATE_LOG')) {
             if (![`dm`, `group`].includes(channel.type)) {
+                if (!channel.guild.channels.get(channelsFile.get('server_log'))) {
+                    channelsFile.set('server_log', '');
+                    channelsFile.save();
+                    return;
+                }
                 var channelType = 'Channel'
                 if (channel.type == `text`) {
                     channelType = `Text channel`;
