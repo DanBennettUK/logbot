@@ -19,9 +19,25 @@ module.exports = async (client, message) => {
             (entry.target.id == message.author.id) && (entry.createdTimestamp > (Date.now() - 5000))) {
                 user = entry.executor
             } else user = message.author;
-            var messageContent = message.content;
-            if (message.content.length == 0) messageContent = message.attachments.first().filename;
-            if (message.content.length > 2000) messageContent = 'Message too long ( > 2000 characters)';
+            var messageContent = '';
+            if (message.content.length == 0) {
+                if (message.content.embeds.length > 0) {
+                    var embed = msg.embeds[0];
+                    var fields = '';
+                    var title = 'This embed has no title';
+                    if (embed.title) title = embed.title;
+                    var dsc = 'This embed has no description';
+                    if (embed.description) dsc = embed.description;
+                    if (embed.fields.length > 0) embed.fields.forEach(f => fields += `\nField name: ${f.name}\nField content: ${f.value}`);
+                    else fields = 'This embed has no fields.';
+                    messageContent = `\`${msg.author.username}#${msg.author.discriminator}\`: **EMBED:**
+                    title: ${title}
+                    description: ${dsc}
+                    fields: ${fields}
+                    \n`;
+                } else messageContent = message.attachments.first().filename;
+            } else messageContent = message.content;
+            if (messageContent.length > 1900) messageContent = 'Message too long ( > 2000 characters)';
             message.guild.channels.get(config.channel_serverlog).send({
                 embed: {
                     color: config.color_warning,
