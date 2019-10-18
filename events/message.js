@@ -6,6 +6,7 @@ module.exports = (client, message) => {
     const customCommands = client.customCommands;
     const modulesFile = client.modulesFile;
     const config = client.config;
+    const cryptoRandomString = client.cryptoRandomString;
     if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
     if (_.indexOf(['dm', 'group'], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
 
@@ -38,7 +39,13 @@ module.exports = (client, message) => {
     if (_.keys(customCommands.read()).includes(command)) {
         if (publicCommands.includes(command) || message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
             var obj = customCommands.get(command);
-            message.channel.send(`${obj.content}`);
+            var content = obj.content;
+            var temp = cryptoRandomString({length: 10});
+            var re = new RegExp(temp);
+            content = content.replace(/\\\\n/gi, temp);
+            content = content.replace(/\\n/gi, '\n');
+            content = content.replace(re, '\\n');
+            message.channel.send(`${content}`);
             message.delete();
         }
     }
