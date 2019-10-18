@@ -600,7 +600,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                                     fields: [
                                         {
                                             name: 'Author',
-                                            value: `${message.author}`,
+                                            value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
                                             inline: true
                                         },
                                         {
