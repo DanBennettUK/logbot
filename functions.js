@@ -933,3 +933,54 @@ exports.setReactionRoles = async function setReactionRoles (client) {
         }
     }
 }
+
+exports.parseEmojiTag = (client, guild, tag) => {
+    if (/^<a?:[a-z0-9]+:[0-9]+>$/i.test(tag)) {
+        var emo = tag.replace(/<|>/g, '');
+        emo = emo.split(':');
+        var emoji = guild.emojis.find(e => e.id == emo[2]);
+        if (emoji) return emoji.id;
+        else return 'err';
+    } else if (/[0-9]+/.test(tag)) {
+        var emoji = guild.emojis.get(tag);
+        if (emoji) return emoji.id;
+        else {
+            emoji = guild.emojis.fine(e => e.name == tag);
+            if (emoji) return emoji.id;
+            else return 'err';
+        }
+    } else if (/[a-z0-9]+/i.test(tag)) {
+        var emoji = guild.emojis.find(e => e.name == tag);
+        if (emoji) return emoji.id;
+        else {
+            emoji = guild.emojis.find(e => e.name.toLowerCase() == tag.toLowerCase());
+            if (emoji) return emoji.id;
+            else return 'err';
+        }
+    } else return tag;
+}
+
+exports.parseRoleTag = (client, guild, tag) => {
+    if (/^<@&[a-z0-9]+>$/i.test(tag)) {
+        var roleID = tag.replace(/<|@|&|>/g, '');
+        var role = guild.roles.get(roleID);
+        if (role) return role.id;
+        else return 'err';
+    } else if (/[0-9]+/.test(tag)) {
+        var role = guild.roles.get(tag);
+        if (role) return role.id;
+        else {
+            role = guild.roles.find(r => r.name == tag);
+            if (role) return role.id;
+            else return 'err';
+        }
+    } else if (/[a-z0-9]+/i.test(tag)) {
+        var role = guild.roles.find(r => r.name == tag);
+        if (role) return role.id;
+        else {
+            role = guild.roles.find(r => r.name.toLowerCase() == tag.toLowerCase());
+            if (role) return role.id;
+            else return 'err';
+        }
+    } 
+}
