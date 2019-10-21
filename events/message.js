@@ -17,8 +17,11 @@ module.exports = (client, message) => {
         if (err) throw err;
     });
 
-    if (modulesFile.get('EVENT_CHECKMESSAGECONTENT')) {
+    if (modulesFile.get('EVENT_CHECK_MESSAGE_CONTENT')) {
         functionsFile.checkMessageContent(client, message);
+    }
+    if (modulesFile.get('EVENT_INVITE_LINK_DETECTION')) {
+        functionsFile.inviteLinkDetection(client, message);
     }
 
     var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];

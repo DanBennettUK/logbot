@@ -5,7 +5,7 @@ module.exports = (client, oldChannel, newChannel) => {
     if (channelsFile.get('server_log')) {
         if (modulesFile.get('EVENT_CHANNEL_UPDATE_LOG')) {
             if (![`dm`, `group`].includes(oldChannel.type)) {
-                if (!channel.guild.channels.get(channelsFile.get('server_log'))) {
+                if (!oldChannel.guild.channels.get(channelsFile.get('server_log'))) {
                     channelsFile.set('server_log', '');
                     channelsFile.save();
                     return;

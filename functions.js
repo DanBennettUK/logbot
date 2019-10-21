@@ -562,6 +562,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     const badWordsFile = client.badWordsFile;
     const connection = client.connection;
     const channelsFile = client.channelsFile;
+    if (message.author.bot) return;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
@@ -983,4 +984,63 @@ exports.parseRoleTag = (client, guild, tag) => {
             else return 'err';
         }
     } 
+}
+
+exports.inviteLinkDetection = (client, message) => {
+    const channelsFile = client.channelsFile;
+    const connection = client.connection;
+    if (message.author.bot) return;
+    if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
+    if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
+        message.delete().then(() => {
+            message.channel.send(`${message.author} no invite links`).then(msg => {
+                    setTimeout(async () => {
+                        await msg.delete();
+                    }, 5000);
+                }).catch(console.error);
+            var data = [message.author.id, message.channel.id, message.content, new Date()];
+            connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
+                function (err, results) {
+                    if (err) throw err;
+                    if (channelsFile.get('action_log')) {
+                        if (!message.guild.channels.get(channelsFile.get('action_log'))) {
+                            channelsFile.set('action_log', '');
+                            channelsFile.save();
+                            return;
+                        }
+                        message.guild.channels.get(channelsFile.get('action_log')).send({
+                            embed: {
+                                color: client.config.color_warning,
+                                author: {
+                                    name: `${message.author.username}#${message.author.discriminator}`,
+                                    icon_url: message.author.displayAvatarURL
+                                },
+                                title: 'Removed message containing invite link',
+                                fields: [
+                                    {
+                                        name: 'Author',
+                                        value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Channel',
+                                        value: `${message.channel}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Content',
+                                        value: `${message.content}`
+                                    }
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                }
+                            }
+                        })
+                    }
+                }
+            );
+        }).catch(console.error);
+    }
 }
