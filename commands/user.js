@@ -68,6 +68,10 @@ exports.run = async (client, message, args) => {
                         },
                         fields: [
                             {
+                                name: 'Created',
+                                value: userObject.user.createdAt.toUTCString()
+                            },
+                            {
                                 name: 'ID',
                                 value: userObject.user.id,
                                 inline: true
@@ -78,18 +82,14 @@ exports.run = async (client, message, args) => {
                                 inline: true
                             },
                             {
-                                name: 'Created',
-                                value: userObject.user.createdAt.toUTCString(),
-                                inline: true
-                            },
-                            {
                                 name: 'Application',
                                 value: `${app}`,
                                 inline: true
                             },
                             {
                                 name: 'Voice channel',
-                                value: `${voiceChannel}`
+                                value: `${voiceChannel}`,
+                                inline: true
                             }
                         ],
                         timestamp: new Date(),
@@ -352,18 +352,17 @@ exports.run = async (client, message, args) => {
                                     },
                                     fields: [
                                         {
+                                            name: 'Created',
+                                            value: userObject.user.createdAt.toUTCString()
+                                        },
+                                        {
                                             name: 'ID',
                                             value: userObject.user.id,
                                             inline: true
                                         },
                                         {
                                             name: 'Status',
-                                            value: userObject.user.presence.status,
-                                            inline: true
-                                        },
-                                        {
-                                            name: 'Created',
-                                            value: userObject.user.createdAt.toUTCString(),
+                                            value: `${userObject.user.presence.status.toUpperCase()}`,
                                             inline: true
                                         },
                                         {
@@ -373,7 +372,8 @@ exports.run = async (client, message, args) => {
                                         },
                                         {
                                             name: 'Voice channel',
-                                            value: `${voiceChannel}`
+                                            value: `${voiceChannel}`,
+                                            inline: true
                                         }
                                     ],
                                     timestamp: new Date(),
