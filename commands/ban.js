@@ -17,7 +17,7 @@ exports.run = async (client, message, args) => {
                     if (guild.member(user)) { //Check if the user exists in the guild
                         if (message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
                             var tail = args.slice(1);
-                            var reason = tail.join(" ").trim();
+                            var reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
 
                             if (tail.length > 0) {
                                 var identifier = cryptoRandomString({length: 10});
@@ -28,6 +28,10 @@ exports.run = async (client, message, args) => {
                                             color: config.color_warning,
                                             title:`You have been banned from ${guild.name} for breaking one or more of the rules` ,
                                             fields: [
+                                                {
+                                                    name: 'Reason',
+                                                    value: `${reason}`
+                                                },
                                                 {
                                                     name: 'Want to dispute?',
                                                     value: `This ban can be disputed reasonably by contacting us via our [subreddit modmail](https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.])`
@@ -173,7 +177,7 @@ exports.run = async (client, message, args) => {
                                         if (react.emoji.name == '✅') {
                                             await msg.delete();
                                             var tail = args.slice(1);
-                                            var reason = tail.join(' ').trim();
+                                            var reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
 
                                             if (tail.length > 0) {
                                                 var identifier = cryptoRandomString({length: 10});

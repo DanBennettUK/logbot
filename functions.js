@@ -373,9 +373,9 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
         if (usernameResolve == null) {
             usernameResolve = client.users.find(obj => obj.username.toLowerCase() === tag);
             if (usernameResolve == null) {
-                var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
+                var nicknameResolve = guild.members.find(obj => obj.displayName === tag);
                 if (nicknameResolve == null) {
-                    nicknameResolve = guild.members.find(obj => obj.nickname.toLowerCase() === tag);
+                    nicknameResolve = guild.members.find(obj => obj.displayName.toLowerCase() === tag);
                     if (nicknameResolve == null) {
                         return 'err';
                     } else return nicknameResolve.id;
@@ -633,6 +633,7 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const config = client.config;
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
+    const channelsFile = client.channelsFile;
     var mutes = mutedFile.read();
     for (key in mutes) {
         if (mutes[key].end < Math.floor(Date.now() / 1000)) {
@@ -641,7 +642,9 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
 
             if (actionee) {
                 actionee.removeRole(mutedRole).then(async member => {
-                    await guild.channels.get(config.channel_serverlog).send(`${member} has been unmuted`);
+                    if (channelsFile.get('server_log')) {
+                        await guild.channels.get(channelsFile.get('server_log')).send(`${member} has been unmuted`);
+                    }
                     mutedFile.unset(key);
                     await mutedFile.save();
                 }).catch(console.error);

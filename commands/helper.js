@@ -70,16 +70,17 @@ exports.run = (client, message, args) => {
                     if (user !== 'err' && guildUser) {
                         if (mutedFile.get(user)) {
                             var existingMute = mutedFile.get(user);
-                            message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000)}`);
+                            message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000).toUTCString()}`);
                         } else {
                             if (parseInt(args[2])) {
                                 if (args[2] <= 5) {
                                     var end = Math.floor(Date.now() / 1000) + args[2] * 60;
                                     var seconds = args[2] * 60;
 
-                                    var reason = _.rest(args, 3).join(' ');
+                                    var tail = _.rest(args, 3).join(' ');
 
-                                    if (reason.length > 0) {
+                                    if (tail.length > 0) {
+                                        var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                         mutedFile.set(`${user}.end`, end);
                                         mutedFile.set(`${user}.actioner`,  message.author.id);
                                         mutedFile.set(`${user}.actionee`, user);

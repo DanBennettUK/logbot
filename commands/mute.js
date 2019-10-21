@@ -16,7 +16,7 @@ exports.run = (client, message, args) => {
                 if (user !== 'err' && guildUser) {
                     if (mutedFile.get(user)) {
                         var existingMute = mutedFile.get(user);
-                        message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000)}`);
+                        message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000).toUTCString()}`);
                     } else {
                         var end;
                         var seconds;
@@ -42,9 +42,10 @@ exports.run = (client, message, args) => {
                                     break;
                             }
 
-                            var reason = _.rest(args, 2).join(' ');
+                            var tail = _.rest(args, 2).join(' ');
 
-                            if (reason.length > 0) {
+                            if (tail.length > 0) {
+                                var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                 mutedFile.set(`${user}.end`, end);
                                 mutedFile.set(`${user}.actioner`,message.author.id);
                                 mutedFile.set(`${user}.actionee`, user);
@@ -136,7 +137,7 @@ exports.run = (client, message, args) => {
                                                 } else {
                                                     var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
                                                 }
-                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
+                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                                     function (err, results) {
                                                         if (err) throw err;
                                                     }
