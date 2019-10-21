@@ -30,7 +30,7 @@ exports.run = async (client, message, args) => {
                                             fields: [
                                                 {
                                                     name: 'Want to dispute?',
-                                                    value: `This ban can be disputed reasonably by contacting us via our subreddit modmail using the link below\n\n <https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.]>`
+                                                    value: `This ban can be disputed reasonably by contacting us via our [subreddit modmail](https://www.reddit.com/message/compose?to=/r/PUBATTLEGROUNDS&subject=[${identifier}]%20Discord%20Ban%20Appeal&message=[Please%20use%20this%20message%20box%20to%20explain%20your%20side%20of%20the%20ban,%20including%20any%20evidence.%20Please%20do%20not%20change%20the%20subject%20of%20this%20message.])`
                                                 }
                                             ],
                                             timestamp: new Date(),

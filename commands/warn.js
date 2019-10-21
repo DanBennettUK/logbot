@@ -70,7 +70,7 @@ exports.run = (client, message, args) => {
                                                     },
                                                     {
                                                         name: 'Want to dispute?',
-                                                        value: 'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                        value: 'This warning can be disputed reasonably by contacting ModMail (<@407690548401405962>). Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                     }
                                                 ],
                                                 timestamp: new Date(),

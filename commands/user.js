@@ -68,12 +68,18 @@ exports.run = async (client, message, args) => {
                         },
                         fields: [
                             {
-                                name: 'Created',
-                                value: userObject.user.createdAt.toUTCString()
+                                name: 'ID',
+                                value: userObject.user.id,
+                                inline: true
                             },
                             {
                                 name: 'Status',
                                 value: `${userObject.user.presence.status.toUpperCase()}`,
+                                inline: true
+                            },
+                            {
+                                name: 'Created',
+                                value: userObject.user.createdAt.toUTCString(),
                                 inline: true
                             },
                             {
@@ -346,12 +352,18 @@ exports.run = async (client, message, args) => {
                                     },
                                     fields: [
                                         {
-                                            name: 'Created',
-                                            value: userObject.user.createdAt.toUTCString()
+                                            name: 'ID',
+                                            value: userObject.user.id,
+                                            inline: true
                                         },
                                         {
                                             name: 'Status',
                                             value: userObject.user.presence.status,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Created',
+                                            value: userObject.user.createdAt.toUTCString(),
                                             inline: true
                                         },
                                         {
