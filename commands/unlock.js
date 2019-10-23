@@ -6,6 +6,8 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
+            if (args) var dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
+            else var dsc = '';
             var everyone = guild.roles.find(role => role.name === '@everyone');
             var LFGRoomsObject = LFGRoomsFile.read();
             for (key in LFGRoomsObject) {
@@ -18,8 +20,8 @@ exports.run = async (client, message, args) => {
                                     channel.send({
                                         embed: {
                                             color: config.color_info,
-                                            title: 'Maintenance has ended',
-                                            description: 'Channel is now unlocked.',
+                                            title: 'Channel unlocked',
+                                            description: dsc,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
