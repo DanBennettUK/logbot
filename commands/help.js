@@ -21,8 +21,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}warn <user> <reason>
         ${config.prefix}cwarn <identifier>
         ${config.prefix}user <user>
-        ${config.prefix}helper clear <amount> <channel> <user>
-        ${config.prefix}helper mute <user> <length> <reason>
+        ${config.prefix}clear <amount> <channel> <user>
         ${config.prefix}voicelog <user>
         ${config.prefix}vc <user>
         ${config.prefix}vct <user>
@@ -76,8 +75,8 @@ exports.run = (client, message, args) => {
 
         **Utility commands:**
         **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
-        **${config.prefix}helper clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
-        **${config.prefix}helper mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
+        **${config.prefix}clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
+        **${config.prefix}mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
         **${config.prefix}commands list:** This command lists all current custom commands.
         **${config.prefix}remindme <length> <reminder>:** This command is used to remind you of the note provided after the specified time has passed.
 
