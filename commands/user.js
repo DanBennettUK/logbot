@@ -98,16 +98,8 @@ exports.run = async (client, message, args) => {
                         }
                     }
                 }).then(async msg => {
-                    await msg.react('👥');
-                    await msg.react('👮');
-                    await msg.react('🔈');
-                    await msg.react('✍');
-                    await msg.react('🖥');
-                    await msg.react('📛');
-                    await msg.react('📥');
-                    await msg.react('❌');
 
-                    const filter = (reaction, user) => user.bot == false;
+                    const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
                     collector.on('collect', async r => {
@@ -510,6 +502,14 @@ exports.run = async (client, message, args) => {
                             return;
                         }
                     });
+                    await msg.react('👥');
+                    await msg.react('👮');
+                    await msg.react('🔈');
+                    await msg.react('✍');
+                    await msg.react('🖥');
+                    await msg.react('📛');
+                    await msg.react('📥');
+                    await msg.react('❌');
                     //collector.on('end');
                 }).catch(console.error);
             } else if (globalUser) {
@@ -528,16 +528,8 @@ exports.run = async (client, message, args) => {
                         }
                     }
                 }).then(async msg => {
-                    await msg.react('👥');
-                    await msg.react('👮');
-                    await msg.react('🔈');
-                    await msg.react('✍');
-                    await msg.react('🖥');
-                    await msg.react('📛');
-                    await msg.react('📥');
-                    await msg.react('❌');
 
-                    const filter = (reaction, user) => user.bot == false;
+                    const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
                     collector.on('collect', async r => {
@@ -903,6 +895,14 @@ exports.run = async (client, message, args) => {
                             return;
                         }
                     });
+                    await msg.react('👥');
+                    await msg.react('👮');
+                    await msg.react('🔈');
+                    await msg.react('✍');
+                    await msg.react('🖥');
+                    await msg.react('📛');
+                    await msg.react('📥');
+                    await msg.react('❌');
                     //collector.on('end');
                 }).catch(console.error);
             } else {
@@ -924,16 +924,8 @@ exports.run = async (client, message, args) => {
                             }
                         }
                     }).then(async msg => {
-                        await msg.react('👥');
-                        await msg.react('👮');
-                        await msg.react('🔈');
-                        await msg.react('✍');
-                        await msg.react('🖥');
-                        await msg.react('📛');
-                        await msg.react('📥');
-                        await msg.react('❌');
 
-                        const filter = (reaction, user) => user.bot == false;
+                        const filter = (reaction, user) => !user.bot;
                         const collector = msg.createReactionCollector(filter);
 
                         collector.on('collect', async r => {
@@ -1296,6 +1288,14 @@ exports.run = async (client, message, args) => {
                                 return;
                             }
                         });
+                        await msg.react('👥');
+                        await msg.react('👮');
+                        await msg.react('🔈');
+                        await msg.react('✍');
+                        await msg.react('🖥');
+                        await msg.react('📛');
+                        await msg.react('📥');
+                        await msg.react('❌');
                         //collector.on('end');
                     }).catch(console.error);
                 });
