@@ -73,6 +73,7 @@ exports.run = (client, message, args) => {
         **${config.prefix}flipacoin:** This command will flip a coin and return the result.
         **${config.prefix}roll:** This command will return a random number between 1 and 100.
         **${config.prefix}ask <query>:** This command will return an answer to the query.
+        **${config.prefix}cat:** This command will return a random cat picture.
 
         **Utility commands:**
         **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
