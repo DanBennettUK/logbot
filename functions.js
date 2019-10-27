@@ -357,7 +357,12 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
         var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
 
         if (usernameResolve == null) {
-            return 'err';
+            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split[0].toLowerCase()) && (obj.discriminator == split[1]));
+            if (usernameResolve == null) {
+                return 'err';
+            } else {
+                return usernameResolve.id;
+            }
         } else {
             return usernameResolve.id;
         }
@@ -366,10 +371,16 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
     } else {
         var usernameResolve = client.users.find(obj => obj.username === tag);
         if (usernameResolve == null) {
-            var nicknameResolve = guild.members.find(obj => obj.nickname === tag);
-            if (nicknameResolve == null) {
-                return 'err';
-            } else return nicknameResolve.id;
+            usernameResolve = client.users.find(obj => obj.username.toLowerCase() === tag.toLowerCase());
+            if (usernameResolve == null) {
+                var nicknameResolve = guild.members.find(obj => obj.displayName === tag);
+                if (nicknameResolve == null) {
+                    nicknameResolve = guild.members.find(obj => obj.displayName.toLowerCase() === tag.toLowerCase());
+                    if (nicknameResolve == null) {
+                        return 'err';
+                    } else return nicknameResolve.id;
+                } else return nicknameResolve.id;
+            } else return usernameResolve.id;
         } else return usernameResolve.id;
     }
 }
@@ -390,14 +401,24 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
         trimMe.replace('#', '');
         var chnl = guild.channels.find(c => c.name === trimMe);
         if (chnl == null) {
-            return 'err';
+            chnl = guild.channels.find(c => c.name.toLowerCase() === trimMe);
+            if (chnl == null) {
+                return 'err';
+            } else {
+                return chnl.id;
+            }
         } else {
             return chnl.id;
         }
     } else if (/.+/.test(tag)) {
         var chnl = guild.channels.find(c => c.name === trimMe);
         if (chnl == null) {
-            return 'err';
+            chnl = guild.channels.find(c => c.name.toLowerCase() === trimMe);
+            if (chnl == null) {
+                return 'err';
+            } else {
+                return chnl.id;
+            }
         } else {
             return chnl.id;
         }
@@ -521,7 +542,7 @@ exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, ch
 
 exports.syntaxErr = function syntaxErr(client, message, command) {
     const config = client.config;
-    message.channel.send(`There is a problem in your syntax for ${config.prefix}${command}. Try using ${config.prefix}help`).then(msg => {
+    message.channel.send(`There is a problem in your syntax for \`${config.prefix}${command}\`. Try using \`${config.prefix}help\``).then(msg => {
         setTimeout(async () => {
             await message.delete();
             await msg.delete();
@@ -540,6 +561,8 @@ exports.isNull = function isNull(value, def) {
 exports.checkMessageContent = function checkMessageContent(client, message) {
     const badWordsFile = client.badWordsFile;
     const connection = client.connection;
+    const channelsFile = client.channelsFile;
+    if (message.author.bot) return;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
@@ -561,6 +584,43 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                 connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                     function (err, results) {
                         if (err) throw err;
+                        if (channelsFile.get('action_log')) {
+                            if (!message.guild.channels.get(channelsFile.get('action_log'))) {
+                                channelsFile.set('action_log', '');
+                                channelsFile.save();
+                                return;
+                            }
+                            message.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: client.config.color_warning,
+                                    author: {
+                                        name: `${message.author.username}#${message.author.discriminator}`,
+                                        icon_url: message.author.displayAvatarURL
+                                    },
+                                    title: 'Removed message containing banned word',
+                                    fields: [
+                                        {
+                                            name: 'Author',
+                                            value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Channel',
+                                            value: `${message.channel}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Content',
+                                            value: `${message.content}`
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            })
+                        }
                     }
                 );
             }).catch(console.error);
@@ -568,99 +628,89 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     }
 }
 
-exports.checkExpiredMutes = function checkExpiredMutes(client) {
+exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const mutedFile = client.mutedFile;
     const config = client.config;
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
+    const channelsFile = client.channelsFile;
     var mutes = mutedFile.read();
-    var muteKeys = _.keys(mutes);
-
-    for (var a = 0; a < muteKeys.length; a++) {
-        let key = muteKeys[a];
+    for (key in mutes) {
         if (mutes[key].end < Math.floor(Date.now() / 1000)) {
             var actionee = guild.member(key);
             var mutedRole = guild.roles.find(val => val.name === 'Muted');
 
             if (actionee) {
-                actionee.removeRole(mutedRole).then(member => {
-                    guild.channels.get(config.channel_serverlog).send(`${member} has been unmuted`);
+                actionee.removeRole(mutedRole).then(async member => {
+                    if (channelsFile.get('server_log')) {
+                        await guild.channels.get(channelsFile.get('server_log')).send(`${member} has been unmuted`);
+                    }
                     mutedFile.unset(key);
-                    mutedFile.save();
+                    await mutedFile.save();
                 }).catch(console.error);
             } else {
                 console.log(`Actionee could not be found ${key}`);
                 mutedFile.unset(key);
-                mutedFile.save();
+                await mutedFile.save();
             }
         }
     }
 }
 
-exports.checkReminders = function checkReminders(client) {
+exports.checkReminders = async function checkReminders(client) {
     const config = client.config;
     const reminderFile = client.reminderFile;
     const _ = client.underscore;
     var guild = client.guilds.get(config.guildid);
     var reminders = reminderFile.read();
-    var reminderKeys = _.keys(reminders);
 
-    var a = 0;
-
-    function loop() {
-        setTimeout(function () {
-            var current = reminderFile.get(reminderKeys[a]);
-            if (current.end < Math.floor(Date.now() / 1000)) {
-                var member = guild.member(current.who);
-                var time = current.length;
-                var unit = time.replace(/[0-9]+/g, ``);
-                time = time.replace(/[a-z]$/i, ``);
-                switch (unit) {
-                    case `m`:
-                        if (parseInt(time) == 1) unit = `minute`;
-                        else unit = `minutes`;
-                        break;
-                    case `h`:
-                        if (parseInt(time) == 1) unit = `hour`;
-                        else unit = `hours`;
-                        break;
-                    case `d`:
-                        if (parseInt(time) == 1) unit = `day`;
-                        else unit = `days`;
-                        break;
-                    default:
-                        if (parseInt(time) == 1) unit = `hour`;
-                        else unit = `hours`;
-                }
-                if (member) {
-                    member.createDM().then(chnl => {
-                        chnl.send({
-                            embed: {
-                                color: config.color_info,
-                                author: {
-                                    name: client.user.username,
-                                    icon_url: client.user.displayAvatarURL
-                                },
-                                title: `You set a reminder ${time} ${unit} ago.`,
-                                description: current.reminder,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                }
+    for (key in reminders) {
+        var current = reminders[key];
+        if (current.end < Math.floor(Date.now() / 1000)) {
+            var member = guild.member(current.who);
+            var time = current.length;
+            var unit = time.replace(/[0-9]+/g, ``);
+            time = time.replace(/[a-z]$/i, ``);
+            switch (unit) {
+                case `m`:
+                    if (parseInt(time) == 1) unit = `minute`;
+                    else unit = `minutes`;
+                    break;
+                case `h`:
+                    if (parseInt(time) == 1) unit = `hour`;
+                    else unit = `hours`;
+                    break;
+                case `d`:
+                    if (parseInt(time) == 1) unit = `day`;
+                    else unit = `days`;
+                    break;
+                default:
+                    if (parseInt(time) == 1) unit = `hour`;
+                    else unit = `hours`;
+            }
+            if (member) {
+                await member.createDM().then(async chnl => {
+                    await chnl.send({
+                        embed: {
+                            color: config.color_info,
+                            author: {
+                                name: client.user.username,
+                                icon_url: client.user.displayAvatarURL
+                            },
+                            title: `You set a reminder ${time} ${unit} ago.`,
+                            description: current.reminder,
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
-                        });
-                    }).catch(console.error);
-                }
-                reminderFile.unset(reminderKeys[a]);
-                reminderFile.save();
+                        }
+                    });
+                }).catch(console.error);
             }
-            a++;
-            if (a < reminderKeys.length) {
-                loop();
-            }
-        }, 100);
-    }
-    loop();
+            reminderFile.unset(key);
+            await reminderFile.save();
+        }
+    }   
 }
 
 exports.importWarnings = function importWarnings(client) {
@@ -843,4 +893,157 @@ exports.checkStreamers = function checkStreamers(client) {
             s.removeRole(spotlightRole);
         }
     });
+}
+
+exports.setReactionRoles = async function setReactionRoles (client) {
+    const guild = client.guilds.get(client.config.guildid);
+    const reactionsFile = client.reactionsFile;
+    const reactionsObject = reactionsFile.read();
+    for (cKey in reactionsObject) {
+        var chnl = guild.channels.get(cKey);
+        if (chnl) {
+            const channelsObject = reactionsObject[cKey];
+            for (mKey in channelsObject) {
+                try {
+                    var msg = await chnl.fetchMessage(mKey);
+                } catch (e) {}
+                if (msg) {
+                    const messagesObject = channelsObject[mKey];
+                    for (rKey in messagesObject) {
+                        if (/[0-9]+/.test(rKey)) var emoji = client.emojis.get(rKey);
+                        else var emoji = rKey;
+                        if (emoji) {
+                            const roleId = messagesObject[rKey];
+                            var role = guild.roles.get(roleId);
+                            if (role) {
+                                await msg.react(emoji);
+                            } else {
+                                reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                reactionsFile.save();
+                            }
+                        } else {
+                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                            reactionsFile.save();
+                        }
+                    }
+                } else {
+                    reactionsFile.unset(`${cKey}.${mKey}`);
+                    reactionsFile.save();
+                }
+            }
+        } else {
+            reactionsFile.unset(`${cKey}`);
+            reactionsFile.save();
+        }
+    }
+}
+
+exports.parseEmojiTag = (client, guild, tag) => {
+    if (/^<a?:[a-z0-9]+:[0-9]+>$/i.test(tag)) {
+        var emo = tag.replace(/<|>/g, '');
+        emo = emo.split(':');
+        var emoji = guild.emojis.find(e => e.id == emo[2]);
+        if (emoji) return emoji.id;
+        else return 'err';
+    } else if (/[0-9]+/.test(tag)) {
+        var emoji = guild.emojis.get(tag);
+        if (emoji) return emoji.id;
+        else {
+            emoji = guild.emojis.fine(e => e.name == tag);
+            if (emoji) return emoji.id;
+            else return 'err';
+        }
+    } else if (/[a-z0-9]+/i.test(tag)) {
+        var emoji = guild.emojis.find(e => e.name == tag);
+        if (emoji) return emoji.id;
+        else {
+            emoji = guild.emojis.find(e => e.name.toLowerCase() == tag.toLowerCase());
+            if (emoji) return emoji.id;
+            else return 'err';
+        }
+    } else return tag;
+}
+
+exports.parseRoleTag = (client, guild, tag) => {
+    if (/^<@&[a-z0-9]+>$/i.test(tag)) {
+        var roleID = tag.replace(/<|@|&|>/g, '');
+        var role = guild.roles.get(roleID);
+        if (role) return role.id;
+        else return 'err';
+    } else if (/[0-9]+/.test(tag)) {
+        var role = guild.roles.get(tag);
+        if (role) return role.id;
+        else {
+            role = guild.roles.find(r => r.name == tag);
+            if (role) return role.id;
+            else return 'err';
+        }
+    } else if (/[a-z0-9]+/i.test(tag)) {
+        var role = guild.roles.find(r => r.name == tag);
+        if (role) return role.id;
+        else {
+            role = guild.roles.find(r => r.name.toLowerCase() == tag.toLowerCase());
+            if (role) return role.id;
+            else return 'err';
+        }
+    } 
+}
+
+exports.inviteLinkDetection = (client, message) => {
+    const channelsFile = client.channelsFile;
+    const connection = client.connection;
+    if (message.author.bot) return;
+    if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
+    if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
+        message.delete().then(() => {
+            message.channel.send(`${message.author} no invite links`).then(msg => {
+                    setTimeout(async () => {
+                        await msg.delete();
+                    }, 5000);
+                }).catch(console.error);
+            var data = [message.author.id, message.channel.id, message.content, new Date()];
+            connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
+                function (err, results) {
+                    if (err) throw err;
+                    if (channelsFile.get('action_log')) {
+                        if (!message.guild.channels.get(channelsFile.get('action_log'))) {
+                            channelsFile.set('action_log', '');
+                            channelsFile.save();
+                            return;
+                        }
+                        message.guild.channels.get(channelsFile.get('action_log')).send({
+                            embed: {
+                                color: client.config.color_warning,
+                                author: {
+                                    name: `${message.author.username}#${message.author.discriminator}`,
+                                    icon_url: message.author.displayAvatarURL
+                                },
+                                title: 'Removed message containing invite link',
+                                fields: [
+                                    {
+                                        name: 'Author',
+                                        value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Channel',
+                                        value: `${message.channel}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Content',
+                                        value: `${message.content}`
+                                    }
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                }
+                            }
+                        })
+                    }
+                }
+            );
+        }).catch(console.error);
+    }
 }

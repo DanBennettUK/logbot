@@ -34,7 +34,7 @@ exports.run = (client, message, args) => {
                                         icon_url: client.user.displayAvatarURL
                                     },
                                     title: `[Action] Unban`,
-                                    description: 'The user provided has been successfully unbanned',
+                                    description: `The user provided has been successfully unbanned`,
                                     fields: [
                                         {
                                             name: 'ID',

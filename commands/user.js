@@ -72,6 +72,11 @@ exports.run = async (client, message, args) => {
                                 value: userObject.user.createdAt.toUTCString()
                             },
                             {
+                                name: 'ID',
+                                value: userObject.user.id,
+                                inline: true
+                            },
+                            {
                                 name: 'Status',
                                 value: `${userObject.user.presence.status.toUpperCase()}`,
                                 inline: true
@@ -83,7 +88,8 @@ exports.run = async (client, message, args) => {
                             },
                             {
                                 name: 'Voice channel',
-                                value: `${voiceChannel}`
+                                value: `${voiceChannel}`,
+                                inline: true
                             }
                         ],
                         timestamp: new Date(),
@@ -92,16 +98,8 @@ exports.run = async (client, message, args) => {
                         }
                     }
                 }).then(async msg => {
-                    await msg.react('👥');
-                    await msg.react('👮');
-                    await msg.react('🔈');
-                    await msg.react('✍');
-                    await msg.react('🖥');
-                    await msg.react('📛');
-                    await msg.react('📥');
-                    await msg.react('❌');
 
-                    const filter = (reaction, user) => user.bot == false;
+                    const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
                     collector.on('collect', async r => {
@@ -156,7 +154,7 @@ exports.run = async (client, message, args) => {
                                             embed: {
                                                 color: config.color_caution,
                                                 author: {
-                                                    name: userObject.user.username,
+                                                    name: `${userObject.user.username} (${nickname})`,
                                                     icon_url: userObject.user.displayAvatarURL
                                                 },
                                                 description: `There are no recorded warnings for this user`,
@@ -221,7 +219,7 @@ exports.run = async (client, message, args) => {
                                         embed: {
                                             color: config.color_caution,
                                             author: {
-                                                name: userObject.user.username,
+                                                name: `${userObject.user.username} (${nickname})`,
                                                 icon_url: userObject.user.displayAvatarURL
                                             },
                                             description: `There are no recorded mutes for this user`,
@@ -287,7 +285,7 @@ exports.run = async (client, message, args) => {
                                 var notes = [];
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -323,6 +321,16 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            if (userObject.voiceChannel) {
+                                voiceChannel = userObject.voiceChannel.name;
+                            } else {
+                                voiceChannel = 'Not in a voice channel';
+                            }
+                            if (userObject.user.presence.game) {
+                                app = userObject.user.presence.game.name;
+                            } else {
+                                app = 'None';
+                            }
                             msg.edit({
                                 embed: {
                                     color: config.color_info,
@@ -337,11 +345,16 @@ exports.run = async (client, message, args) => {
                                     fields: [
                                         {
                                             name: 'Created',
-                                            value: userObject.user.createdAt
+                                            value: userObject.user.createdAt.toUTCString()
+                                        },
+                                        {
+                                            name: 'ID',
+                                            value: userObject.user.id,
+                                            inline: true
                                         },
                                         {
                                             name: 'Status',
-                                            value: userObject.user.presence.status,
+                                            value: `${userObject.user.presence.status.toUpperCase()}`,
                                             inline: true
                                         },
                                         {
@@ -351,7 +364,8 @@ exports.run = async (client, message, args) => {
                                         },
                                         {
                                             name: 'Voice channel',
-                                            value: `${voiceChannel}`
+                                            value: `${voiceChannel}`,
+                                            inline: true
                                         }
                                     ],
                                     timestamp: new Date(),
@@ -367,33 +381,23 @@ exports.run = async (client, message, args) => {
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
-                                var validRows = [];
                                 var max = 0;
                                 var extra;
 
-                                for (var i = 0; i < rows.length; i++) {
-                                    var row = rows[i];
-                                    if (names.includes(row.new)) continue;
-                                    names.push(row.new);
-                                    validRows.push(row);
-                                }
-
-                                if (validRows.length <= 5) {
-                                    max = validRows.length;
+                                if (rows.length <= 5) {
+                                    max = rows.length;
                                 } else {
-                                    extra = validRows.length - max;
+                                    extra = rows.length - max;
                                 }
-
-                                names = [];
 
                                 for (var i = 0; i < max; i++) {
-                                    var row = validRows[i];
+                                    var row = rows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${userObject.user.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${userObject.user.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${userObject.user.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${userObject.user.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -498,6 +502,14 @@ exports.run = async (client, message, args) => {
                             return;
                         }
                     });
+                    await msg.react('👥');
+                    await msg.react('👮');
+                    await msg.react('🔈');
+                    await msg.react('✍');
+                    await msg.react('🖥');
+                    await msg.react('📛');
+                    await msg.react('📥');
+                    await msg.react('❌');
                     //collector.on('end');
                 }).catch(console.error);
             } else if (globalUser) {
@@ -516,16 +528,8 @@ exports.run = async (client, message, args) => {
                         }
                     }
                 }).then(async msg => {
-                    await msg.react('👥');
-                    await msg.react('👮');
-                    await msg.react('🔈');
-                    await msg.react('✍');
-                    await msg.react('🖥');
-                    await msg.react('📛');
-                    await msg.react('📥');
-                    await msg.react('❌');
 
-                    const filter = (reaction, user) => user.bot == false;
+                    const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
                     collector.on('collect', async r => {
@@ -711,7 +715,7 @@ exports.run = async (client, message, args) => {
                                 var notes = [];
                                 for (var i = 0; i < rows.length; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -752,33 +756,23 @@ exports.run = async (client, message, args) => {
                             [userID, userID], async function (err, rows, results) {
                                 if (err) throw err;
                                 var names = [];
-                                var validRows = [];
                                 var max = 0;
                                 var extra;
 
-                                for (var i = 0; i < rows.length; i++) {
-                                    var row = rows[i];
-                                    if (names.includes(row.new)) continue;
-                                    names.push(row.new);
-                                    validRows.push(row);
-                                }
-
-                                if (validRows.length <= 5) {
-                                    max = validRows.length;
+                                if (rows.length <= 5) {
+                                    max = rows.length;
                                 } else {
-                                    extra = validRows.length - max;
+                                    extra = rows.length - max;
                                 }
-
-                                names = [];
 
                                 for (var i = 0; i < max; i++) {
-                                    var row = validRows[i];
+                                    var row = rows[i];
                                     switch(row.type) {
                                         case 'user':
-                                            names.push(`📛${globalUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`📛${globalUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                         case 'nick':
-                                            names.push(`${globalUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                            names.push(`${globalUser.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                             break;
                                     }
                                     if (i == max - 1 && extra > 0) {
@@ -901,6 +895,14 @@ exports.run = async (client, message, args) => {
                             return;
                         }
                     });
+                    await msg.react('👥');
+                    await msg.react('👮');
+                    await msg.react('🔈');
+                    await msg.react('✍');
+                    await msg.react('🖥');
+                    await msg.react('📛');
+                    await msg.react('📥');
+                    await msg.react('❌');
                     //collector.on('end');
                 }).catch(console.error);
             } else {
@@ -922,16 +924,8 @@ exports.run = async (client, message, args) => {
                             }
                         }
                     }).then(async msg => {
-                        await msg.react('👥');
-                        await msg.react('👮');
-                        await msg.react('🔈');
-                        await msg.react('✍');
-                        await msg.react('🖥');
-                        await msg.react('📛');
-                        await msg.react('📥');
-                        await msg.react('❌');
 
-                        const filter = (reaction, user) => user.bot == false;
+                        const filter = (reaction, user) => !user.bot;
                         const collector = msg.createReactionCollector(filter);
 
                         collector.on('collect', async r => {
@@ -1116,7 +1110,7 @@ exports.run = async (client, message, args) => {
                                     var notes = [];
                                     for (var i = 0; i < rows.length; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 📌 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -1157,40 +1151,29 @@ exports.run = async (client, message, args) => {
                                 [userID, userID], async function (err, rows, results) {
                                     if (err) throw err;
                                     var names = [];
-                                    var validRows = [];
                                     var max = 0;
                                     var extra;
 
-                                    for (var i = 0; i < rows.length; i++) {
-                                        var row = rows[i];
-                                        if (names.includes(row.new)) continue;
-                                        names.push(row.new);
-                                        validRows.push(row);
-                                    }
-
-                                    if (validRows.length <= 5) {
-                                        max = validRows.length;
+                                    if (rows.length <= 5) {
+                                        max = rows.length;
                                     } else {
-                                        extra = validRows.length - max;
+                                        extra = rows.length - max;
                                     }
-
-                                    names = [];
 
                                     for (var i = 0; i < max; i++) {
-                                        var row = validRows[i];
+                                        var row = rows[i];
                                         switch(row.type) {
                                             case 'user':
-                                                names.push(`📛${cardUser.username} changed username to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                             case 'nick':
-                                                names.push(`${cardUser.username} changed nickname to ${row.new} on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
+                                                names.push(`${cardUser.username} changed nickname from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
                                             names.push(`...${extra} more`);
                                         }
                                     }
-
                                     if (!_.isEmpty(names)) {
                                         await msg.edit({
                                             embed: {
@@ -1305,6 +1288,14 @@ exports.run = async (client, message, args) => {
                                 return;
                             }
                         });
+                        await msg.react('👥');
+                        await msg.react('👮');
+                        await msg.react('🔈');
+                        await msg.react('✍');
+                        await msg.react('🖥');
+                        await msg.react('📛');
+                        await msg.react('📥');
+                        await msg.react('❌');
                         //collector.on('end');
                     }).catch(console.error);
                 });

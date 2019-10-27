@@ -1,12 +1,21 @@
 module.exports = client => {
     const functionsFile = client.functionsFile;
     const config = client.config;
+    const modulesFile = client.modulesFile;
+    const channelsFile = client.channelsFile;
     functionsFile.setupTables(client);
 
     if (config.test) {
         console.log(`[TEST VERSION] [${new Date()}] Bot Active.`);
     } else {
         console.log(`[${new Date()}] Bot Active.`);
+    }
+    
+    if ((!channelsFile.read()) || Object.keys(channelsFile.read()).length == 0) {
+        channelsFile.set('server_log', '');
+        channelsFile.set('action_log', '');
+        channelsFile.set('voice_log', '');
+        channelsFile.save();
     }
 
     client.user.setPresence({
@@ -20,21 +29,12 @@ module.exports = client => {
     //importUnbans();
 
     functionsFile.updateUserTable(client, 'system', null);
-    const guild = client.guilds.get(config.guildid);
 
-    var react = guild.channels.get(config.reaction_channel);
-
-    react.fetchMessage(config.reaction_message).then(async m => {
-        await m.react(guild.emojis.find(e => e.name == 'eu')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'na')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'SA')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'asia')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'sea')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'oce')).catch(console.error);
-        await m.react(guild.emojis.find(e => e.name == 'kjp')).catch(console.error);
-    });
+    functionsFile.setReactionRoles(client);
 
     setInterval(() => functionsFile.checkExpiredMutes(client), 10000);
     setInterval(() => functionsFile.checkReminders(client), 15000);
-    setInterval(() => functionsFile.checkStreamers(client), 60000);
+    if (modulesFile.get('EVENT_CHECK_STREAMERS')) {
+        setInterval(() => functionsFile.checkStreamers(client), 60000);
+    }
 }

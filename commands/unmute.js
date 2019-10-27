@@ -15,9 +15,11 @@ exports.run = (client, message, args) => {
 
                 if (user !== 'err' && guildUser) {
                     if ((mutedFile.get(user)) || (guild.members.get(user).roles.some(r => r.name === 'Muted'))) {
-                        var reason = _.rest(args, 1).join(' ');
+                        var tail = _.rest(args, 1).join(' ');
 
-                        if (reason.length > 0) {
+                        if (tail.length > 0) {
+
+                            var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
 
                             mutedFile.unset(`${user}`);
                             mutedFile.save();
@@ -63,7 +65,7 @@ exports.run = (client, message, args) => {
                                         embed: {
                                             color: config.color_info,
                                             title: `You have been unmuted in ${guild.name}`,
-                                            description: `Details regarding the mute can be found below:`,
+                                            description: `Details regarding the unmute can be found below:`,
                                             fields: [
                                                 {
                                                 name: 'Reason',

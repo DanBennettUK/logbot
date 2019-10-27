@@ -8,6 +8,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}flipacoin
         ${config.prefix}roll
         ${config.prefix}ask <query>
+        ${config.prefix}cat
 
         **Utility commands:**
         ${config.prefix}module <module> <0/1>
@@ -21,10 +22,10 @@ exports.run = (client, message, args) => {
         ${config.prefix}warn <user> <reason>
         ${config.prefix}cwarn <identifier>
         ${config.prefix}user <user>
-        ${config.prefix}helper clear <amount> <channel> <user>
-        ${config.prefix}helper mute <user> <length> <reason>
+        ${config.prefix}clear <amount> <channel> <user>
         ${config.prefix}voicelog <user>
         ${config.prefix}vc <user>
+        ${config.prefix}vct <user>
         ${config.prefix}disconnect <user>
         ${config.prefix}badwords add <word/s>
         ${config.prefix}badwords remove <word/s>
@@ -36,6 +37,16 @@ exports.run = (client, message, args) => {
         ${config.prefix}commands add <command> <content>
         ${config.prefix}commands remove <command>
         ${config.prefix}commands list
+        ${config.prefix}reactions add <channel> <message_id> <emoji> <role>
+        ${config.prefix}reactions remove [channel] [message_id] [emoji]
+        ${config.prefix}reactions list
+        ${config.prefix}reactions reset
+        ${config.prefix}lfgrooms add <channel>
+        ${config.prefix}lfgrooms remove <channel>
+        ${config.prefix}lfgrooms list
+        ${config.prefix}channels set <server/action/voice_log> [channel]
+        ${config.prefix}channels unset <server/action/voice_log>
+        ${config.prefix}channels list
         ${config.prefix}lock
         ${config.prefix}unlock`;
 
@@ -62,11 +73,12 @@ exports.run = (client, message, args) => {
         **${config.prefix}flipacoin:** This command will flip a coin and return the result.
         **${config.prefix}roll:** This command will return a random number between 1 and 100.
         **${config.prefix}ask <query>:** This command will return an answer to the query.
+        **${config.prefix}cat:** This command will return a random cat picture.
 
         **Utility commands:**
         **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
-        **${config.prefix}helper clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
-        **${config.prefix}helper mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
+        **${config.prefix}clear <amount> <channel> <user>:** This command is used to clear messages written by a user in the given channel.
+        **${config.prefix}mute <user> <length> <reason>:** This command is used to mute a user for a given time period (maximum of 5 minutes).
         **${config.prefix}commands list:** This command lists all current custom commands.
         **${config.prefix}remindme <length> <reminder>:** This command is used to remind you of the note provided after the specified time has passed.
 

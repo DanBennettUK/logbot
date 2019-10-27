@@ -19,12 +19,12 @@ exports.run = (client, message, args) => {
             } else {
                 if (guild.member(user)) {
                     var tail = args.slice(1);
-                    var content = tail.join(' ').trim();
 
                     if (tail.length > 0) {
+                        var content = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
                         var identifier = cryptoRandomString({ length: 10 });
                         var data = [user, message.author.id, content, identifier, 0, new Date(), user /*SP arg*/];
-                        connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total) ', data,
+                        connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
                         async function (err, results) {
                             if (err) throw err;
 
@@ -70,7 +70,7 @@ exports.run = (client, message, args) => {
                                                     },
                                                     {
                                                         name: 'Want to dispute?',
-                                                        value: 'This warning can be disputed reasonably by contacting ModMail. Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                        value: 'This warning can be disputed reasonably by contacting ModMail (<@407690548401405962>). Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                     }
                                                 ],
                                                 timestamp: new Date(),

@@ -1,32 +1,32 @@
 module.exports = (client, messageReaction, user) => {
     const modulesFile = client.modulesFile;
-    const config = client.config;
+    const reactionsFile = client.reactionsFile;
+    const _ = client.underscore;
     const guild = messageReaction.message.guild;
     if (user.bot) return;
     if (modulesFile.get('EVENT_MESSAGE_REACTION_REMOVE')) {
-        if (messageReaction.message.id == config.reaction_message && messageReaction.message.channel.id == config.reaction_channel) {
-            switch (messageReaction.emoji.name) {
-                case 'eu':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[EU]'))).catch(console.error);
-                    break;
-                case 'na':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[NA]'))).catch(console.error);
-                    break;
-                case 'SA':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SA]'))).catch(console.error);
-                    break;
-                case 'asia':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[ASIA]'))).catch(console.error);
-                    break;
-                case 'sea':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[SEA]'))).catch(console.error);
-                    break;
-                case 'oce':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[OCE]'))).catch(console.error);
-                    break;
-                case 'kjp':
-                    guild.fetchMember(user).then(u => u.removeRole(guild.roles.find(r => r.name == '[KR/JP]'))).catch(console.error);
-                    break;
+        var reactionObject = reactionsFile.read();
+        var chnlIDs = _.keys(reactionObject);
+        if (chnlIDs.includes(messageReaction.message.channel.id)) {
+            var channelObject = reactionObject[`${messageReaction.message.channel.id}`];
+            var msgIDs = _.keys(channelObject);
+            if (msgIDs.includes(messageReaction.message.id)) {
+                var messageObject = channelObject[`${messageReaction.message.id}`];
+                var reactions = _.keys(messageObject);
+                var emojis = [];
+                reactions.forEach(r => {
+                    if (/[0-9]+/.test(r)) var emoji = client.emojis.get(r);
+                    else var emoji = r;
+                    if (emoji) emojis.push(emoji);
+                });
+                if (emojis.includes(messageReaction.emoji) || emojis.includes(messageReaction.emoji.id) || emojis.includes(messageReaction.emoji.name)) {
+                    if (messageReaction.emoji.id) {
+                        var role = guild.roles.get(messageObject[`${messageReaction.emoji.id}`]);
+                    } else var role = guild.roles.get(messageObject[`${messageReaction.emoji.name}`]);
+                    if (role) {
+                        guild.member(user.id).removeRole(role).catch(console.error);
+                    }
+                }
             }
         }
     }

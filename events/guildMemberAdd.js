@@ -6,6 +6,7 @@ module.exports = (client, member) => {
     const stringSimilarity = client.stringSimilarity;
     const _ = client.underscore;
     const cryptoRandomString = client.cryptoRandomString;
+    const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         var params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
@@ -14,25 +15,32 @@ module.exports = (client, member) => {
         function (err, results) {
             if (err) throw err;
         });
-        if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
-            member.guild.channels.get(config.channel_serverlog).send({
-                embed: {
-                    color: config.color_success,
-                    author: {
-                        name: `${member.user.username}#${member.user.discriminator}`,
-                        icon_url: member.user.displayAvatarURL
-                    },
-                    title: 'User joined',
-                    thumbnail: {
-                        url: member.user.displayAvatarURL
-                    },
-                    description: `User ${member.user} has joined ${member.guild.name}`,
-                    timestamp: Date.now(),
-                    footer: {
-                        text: `Marvin's Little Brother | Current version: ${config.version}`
+        if (channelsFile.get('server_log')) {
+            if (!member.guild.channels.get(channelsFile.get('server_log'))) {
+                channelsFile.set('server_log', '');
+                channelsFile.save();
+                return;
+            }
+            if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
+                member.guild.channels.get(channelsFile.get('server_log')).send({
+                    embed: {
+                        color: config.color_success,
+                        author: {
+                            name: `${member.user.username}#${member.user.discriminator}`,
+                            icon_url: member.user.displayAvatarURL
+                        },
+                        title: `User joined`,
+                        thumbnail: {
+                            url: member.user.displayAvatarURL
+                        },
+                        description: `User ${member.user} (${member.user.username}#${member.user.discriminator} ${member.user.id}) has joined ${member.guild.name}`,
+                        timestamp: Date.now(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -62,24 +70,32 @@ module.exports = (client, member) => {
         if (identifiers.length > 0) {
             data.push(identifiers); //If this work - ew.....you motherfucker, it did.
 
-            connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?)', data,
+            connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
             function (err, rows, results) {
                 if (err) throw err;
+                if (rows.length == 0) return;
                 for (var b = 0; b < rows.length; b++) {
                     var row = rows[b];
                     msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
                 }
-                member.guild.channels.get(config.channel_serverlog).send({
-                    embed: {
-                        color: config.color_warning,
-                        title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
-                        description: msg.join(' '),
-                        timestamp: new Date(),
-                        footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
-                        }
+                if (channelsFile.get('action_log')) {
+                    if (!member.guild.channels.get(channelsFile.get('action_log'))) {
+                        channelsFile.set('action_log', '');
+                        channelsFile.save();
+                        return;
                     }
-                }).catch(console.error);
+                    member.guild.channels.get(channelsFile.get('action_log')).send({
+                        embed: {
+                            color: config.color_warning,
+                            title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
+                            description: msg.join(' '),
+                            timestamp: new Date(),
+                            footer: {
+                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                            }
+                        }
+                    }).catch(console.error);
+                }
                 var identifier = cryptoRandomString({length: 10});
                 connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' '), identifier, 0, new Date()],
                 function(err, results){
@@ -90,32 +106,6 @@ module.exports = (client, member) => {
     }
     if (modulesFile.get('EVENT_NEWACC_DETEC')) {
         if (member.user.createdTimestamp > (Date.now() - 1000 * 60 * 60 * 24 * 7)) {
-            member.guild.channels.get(config.channel_serverlog).send({
-                embed: {
-                    color: config.color_warning,
-                    author: {
-                        name: `${member.user.username}#${member.user.discriminator}`,
-                        icon_url: member.user.displayAvatarURL
-                    },
-                    title: '❗ new Discord account',
-                    fields: [
-                        {
-                            name: 'User',
-                            value: `${member}\nID: ${member.id}`,
-                            inline: true
-                        },
-                        {
-                            name: 'Created',
-                            value: `${member.user.createdAt.toUTCString()}`,
-                            inline: true
-                        }
-                    ],
-                    timestamp: new Date(),
-                    footer: {
-                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                    }
-                }
-            }).catch(console.error);
             var s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
             var d = 0;
             var h = 0;
@@ -154,6 +144,39 @@ module.exports = (client, member) => {
                 default:
                     time = `${d}d${h}h${m}m${s}s`
                     break;
+            }
+            if (channelsFile.get('action_log')) {
+                if (!member.guild.channels.get(channelsFile.get('action_log'))) {
+                    channelsFile.set('action_log', '');
+                    channelsFile.save();
+                    return;
+                }
+                member.guild.channels.get(config.channel_serverlog).send({
+                    embed: {
+                        color: config.color_warning,
+                        author: {
+                            name: `${member.user.username}#${member.user.discriminator}`,
+                            icon_url: member.user.displayAvatarURL
+                        },
+                        title: '❗ new Discord account',
+                        fields: [
+                            {
+                                name: 'User',
+                                value: `${member}\nID: ${member.id}`,
+                                inline: true
+                            },
+                            {
+                                name: 'Created',
+                                value: `${member.user.createdAt.toUTCString()},\njoined the guild ${time} after creation`,
+                                inline: true
+                            }
+                        ],
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
+                    }
+                }).catch(console.error);
             }
             var message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
             var identifier = cryptoRandomString({length: 10});
