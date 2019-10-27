@@ -12,11 +12,7 @@ exports.run = (client, message, args) => {
                     message.channel.send({
                         embed: {
                             color: config.color_info,
-                            author: {
-                                name: client.user.username,
-                                icon_url: client.user.displayAvatarURL
-                            },
-                            title: `Quote by ${answer.author}`,
+                            title: `${answer.author}`,
                             description: `${answer.content}`,
                             timestamp: Date.now(),
                             footer: {
