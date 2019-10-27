@@ -8,6 +8,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}flipacoin
         ${config.prefix}roll
         ${config.prefix}ask <query>
+        ${config.prefix}cat
 
         **Utility commands:**
         ${config.prefix}module <module> <0/1>
