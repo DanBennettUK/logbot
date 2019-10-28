@@ -151,7 +151,7 @@ module.exports = (client, member) => {
                     channelsFile.save();
                     return;
                 }
-                member.guild.channels.get(config.channel_serverlog).send({
+                member.guild.channels.get(channelsFile.get('action_log')).send({
                     embed: {
                         color: config.color_warning,
                         author: {
