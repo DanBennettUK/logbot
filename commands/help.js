@@ -49,6 +49,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}channels set <server/action/voice_log> [channel]
         ${config.prefix}channels unset <server/action/voice_log>
         ${config.prefix}channels list
+        ${config.prefix}lfg
         ${config.prefix}lock
         ${config.prefix}unlock`;
 
