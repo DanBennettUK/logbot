@@ -2,11 +2,11 @@ exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const request = client.request;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
-        if (modulesFile.get('COMMAND_CAT')) {
-            request(`https://dog.ceo/api/breeds/image/random`,
+        if (modulesFile.get('COMMAND_ANIMAL_PICTURE')) {
+            request(`https://some-random-api.ml/img/dog`,
             function (error, response, body) {
                 answer = JSON.parse(body);
-                message.channel.send(answer['message']);
+                message.channel.send(answer['link']);
             });            
         }
     } // End of permission checking statement
