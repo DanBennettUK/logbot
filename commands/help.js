@@ -8,6 +8,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}flipacoin
         ${config.prefix}roll
         ${config.prefix}ask <query>
+        ${config.prefix}birb
         ${config.prefix}cat
         ${config.prefix}dog
 
@@ -74,6 +75,7 @@ exports.run = (client, message, args) => {
         **${config.prefix}flipacoin:** This command will flip a coin and return the result.
         **${config.prefix}roll:** This command will return a random number between 1 and 100.
         **${config.prefix}ask <query>:** This command will return an answer to the query.
+        **${config.prefix}birb:** This command will return a random bird picture.
         **${config.prefix}cat:** This command will return a random cat picture.
         **${config.prefix}dog:** This command will return a random dog picture.
 
