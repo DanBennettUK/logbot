@@ -13,8 +13,6 @@ module.exports = (client, oldMessage, newMessage) => {
         );
         if (channelsFile.get('server_log')) {
             if (!oldMessage.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_UPDATE_LOG')) {

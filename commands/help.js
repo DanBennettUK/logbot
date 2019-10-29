@@ -8,7 +8,9 @@ exports.run = (client, message, args) => {
         ${config.prefix}flipacoin
         ${config.prefix}roll
         ${config.prefix}ask <query>
+        ${config.prefix}birb
         ${config.prefix}cat
+        ${config.prefix}dog
 
         **Utility commands:**
         ${config.prefix}module <module> <0/1>
@@ -47,6 +49,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}channels set <server/action/voice_log> [channel]
         ${config.prefix}channels unset <server/action/voice_log>
         ${config.prefix}channels list
+        ${config.prefix}lfg
         ${config.prefix}lock
         ${config.prefix}unlock`;
 
@@ -73,7 +76,9 @@ exports.run = (client, message, args) => {
         **${config.prefix}flipacoin:** This command will flip a coin and return the result.
         **${config.prefix}roll:** This command will return a random number between 1 and 100.
         **${config.prefix}ask <query>:** This command will return an answer to the query.
+        **${config.prefix}birb:** This command will return a random bird picture.
         **${config.prefix}cat:** This command will return a random cat picture.
+        **${config.prefix}dog:** This command will return a random dog picture.
 
         **Utility commands:**
         **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.

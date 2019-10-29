@@ -53,41 +53,43 @@ exports.run = (client, message, args) => {
     }
 
     if (args[0] && args[0].toLowerCase() == 'list') {
-        var dsc = '';
-        var LFGRoomsObject = LFGRoomsFile.read();
-        for (key in LFGRoomsObject) {
-            var chnl = message.guild.channels.get(key);
-            if (chnl) {
-                dsc += `${chnl} (${key})\n`;
-            } else {
-                LFGRoomsFile.unset(key);
-                LFGRoomsFile.save();
+        if (message.member.roles.some(r => r.name == 'Moderators')) {
+            var dsc = '';
+            var LFGRoomsObject = LFGRoomsFile.read();
+            for (key in LFGRoomsObject) {
+                var chnl = message.guild.channels.get(key);
+                if (chnl) {
+                    dsc += `${chnl} (${key})\n`;
+                } else {
+                    LFGRoomsFile.unset(key);
+                    LFGRoomsFile.save();
+                }
             }
-        }
 
-        if (dsc.length > 0) {
-            message.channel.send({
-                embed: {
-                    color: config.color_info,
-                    title: 'List of LFG rooms',
-                    description: `${dsc}`,
-                    timestamp: new Date(),
-                    footer: {
-                        text: `Marvin's Little Brother | Current version: ${config.version}`
+            if (dsc.length > 0) {
+                message.channel.send({
+                    embed: {
+                        color: config.color_info,
+                        title: 'List of LFG rooms',
+                        description: `${dsc}`,
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
                     }
-                }
-            });
-        } else {
-            message.channel.send({
-                embed: {
-                    color: config.color_info,
-                    title: 'There are no set LFG rooms',
-                    timestamp: new Date(),
-                    footer: {
-                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                });
+            } else {
+                message.channel.send({
+                    embed: {
+                        color: config.color_info,
+                        title: 'There are no set LFG rooms',
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 }

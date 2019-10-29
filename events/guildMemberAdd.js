@@ -17,8 +17,6 @@ module.exports = (client, member) => {
         });
         if (channelsFile.get('server_log')) {
             if (!member.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
@@ -80,8 +78,6 @@ module.exports = (client, member) => {
                 }
                 if (channelsFile.get('action_log')) {
                     if (!member.guild.channels.get(channelsFile.get('action_log'))) {
-                        channelsFile.set('action_log', '');
-                        channelsFile.save();
                         return;
                     }
                     member.guild.channels.get(channelsFile.get('action_log')).send({
@@ -147,11 +143,9 @@ module.exports = (client, member) => {
             }
             if (channelsFile.get('action_log')) {
                 if (!member.guild.channels.get(channelsFile.get('action_log'))) {
-                    channelsFile.set('action_log', '');
-                    channelsFile.save();
                     return;
                 }
-                member.guild.channels.get(config.channel_serverlog).send({
+                member.guild.channels.get(channelsFile.get('action_log')).send({
                     embed: {
                         color: config.color_warning,
                         author: {

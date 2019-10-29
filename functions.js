@@ -586,8 +586,6 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                         if (err) throw err;
                         if (channelsFile.get('action_log')) {
                             if (!message.guild.channels.get(channelsFile.get('action_log'))) {
-                                channelsFile.set('action_log', '');
-                                channelsFile.save();
                                 return;
                             }
                             message.guild.channels.get(channelsFile.get('action_log')).send({
@@ -643,6 +641,9 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
             if (actionee) {
                 actionee.removeRole(mutedRole).then(async member => {
                     if (channelsFile.get('server_log')) {
+                        if (!guild.channels.get(channelsFile.get('server_log'))) {
+                            return;
+                        }
                         await guild.channels.get(channelsFile.get('server_log')).send(`${member} has been unmuted`);
                     }
                     mutedFile.unset(key);

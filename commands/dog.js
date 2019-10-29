@@ -6,20 +6,20 @@ exports.run = (client, message, args) => {
             var random = Math.floor(Math.random() * Math.floor(2));
             switch(random) {
                 case 0:
-                    request(`https://some-random-api.ml/img/cat`,
+                    request(`https://some-random-api.ml/img/dog`,
                     function (error, response, body) {
                         answer = JSON.parse(body);
                         message.channel.send(answer['link']);
-                    });
+                    }); 
                     break;
                 case 1:
-                    request(`http://aws.random.cat/meow`,
+                    request(`https://dog.ceo/api/breeds/image/random`,
                     function (error, response, body) {
                         answer = JSON.parse(body);
-                        message.channel.send(answer['file']);
+                        message.channel.send(answer['message']);
                     });
                     break;
-            }        
+            }         
         }
     } // End of permission checking statement
 }

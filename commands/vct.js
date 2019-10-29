@@ -32,8 +32,8 @@ exports.run = async (client, message, args) => {
                     const checkVC = setInterval(() => {
                         if (guildUser.voiceChannel != vc || (guildUser.voiceChannel && guildUser.voiceChannel.members.size != size)) {
                             vc = guildUser.voiceChannel;
-                            size = vc.members.size;
                             if (vc != undefined) {
+                                size = vc.members.size;
                                 switch (size) {
                                     case 1:
                                         msg.edit(`User ${guildUser} is in voice channel **${vc.name}**`).catch(console.error);
