@@ -18,8 +18,6 @@ module.exports = (client, oldUser, newUser) => {
             );
             if (channelsFile.get('server_log')) {
                 if (!guild.channels.get(channelsFile.get('server_log'))) {
-                    channelsFile.set('server_log', '');
-                    channelsFile.save();
                     return;
                 }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
@@ -91,8 +89,6 @@ module.exports = (client, oldUser, newUser) => {
                         }
                         if (channelsFile.get('action_log')) {
                             if (!guild.channels.get(channelsFile.get('action_log'))) {
-                                channelsFile.set('action_log', '');
-                                channelsFile.save();
                                 return;
                             }
                             guild.channels.get(channelsFile.get('action_log')).send({
@@ -126,6 +122,9 @@ module.exports = (client, oldUser, newUser) => {
                 }
             );
             if (channelsFile.get('server_log')) {
+                if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    return;
+                }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
                     guild.channels.get(channelsFile.get('server_log')).send({
                         embed: {
@@ -150,6 +149,9 @@ module.exports = (client, oldUser, newUser) => {
         }
         if (oldUser.discriminator !== newUser.discriminator) {
             if (channelsFile.get('server_log')) {
+                if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    return;
+                }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
                     guild.channels.get(channelsFile.get('server_log')).send({
                         embed: {

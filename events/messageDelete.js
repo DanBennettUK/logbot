@@ -13,8 +13,6 @@ module.exports = async (client, message) => {
         );
         if (channelsFile.get('server_log')) {
             if (!message.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {

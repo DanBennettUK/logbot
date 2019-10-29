@@ -20,8 +20,6 @@ module.exports = (client, guild, user) => {
     });
     if (channelsFile.get('server_log')) {
         if (!guild.channels.get(channelsFile.get('server_log'))) {
-            channelsFile.set('server_log', '');
-            channelsFile.save();
             return;
         }
         if (modulesFile.get('EVENT_GUILD_BAN_REMOVE_LOG')) {

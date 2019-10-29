@@ -18,8 +18,6 @@ module.exports = async (client, oldMember, newMember) => {
             );
             if (channelsFile.get('server_log')) {
                 if (!oldMember.guild.channels.get(channelsFile.get('server_log'))) {
-                    channelsFile.set('server_log', '');
-                    channelsFile.save();
                     return;
                 }
                 if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_LOG')) {
@@ -91,8 +89,6 @@ module.exports = async (client, oldMember, newMember) => {
                         }
                         if (channelsFile.get('action_log')) {
                             if (!oldMember.guild.channels.get(channelsFile.get('action_log'))) {
-                                channelsFile.set('action_log', '');
-                                channelsFile.save();
                                 return;
                             }
                             newMember.guild.channels.get(channelsFile.get('action_log')).send({
@@ -118,8 +114,6 @@ module.exports = async (client, oldMember, newMember) => {
         }
         if (channelsFile.get('server_log')) {
             if (!oldMember.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_ROLES_LOG')) {

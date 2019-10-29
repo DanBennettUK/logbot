@@ -28,8 +28,6 @@ module.exports = (client, oldMember, newMember) => {
 
                     if (channelsFile.get('voice_log')) {
                         if (!oldMember.guild.channels.get(channelsFile.get('voice_log'))) {
-                            channelsFile.set('voice_log', '');
-                            channelsFile.save();
                             return;
                         }
                         if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {

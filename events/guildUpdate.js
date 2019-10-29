@@ -4,8 +4,6 @@ module.exports = (client, oldGuild, newGuild) => {
     const channelsFile = client.channelsFile;
     if (channelsFile.get('server_log')) {
         if (!oldGuild.channels.get(channelsFile.get('server_log'))) {
-            channelsFile.set('server_log', '');
-            channelsFile.save();
             return;
         }
         if (modulesFile.get('EVENT_GUILD_UPDATE_LOG')) {
