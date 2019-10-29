@@ -11,7 +11,7 @@
 const Discord = require('discord.js');
 
 var guild;
-const bfj = require('bfj')
+const bfj = require('bfj');
 const mysql = require('mysql2');
 var moment = require('moment');
 const client = new Discord.Client();
