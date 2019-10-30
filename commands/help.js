@@ -112,7 +112,8 @@ exports.run = (client, message, args) => {
     }
 
     var helpCommands =
-    `${config.prefix}bugreport
+    `${config.prefix}invite
+    ${config.prefix}bugreport
     ${config.prefix}forums
     ${config.prefix}invite
     ${config.prefix}official
