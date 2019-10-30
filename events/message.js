@@ -24,7 +24,7 @@ module.exports = (client, message) => {
         functionsFile.inviteLinkDetection(client, message);
     }
 
-    var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
+    var publicCommands = ['bugreport', 'forums', 'invite', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
 
     if ((!message.content.startsWith('!') || !message.content.length > 1 || !publicCommands.includes(message.content.slice(1).toLowerCase())) && //Allow usage of '!' for general commands (invite, report...)
     ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `)))) return; //If the message content doesn't start with our prefix, return.

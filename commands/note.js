@@ -17,7 +17,7 @@ exports.run = (client, message, args) => {
                 message.channel.send('An invalid user was provided. Please try again');
             } else {
                 var tail = args.slice(1);
-                var note = tail.join(' ').trim();
+                var note = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
 
                 if (tail.length > 0) {
                     var identifier = cryptoRandomString({ length: 10 });

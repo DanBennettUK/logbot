@@ -16,14 +16,14 @@ module.exports = async (client, message) => {
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {
+                var dsc = `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}`;
                 const entry = await message.guild.fetchAuditLogs({
                     type: 'MESSAGE_DELETE'
                 }).then(audit => audit.entries.first());
-                var user = '';
                 if (entry.extra.channel.id === message.channel.id &&
                 (entry.target.id == message.author.id) && (entry.createdTimestamp > (Date.now() - 5000))) {
-                    user = entry.executor
-                } else user = message.author;
+                    dsc += ` by ${entry.executor}\n`
+                }
                 var messageContent = '';
                 if (message.content.length == 0) {
                     if (message.content.embeds.length > 0) {
@@ -42,7 +42,8 @@ module.exports = async (client, message) => {
                         \n`;
                     } else messageContent = message.attachments.first().filename;
                 } else messageContent = message.content;
-                if (messageContent.length > 1900) messageContent = 'Message too long ( > 2000 characters)';
+                if (messageContent.length > 1800) messageContent = 'Message too long ( > 2000 characters)';
+                dsc += `\n**Content:**\n\n${messageContent}`;
                 message.guild.channels.get(channelsFile.get('server_log')).send({
                     embed: {
                         color: config.color_warning,
@@ -51,17 +52,7 @@ module.exports = async (client, message) => {
                             icon_url: message.author.displayAvatarURL
                         },
                         title: `Message deletion`,
-                        description: `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}\n`,
-                        fields: [
-                            {
-                                name: 'Deleted by',
-                                value: `${user}`
-                            },
-                            {
-                                name: 'Deleted message',
-                                value: messageContent
-                            }
-                        ],
+                        description: dsc,
                         timestamp: new Date(),
                         footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
