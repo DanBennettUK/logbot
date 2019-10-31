@@ -33,7 +33,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}badwords remove <word/s>
         ${config.prefix}badwords clear
         ${config.prefix}badwords list
-        ${config.prefix}emoji add <emoji>
+        ${config.prefix}emoji add <name> <emoji>
         ${config.prefix}emoji remove <emoji>
         ${config.prefix}emoji list
         ${config.prefix}mute <user> <length> <reason>
