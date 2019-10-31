@@ -140,7 +140,7 @@ exports.run = (client, message, args) => {
                             ],
                             timestamp: new Date(),
                             footer: {
-                            text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
                             }
                         }
                     });
