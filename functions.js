@@ -642,11 +642,11 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
         if (mutes[key].end < Math.floor(Date.now() / 1000)) {
             if (actionee) {
                 actionee.removeRole(mutedRole).then(async member => {
-                    if (channelsFile.get('server_log')) {
-                        if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    if (channelsFile.get('action_log')) {
+                        if (!guild.channels.get(channelsFile.get('action_log'))) {
                             return;
                         }
-                        await guild.channels.get(channelsFile.get('server_log')).send(`${member} has been unmuted`);
+                        await guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
                     }
                     mutedFile.unset(key);
                     await mutedFile.save();
