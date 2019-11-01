@@ -39,6 +39,7 @@ exports.run = async (client, message, args) => {
                     }
 
                     if (reminder.length > 0) {
+                        reminder = `${reminder.charAt(0).toUpperCase()}${reminder.slice(1)}`
                         reminderFile.set(`${user}${ms}.who`, message.author.id);
                         reminderFile.set(`${user}${ms}.end`, end);
                         reminderFile.set(`${user}${ms}.reminder`, reminder);
