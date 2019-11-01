@@ -716,8 +716,8 @@ exports.checkReminders = async function checkReminders(client) {
                         embed: {
                             color: config.color_info,
                             author: {
-                                name: client.user.username,
-                                icon_url: client.user.displayAvatarURL
+                                name: guild.name,
+                                icon_url: guild.iconURL
                             },
                             title: `You set a reminder ${time} ${unit} ago.`,
                             description: current.reminder,
