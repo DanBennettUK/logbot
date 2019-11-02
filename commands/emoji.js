@@ -31,7 +31,7 @@ exports.run = async (client, message, args) => {
                     } else {
                         message.channel.send(`:x: An emoji with that name already exists.`);
                     }
-                } else if (args[0].toLowerCase() === `delete` && args.length == 2) {
+                } else if (args[0].toLowerCase() === `remove` && args.length == 2) {
                     var emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
                     var emoji = await guild.emojis.get(emojiID);
                     if (emoji) {
@@ -39,6 +39,8 @@ exports.run = async (client, message, args) => {
                         message.channel.send(`:white_check_mark: Emoji \`${emoji.name}\` deleted successfully.`);
                     } else message.channel.send(`:x: Emoji not found.`);
                 } else if (args[0].toLowerCase() === `list`) {
+
+                    var sent = false;
     
                     var listOfEmojis = '';
                     var listOfNames = '';
@@ -46,6 +48,32 @@ exports.run = async (client, message, args) => {
                     guild.emojis.forEach(e => {
                         listOfEmojis += `${e}\n`;
                         listOfNames += `${e.name}\n`
+                        if (listOfNames.length > 1000) {
+                            message.channel.send({
+                                embed: {
+                                    color: config.color_info,
+                                    fields: [
+                                        {
+                                            name: 'Emoji',
+                                            value: `${listOfEmojis}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Name',
+                                            value: `${listOfNames}`,
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            });
+                            sent = true;
+                            listOfEmojis = '';
+                            listOfNames = '';
+                        }
                     });
 
                     if (listOfEmojis.length > 0) {
@@ -70,7 +98,7 @@ exports.run = async (client, message, args) => {
                                 }
                             }
                         });
-                    } else {
+                    } else if (!sent) {
                         message.channel.send({
                             embed: {
                                 color: config.color_info,
