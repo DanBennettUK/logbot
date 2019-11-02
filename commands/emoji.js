@@ -45,10 +45,18 @@ exports.run = async (client, message, args) => {
                     var listOfEmojis = '';
                     var listOfNames = '';
 
+                    var listOfAnimatedEmojis = '';
+                    var listOfAnimatedNames = '';
+
                     guild.emojis.forEach(e => {
-                        listOfEmojis += `${e}\n`;
-                        listOfNames += `${e.name}\n`
-                        if (listOfNames.length > 990) {
+                        if (e.animated) {
+                            listOfAnimatedEmojis += `${e}\n`;
+                            listOfAnimatedNames += `${e.name}\n`;
+                        } else {
+                            listOfEmojis += `${e}\n`;
+                            listOfNames += `${e.name}\n`
+                        }
+                        if (listOfNames.length > 980) {
                             message.channel.send({
                                 embed: {
                                     color: config.color_info,
@@ -73,9 +81,33 @@ exports.run = async (client, message, args) => {
                             sent = true;
                             listOfEmojis = '';
                             listOfNames = '';
+                        } if (listOfAnimatedNames.length > 980) {
+                            message.channel.send({
+                                embed: {
+                                    color: config.color_info,
+                                    fields: [
+                                        {
+                                            name: 'Animated emoji',
+                                            value: `${listOfAnimatedEmojis}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Name',
+                                            value: `${listOfAnimatedNames}`,
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            });
+                            sent = true;
+                            listOfAnimatedEmojis = '';
+                            listOfAnimatedNames = '';
                         }
                     });
-
                     if (listOfEmojis.length > 0) {
                         message.channel.send({
                             embed: {
@@ -98,7 +130,31 @@ exports.run = async (client, message, args) => {
                                 }
                             }
                         });
-                    } else if (!sent) {
+                        sent = true;
+                    } if (listOfAnimatedNames.length > 0) {
+                        message.channel.send({
+                            embed: {
+                                color: config.color_info,
+                                fields: [
+                                    {
+                                        name: 'Animated emoji',
+                                        value: `${listOfAnimatedEmojis}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Name',
+                                        value: `${listOfAnimatedNames}`,
+                                        inline: true
+                                    }
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        });
+                        sent = true;
+                    } if (!sent) {
                         message.channel.send({
                             embed: {
                                 color: config.color_info,
