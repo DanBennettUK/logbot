@@ -270,7 +270,7 @@ exports.run = async (client, message, args) => {
                                                 amount = 0;
                                                 sent = true;
                                             }
-                                            dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url})\n`;
+                                            dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url}) in ${chnl}\n`;
                                             amount ++;
                                         } else {
                                             reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);

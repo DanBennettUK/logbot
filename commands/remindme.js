@@ -33,7 +33,13 @@ exports.run = async (client, message, args) => {
 
                     var reminder = _.rest(args, 1).join(' ');
 
+                    if (reminder.length > 1000) {
+                        message.channel.send(':x: Please keep the reminder message under 1000 characters.');
+                        return;
+                    }
+
                     if (reminder.length > 0) {
+                        reminder = `${reminder.charAt(0).toUpperCase()}${reminder.slice(1)}`
                         reminderFile.set(`${user}${ms}.who`, message.author.id);
                         reminderFile.set(`${user}${ms}.end`, end);
                         reminderFile.set(`${user}${ms}.reminder`, reminder);
@@ -43,11 +49,19 @@ exports.run = async (client, message, args) => {
                         message.channel.send({
                             embed: {
                                 color: config.color_success,
-                                author: {
-                                    name: client.user.username,
-                                    icon_url: client.user.displayAvatarURL
-                                },
                                 title: `Reminder Set`,
+                                fields: [
+                                    {
+                                        name: 'Reminder length',
+                                        value: `${args[0]}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Reminder content',
+                                        value: `${reminder}`,
+                                        inline: true
+                                    }
+                                ],
                                 timestamp: new Date(),
                                 footer: {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -55,7 +69,7 @@ exports.run = async (client, message, args) => {
                             }
                         });
                     } else {
-                        message.channel.send('Please provide a reminder note.');
+                        message.channel.send(':x: Please provide a reminder note.');
                     }
                 }
             } else functionsFile.syntaxErr(client, message, 'remindme');
