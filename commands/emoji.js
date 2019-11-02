@@ -48,7 +48,7 @@ exports.run = async (client, message, args) => {
                     guild.emojis.forEach(e => {
                         listOfEmojis += `${e}\n`;
                         listOfNames += `${e.name}\n`
-                        if (listOfNames.length > 1000) {
+                        if (listOfNames.length > 990) {
                             message.channel.send({
                                 embed: {
                                     color: config.color_info,
