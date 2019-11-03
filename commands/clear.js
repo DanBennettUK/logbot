@@ -31,7 +31,7 @@ exports.run = async (client, message, args) => {
                                                 text: `${identifier} | Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
                                 connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data,
                                 function (err, results) {

@@ -96,7 +96,7 @@ exports.run = (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     });
 
                                     try {
@@ -142,7 +142,7 @@ exports.run = (client, message, args) => {
                                                         if (err) throw err;
                                                     }
                                                 );
-                                            });
+                                            }).catch(console.error);
                                     } catch (e) {
                                         message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
                                     }
@@ -227,7 +227,7 @@ exports.run = (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                         var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
                                         connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data,
                                         function (err, results) {
@@ -276,7 +276,7 @@ exports.run = (client, message, args) => {
                                                     if (err)
                                                         throw err;
                                                 });
-                                            });
+                                            }).catch(console.error);
                                         }).catch(console.error);
                                     }).catch(console.error);
                                 } else {

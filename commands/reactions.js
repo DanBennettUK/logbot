@@ -55,7 +55,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });
+                                            }).catch(console.error);
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -107,7 +107,7 @@ exports.run = async (client, message, args) => {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
                                         }
                                     }
-                                });                            
+                                }).catch(console.error);                         
                             } else {
                                 try {
                                     var msg = chnl.fetchMessage(args[2]);
@@ -143,7 +143,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });                                        
+                                            }).catch(console.error);                                      
                                         } else {
                                             var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
@@ -179,7 +179,7 @@ exports.run = async (client, message, args) => {
                                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                                 }
                                                             }
-                                                        });                                                    
+                                                        }).catch(console.error);                                                   
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }

@@ -27,10 +27,10 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                     message.channel.send(`Channel ${channel} successfully unlocked`);
                                 }
-                            );
+                            ).catch(console.error);
                     } else message.channel.send(`Channel ${channelObj} is not locked.`);
                 } else {
                     message.channel.send(`Channel ${key} could not be found/resolved and will be removed from the list.`);

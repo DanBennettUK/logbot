@@ -42,7 +42,7 @@ module.exports = async (client, message) => {
                         \n`;
                     } else messageContent = message.attachments.first().filename;
                 } else messageContent = message.content;
-                if (messageContent.length > 1800) messageContent = 'Message too long ( > 2000 characters)';
+                if (messageContent.length > 1800) messageContent = 'Message too long ( > 1800 characters)';
                 dsc += `\n**Content:**\n\n${messageContent}`;
                 message.guild.channels.get(channelsFile.get('server_log')).send({
                     embed: {
@@ -58,7 +58,7 @@ module.exports = async (client, message) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }

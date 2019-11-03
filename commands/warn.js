@@ -52,7 +52,7 @@ exports.run = (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                             try {
                                 var chnl = await client.users.get(user).createDM();
                                     await chnl.send({
@@ -85,7 +85,7 @@ exports.run = (client, message, args) => {
                                                     if (err) throw err;
                                                 }
                                             );
-                                        });
+                                        }).catch(console.error);
                             } catch (e) {
                                 message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
                             }

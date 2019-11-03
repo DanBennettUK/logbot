@@ -58,7 +58,7 @@ exports.run = (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 });
                                 member.createDM().then(async chnl => {
                                     await chnl.send({
@@ -92,7 +92,7 @@ exports.run = (client, message, args) => {
                                         connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
                                             if (err) throw err;
                                         });
-                                    });
+                                    }).catch(console.error);
                                 }).catch(console.error);
                             }).catch(console.error);
                         } else {

@@ -77,7 +77,7 @@ exports.run = async (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                             sent = true;
                             listOfEmojis = '';
                             listOfNames = '';
@@ -102,7 +102,7 @@ exports.run = async (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                             sent = true;
                             listOfAnimatedEmojis = '';
                             listOfAnimatedNames = '';
@@ -129,7 +129,7 @@ exports.run = async (client, message, args) => {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
                             }
-                        });
+                        }).catch(console.error);
                         sent = true;
                     } if (listOfAnimatedNames.length > 0) {
                         message.channel.send({
@@ -152,7 +152,7 @@ exports.run = async (client, message, args) => {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
                             }
-                        });
+                        }).catch(console.error);
                         sent = true;
                     } if (!sent) {
                         message.channel.send({
@@ -164,7 +164,7 @@ exports.run = async (client, message, args) => {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
                             }
-                        });
+                        }).catch(console.error);
                     }
                 }
             } else message.channel.send(`:x: Wrong command syntax. Please use \`${config.prefix}help\` to view all commands.`);

@@ -70,7 +70,7 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
         return;
     }
     if (message.member.roles.some(role => ['Support'].includes(role.name))) {
@@ -110,7 +110,7 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
         return;
     }
 
@@ -141,5 +141,5 @@ exports.run = (client, message, args) => {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
             }
         }
-    });
+    }).catch(console.error);
 }

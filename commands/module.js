@@ -19,7 +19,7 @@ exports.run = (client, message, args) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             } else {
                 message.channel.send(`Please provide a valid status\n\nOff: 0\nOn: 1`).then(msg => {
                     setTimeout(async () => {

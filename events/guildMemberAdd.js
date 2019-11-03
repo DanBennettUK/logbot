@@ -37,7 +37,7 @@ module.exports = (client, member) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }
