@@ -1024,7 +1024,7 @@ exports.parseEmojiTag = (client, guild, tag) => {
         var emoji = guild.emojis.get(tag);
         if (emoji) return emoji.id;
         else {
-            emoji = guild.emojis.fine(e => e.name == tag);
+            emoji = guild.emojis.find(e => e.name == tag);
             if (emoji) return emoji.id;
             else return 'err';
         }
