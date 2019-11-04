@@ -5,6 +5,7 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     const modulesFile = client.modulesFile;
     const cryptoRandomString = client.cryptoRandomString;
+    const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_CLEAR')) {
             if (args.length >= 3) {
@@ -49,7 +50,7 @@ exports.run = async (client, message, args) => {
                     message.channel.send('The user provided was not found in this guild');
                 }
             } else {
-                syntaxErr(client, message, 'clear');
+                functionsFile.syntaxErr(client, message, 'clear');
             }
         } else {
             message.channel.send(`That module (${command}) is disabled.`);
