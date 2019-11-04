@@ -26,7 +26,7 @@ module.exports = async (client, message) => {
                 }
                 var messageContent = '';
                 if (message.content.length == 0) {
-                    if (message.content.embeds.length > 0) {
+                    if (message.embeds.length > 0) {
                         var embed = msg.embeds[0];
                         var fields = '';
                         var title = 'This embed has no title';
