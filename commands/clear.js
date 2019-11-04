@@ -5,7 +5,6 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     const modulesFile = client.modulesFile;
     const cryptoRandomString = client.cryptoRandomString;
-    const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_CLEAR')) {
             if (args.length >= 3) {
