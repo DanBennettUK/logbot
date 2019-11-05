@@ -24,6 +24,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}warn <user> <reason>
         ${config.prefix}cwarn <identifier>
         ${config.prefix}user <user>
+        ${config.prefix}id <user/id>
         ${config.prefix}clear <amount> <channel> <user>
         ${config.prefix}voicelog <user>
         ${config.prefix}vclog <channel>

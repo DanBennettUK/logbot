@@ -70,7 +70,7 @@ exports.run = async (client, message, args) => {
                             try {
                                 user = await client.fetchUser(row.userID);
                             } catch (e) {
-                                message.channel.send(`${row.userID} could not be found.`);
+                                message.channel.send(`${row.userID} could not be found.`).catch(console.error);
                             }
                             users += `${user}\n`;
                             joinTime += `${row.timestamp.toUTCString()}\n`;
@@ -100,6 +100,6 @@ exports.run = async (client, message, args) => {
                     } else message.channel.send('No users were in that channel.').catch(console.error);
                 });
             } else functionsFile.syntaxErr(client, message, 'vclog');
-        } else message.channel.send(':x: That module is disabled.');
+        } else message.channel.send(':x: That module is disabled.').catch(console.error);
     }
 }
