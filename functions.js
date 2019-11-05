@@ -702,12 +702,12 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                         await guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
                     }
                     mutedFile.unset(key);
-                    await mutedFile.save();
+                    mutedFile.save();
                 }).catch(console.error);
             } else {
                 console.log(`Actionee could not be found ${key}`);
                 mutedFile.unset(key);
-                await mutedFile.save();
+                mutedFile.save();
             }
         } else {
             if (actionee) {
