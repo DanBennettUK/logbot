@@ -38,6 +38,21 @@ exports.run = async (client, message, args) => {
                         guild.deleteEmoji(emoji);
                         message.channel.send(`:white_check_mark: Emoji \`${emoji.name}\` deleted successfully.`);
                     } else message.channel.send(`:x: Emoji not found.`);
+                } else if (args[0].toLowerCase() == 'rename') {
+                    if (args.length == 3) {
+                        var emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
+                        var emoji = guild.emojis.get(emojiID);
+                        if (emoji) {
+                            var currentName = emoji.name;
+                            if (args[2].length > 1 && args[2].length < 33 && !args[2].includes('.')) {
+                                if ((emoji.name) != args[2]) {
+                                    emoji.setName(`${args[2]}`).then(e => {
+                                        message.channel.send(`Name of ${e} successfully changed from \`${currentName}\` to \`${e.name}\``).catch(console.error);
+                                    }).catch(console.error);
+                                } else message.channel.send(':x: The given name matches the current name.').catch(console.error);
+                            } else message.channel.send(':x: Name must be between 2 and 32 characters and cannot include any `.` characters.').catch(console.error);
+                        } else message.channel.send(':x: I could not find that emoji.').catch(console.error);
+                    } else functionsFile.syntaxErr(client, message, 'emoji rename');
                 } else if (args[0].toLowerCase() === `list`) {
 
                     var sent = false;
