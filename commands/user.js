@@ -240,9 +240,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for (var i = 0; i < rows.length; i++) {
+                                    
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -283,9 +296,22 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -683,9 +709,22 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
                                     await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -725,9 +764,21 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -1078,9 +1129,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results ) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for ( var i = 0; i < rows.length; i++ ) {
+
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for ( var i = 0; i < max; i++ ) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -1120,9 +1184,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for (var i = 0; i < rows.length; i++) {
+
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for (var i = 0; i < max; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
