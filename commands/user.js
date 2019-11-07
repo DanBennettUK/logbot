@@ -520,8 +520,20 @@ exports.run = async (client, message, args) => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                         },
-                        title: `${userID}`,
+                        title: `${globalUser.username}#${globalUser.discriminator}`,
                         description: `The user you provided is not currently camping in this guild.`,
+                        fields: [
+                            {
+                                name: 'Created',
+                                value: globalUser.createdAt.toUTCString(),
+                                inline: true
+                            },
+                            {
+                                name: 'ID',
+                                value: globalUser.id,
+                                inline: true
+                            }
+                        ],
                         timestamp: new Date(),
                         footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
