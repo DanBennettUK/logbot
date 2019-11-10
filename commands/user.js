@@ -7,7 +7,7 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
-            if (args[0]) var userID = functionsFile.parseUserTag(client, message.guild, args[0]);
+            if (args) var userID = functionsFile.parseUserTag(client, message.guild, args.join(' '));
             else {
                 functionsFile.syntaxErr(client, message, 'user');
                 return;
@@ -148,7 +148,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -163,7 +163,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 }
                             );
@@ -213,7 +213,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -228,7 +228,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
@@ -240,9 +240,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for (var i = 0; i < rows.length; i++) {
+                                    
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -258,7 +271,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -273,7 +286,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 }
                             );
@@ -283,9 +296,22 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -301,7 +327,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -316,7 +342,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '👥') {
@@ -373,7 +399,7 @@ exports.run = async (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                         } else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
@@ -419,7 +445,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -434,7 +460,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '📥') {
@@ -480,7 +506,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -495,7 +521,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else {
@@ -520,8 +546,20 @@ exports.run = async (client, message, args) => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                         },
-                        title: `${userID}`,
+                        title: `${globalUser.username}#${globalUser.discriminator}`,
                         description: `The user you provided is not currently camping in this guild.`,
+                        fields: [
+                            {
+                                name: 'Created',
+                                value: globalUser.createdAt.toUTCString(),
+                                inline: true
+                            },
+                            {
+                                name: 'ID',
+                                value: globalUser.id,
+                                inline: true
+                            }
+                        ],
                         timestamp: new Date(),
                         footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -579,7 +617,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -594,7 +632,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 }
                             );
@@ -644,7 +682,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -659,7 +697,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
@@ -671,9 +709,22 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
                                     await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -689,7 +740,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     msg.edit({
                                         embed: {
@@ -704,7 +755,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '🖥') {
@@ -713,9 +764,21 @@ exports.run = async (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
                                 var notes = [];
-                                for (var i = 0; i < rows.length; i++) {
+                                var max = 5;
+                                var extra;
+
+                                if (rows.length <= max) {
+                                    max = rows.length;
+                                } else {
+                                    extra = rows.length - max;
+                                }
+
+                                for (var i = 0; i < max; i++) {
                                     var row = rows[i];
-                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                    await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
+                                    if (i == max - 1 && extra > 0) {
+                                        notes.push(`...${extra} more`);
+                                    }
                                 }
                                 if (!_.isEmpty(notes)) {
                                     msg.edit({
@@ -731,7 +794,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -746,7 +809,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         }  else if (r.emoji.name == '📛') {
@@ -794,7 +857,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -809,7 +872,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else if (r.emoji.name == '👥') {
@@ -828,7 +891,7 @@ exports.run = async (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -873,7 +936,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 } else {
                                     await msg.edit({
                                         embed: {
@@ -888,7 +951,7 @@ exports.run = async (client, message, args) => {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 }
                             });
                         } else {
@@ -974,7 +1037,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });
+                                            }).catch(console.error);
                                         } else {
                                             await msg.edit({
                                                 embed: {
@@ -989,7 +1052,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });
+                                            }).catch(console.error);
                                         }
                                     }
                                 );
@@ -1039,7 +1102,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -1054,7 +1117,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 });
                             } else if (r.emoji.name == '❌') {
@@ -1066,9 +1129,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results ) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for ( var i = 0; i < rows.length; i++ ) {
+
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for ( var i = 0; i < max; i++ ) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -1084,7 +1160,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         msg.edit({
                                             embed: {
@@ -1099,7 +1175,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 });
                             } else if (r.emoji.name == '🖥') {
@@ -1108,9 +1184,22 @@ exports.run = async (client, message, args) => {
                                 async function (err, rows, results) {
                                     if (err) throw err;
                                     var notes = [];
-                                    for (var i = 0; i < rows.length; i++) {
+
+                                    var max = 5;
+                                    var extra;
+
+                                    if (rows.length <= max) {
+                                        max = rows.length;
+                                    } else {
+                                        extra = rows.length - max;
+                                    }
+
+                                    for (var i = 0; i < max; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
+                                        if (i == max - 1 && extra > 0) {
+                                            notes.push(`...${extra} more`);
+                                        }
                                     }
                                     if (!_.isEmpty(notes)) {
                                         msg.edit({
@@ -1126,7 +1215,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -1141,7 +1230,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 });
                             }  else if (r.emoji.name == '📛') {
@@ -1188,7 +1277,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -1203,12 +1292,12 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     }
                                 });
                             }  else if (r.emoji.name == '👥') {
                                 await r.remove(r.users.last());
-                                msg.edit({
+                                await msg.edit({
                                     embed: {
                                         color: config.color_caution,
                                         author: {
@@ -1222,7 +1311,7 @@ exports.run = async (client, message, args) => {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
                                         }
                                     }
-                                });
+                                }).catch(console.error);
                             } else if (r.emoji.name == '📥') {
                                 await r.remove(r.users.last());
                                 connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -1266,7 +1355,7 @@ exports.run = async (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                     } else {
                                         await msg.edit({
                                             embed: {
@@ -1283,7 +1372,7 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     }
-                                });
+                                }).catch(console.error);
                             } else {
                                 return;
                             }

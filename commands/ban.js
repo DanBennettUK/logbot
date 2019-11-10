@@ -100,7 +100,7 @@ exports.run = async (client, message, args) => {
                                             bannedUsersFile.set(identifier, result.username);
                                             bannedUsersFile.save();
                                         }).catch(console.error);
-                                    });
+                                    }).catch(console.error);
                                 } catch (e) {
                                     guild.ban(user, { days: 1, reason: reason }).then(async result => {
                                         await message.channel.send({

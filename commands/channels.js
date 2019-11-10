@@ -143,7 +143,7 @@ exports.run = (client, message, args) => {
                                 text: `Marvin's Little Brother | Current version: ${client.config.version}`
                             }
                         }
-                    });
+                    }).catch(console.error);
                 }
             }
         } else message.channel.send(`:x: This module is disabled`);

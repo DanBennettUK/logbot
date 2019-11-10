@@ -31,6 +31,6 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 }

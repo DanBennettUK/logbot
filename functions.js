@@ -471,7 +471,7 @@ exports.updateUserTable = function updateUserTable(client, invoker, channel) {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                             break;
                         case 'system':
                             console.log(`[INFO] Found ${memberArray.length} users.`);
@@ -528,7 +528,7 @@ exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, ch
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
                             break;
                         case 'system':
                             console.log(`[INFO] Found ${banArray.length} bans / Inserted ${results.affectedRows} rows. Bans that are not in the database will be added now,`);
@@ -572,57 +572,110 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
         return;
     }
     if (badWordList.length > 0) {
-        if (badWordList.some(word => wholeMessage.includes(word))) {
-            message.delete().then(() => {
-                message.channel.send(`${message.author} watch your language`).then(msg => {
-                        setTimeout(async () => {
-                            await msg.delete();
-                        }, 5000);
-                    }).catch(console.error);
-
-                var data = [message.author.id, message.channel.id, message.content, new Date()];
-                connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
-                    function (err, results) {
-                        if (err) throw err;
-                        if (channelsFile.get('action_log')) {
-                            if (!message.guild.channels.get(channelsFile.get('action_log'))) {
-                                return;
-                            }
-                            message.guild.channels.get(channelsFile.get('action_log')).send({
-                                embed: {
-                                    color: client.config.color_warning,
-                                    author: {
-                                        name: `${message.author.username}#${message.author.discriminator}`,
-                                        icon_url: message.author.displayAvatarURL
-                                    },
-                                    title: 'Removed message containing banned word',
-                                    fields: [
-                                        {
-                                            name: 'Author',
-                                            value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
-                                            inline: true
-                                        },
-                                        {
-                                            name: 'Channel',
-                                            value: `${message.channel}`,
-                                            inline: true
-                                        },
-                                        {
-                                            name: 'Content',
-                                            value: `${message.content}`
-                                        }
-                                    ],
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
-                                    }
+        badWordList.some(word => {
+            if (wholeMessage.includes(word)) {
+                message.delete().then(() => {
+                    message.channel.send(`${message.author} watch your language`).then(msg => {
+                            setTimeout(async () => {
+                                await msg.delete();
+                            }, 5000);
+                        }).catch(console.error);
+    
+                    var data = [message.author.id, message.channel.id, message.content, new Date()];
+                    connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
+                        function (err, results) {
+                            if (err) throw err;
+                            if (channelsFile.get('action_log')) {
+                                if (!message.guild.channels.get(channelsFile.get('action_log'))) {
+                                    return;
                                 }
-                            })
+                                if (message.content.length < 1024) {
+                                    message.guild.channels.get(channelsFile.get('action_log')).send({
+                                        embed: {
+                                            color: client.config.color_warning,
+                                            author: {
+                                                name: `${message.author.username}#${message.author.discriminator}`,
+                                                icon_url: message.author.displayAvatarURL
+                                            },
+                                            title: 'Removed message containing banned word',
+                                            fields: [
+                                                {
+                                                    name: 'Author',
+                                                    value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Channel',
+                                                    value: `${message.channel}`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Content',
+                                                    value: `${message.content}`
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                } else if (message.content.length < 1800) {
+                                    message.guild.channels.get(channelsFile.get('action_log')).send({
+                                        embed: {
+                                            color: client.config.color_warning,
+                                            author: {
+                                                name: `${message.author.username}#${message.author.discriminator}`,
+                                                icon_url: message.author.displayAvatarURL
+                                            },
+                                            title: 'Removed message containing banned word',
+                                            description: `**Author:**\n${message.author} (${message.author.username}#${message.author.discriminator})\n
+                                            **Channel:**\n${message.channel}\n
+                                            **Content:**\n${message.content}`,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                } else {
+                                    message.guild.channels.get(channelsFile.get('action_log')).send({
+                                        embed: {
+                                            color: client.config.color_warning,
+                                            author: {
+                                                name: `${message.author.username}#${message.author.discriminator}`,
+                                                icon_url: message.author.displayAvatarURL
+                                            },
+                                            title: 'Removed message containing banned word',
+                                            fields: [
+                                                {
+                                                    name: 'Author',
+                                                    value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Channel',
+                                                    value: `${message.channel}`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Removed word',
+                                                    value: `${word}`
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                }
+                            }
                         }
-                    }
-                );
-            }).catch(console.error);
-        }
+                    );
+                }).catch(console.error);
+            }
+        });
     }
 }
 
@@ -649,12 +702,12 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                         await guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
                     }
                     mutedFile.unset(key);
-                    await mutedFile.save();
+                    mutedFile.save();
                 }).catch(console.error);
             } else {
                 console.log(`Actionee could not be found ${key}`);
                 mutedFile.unset(key);
-                await mutedFile.save();
+                mutedFile.save();
             }
         } else {
             if (actionee) {
@@ -961,7 +1014,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
 }
 
 exports.parseEmojiTag = (client, guild, tag) => {
-    if (/^<a?:[a-z0-9]+:[0-9]+>$/i.test(tag)) {
+    if (/^<a?:[^\.]+:[0-9]+>$/i.test(tag)) {
         var emo = tag.replace(/<|>/g, '');
         emo = emo.split(':');
         var emoji = guild.emojis.find(e => e.id == emo[2]);
@@ -971,11 +1024,11 @@ exports.parseEmojiTag = (client, guild, tag) => {
         var emoji = guild.emojis.get(tag);
         if (emoji) return emoji.id;
         else {
-            emoji = guild.emojis.fine(e => e.name == tag);
+            emoji = guild.emojis.find(e => e.name == tag);
             if (emoji) return emoji.id;
             else return 'err';
         }
-    } else if (/[a-z0-9]+/i.test(tag)) {
+    } else if (/[^\.]+/i.test(tag)) {
         var emoji = guild.emojis.find(e => e.name == tag);
         if (emoji) return emoji.id;
         else {
@@ -1029,40 +1082,85 @@ exports.inviteLinkDetection = (client, message) => {
                     if (err) throw err;
                     if (channelsFile.get('action_log')) {
                         if (!message.guild.channels.get(channelsFile.get('action_log'))) {
-                            channelsFile.set('action_log', '');
-                            channelsFile.save();
                             return;
                         }
-                        message.guild.channels.get(channelsFile.get('action_log')).send({
-                            embed: {
-                                color: client.config.color_warning,
-                                author: {
-                                    name: `${message.author.username}#${message.author.discriminator}`,
-                                    icon_url: message.author.displayAvatarURL
-                                },
-                                title: 'Removed message containing invite link',
-                                fields: [
-                                    {
-                                        name: 'Author',
-                                        value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
-                                        inline: true
+                        if (message.content.length < 1024) {
+                            message.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: client.config.color_warning,
+                                    author: {
+                                        name: `${message.author.username}#${message.author.discriminator}`,
+                                        icon_url: message.author.displayAvatarURL
                                     },
-                                    {
-                                        name: 'Channel',
-                                        value: `${message.channel}`,
-                                        inline: true
-                                    },
-                                    {
-                                        name: 'Content',
-                                        value: `${message.content}`
+                                    title: 'Removed message containing invite link',
+                                    fields: [
+                                        {
+                                            name: 'Author',
+                                            value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Channel',
+                                            value: `${message.channel}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Content',
+                                            value: `${message.content}`
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
                                     }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${client.config.version}`
                                 }
-                            }
-                        })
+                            }).catch(console.error);
+                        } else if (message.content.length < 1800) {
+                            message.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: client.config.color_warning,
+                                    author: {
+                                        name: `${message.author.username}#${message.author.discriminator}`,
+                                        icon_url: message.author.displayAvatarURL
+                                    },
+                                    title: 'Removed message containing invite link',
+                                    description: `**Author:**\n${message.author} (${message.author.username}#${message.author.discriminator})\n
+                                    **Channel:**\n${message.channel}\n
+                                    **Content:**\n${message.content}`,
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error); 
+                        } else {
+                            message.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: client.config.color_warning,
+                                    author: {
+                                        name: `${message.author.username}#${message.author.discriminator}`,
+                                        icon_url: message.author.displayAvatarURL
+                                    },
+                                    title: 'Removed message containing invite link',
+                                    fields: [
+                                        {
+                                            name: 'Author',
+                                            value: `${message.author} (${message.author.username}#${message.author.discriminator})`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Channel',
+                                            value: `${message.channel}`,
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                        }
                     }
                 }
             );

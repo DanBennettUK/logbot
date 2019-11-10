@@ -24,8 +24,10 @@ exports.run = (client, message, args) => {
         ${config.prefix}warn <user> <reason>
         ${config.prefix}cwarn <identifier>
         ${config.prefix}user <user>
+        ${config.prefix}id <user/id>
         ${config.prefix}clear <amount> <channel> <user>
         ${config.prefix}voicelog <user>
+        ${config.prefix}vclog <channel>
         ${config.prefix}vc <user>
         ${config.prefix}vct <user>
         ${config.prefix}disconnect <user>
@@ -35,6 +37,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}badwords list
         ${config.prefix}emoji add <name> <emoji>
         ${config.prefix}emoji remove <emoji>
+        ${config.prefix}emoji rename <emoji> <name>
         ${config.prefix}emoji list
         ${config.prefix}mute <user> <length> <reason>
         ${config.prefix}unmute <user> <reason>
@@ -70,7 +73,7 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
         return;
     }
     if (message.member.roles.some(role => ['Support'].includes(role.name))) {
@@ -110,7 +113,7 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
         return;
     }
 
@@ -141,5 +144,5 @@ exports.run = (client, message, args) => {
                 text: `Marvin's Little Brother | Current version: ${config.version}`
             }
         }
-    });
+    }).catch(console.error);
 }

@@ -31,7 +31,7 @@ exports.run = async (client, message, args) => {
                                                 text: `${identifier} | Marvin's Little Brother | Current version: ${config.version}`
                                             }
                                         }
-                                    });
+                                    }).catch(console.error);
                                 var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
                                 connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data,
                                 function (err, results) {
@@ -49,7 +49,7 @@ exports.run = async (client, message, args) => {
                     message.channel.send('The user provided was not found in this guild');
                 }
             } else {
-                syntaxErr(client, message, 'clear');
+                functionsFile.syntaxErr(client, message, 'clear');
             }
         } else {
             message.channel.send(`That module (${command}) is disabled.`);

@@ -104,7 +104,7 @@ module.exports = async (client, oldMember, newMember) => {
                             }).catch(console.error);
                         }
                         var identifier = cryptoRandomString({length: 10});
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' '), identifier, 0, new Date()],
+                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
                         function(err, results){
                             if (err) throw err;
                         });

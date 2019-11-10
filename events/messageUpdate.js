@@ -30,11 +30,11 @@ module.exports = (client, oldMessage, newMessage) => {
                             fields: [
                                 {
                                     name: 'Old message',
-                                    value: `${oldMessage}`
+                                    value: `${oldMessage.content}`
                                 },
                                 {
                                     name: 'New message',
-                                    value: `${newMessage}\n[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                                    value: `${newMessage.content}\n[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
                                 }
                             ],
                             timestamp: new Date(),
@@ -42,7 +42,7 @@ module.exports = (client, oldMessage, newMessage) => {
                                 text: `Marvin's Little Brother | Current version: ${config.version}`
                             }
                         }
-                    });
+                    }).catch(console.error);
                 } else {
                     if (oldMessage.content.length < 1024 && newMessage.content.length > 900) {
                         oldMessage.guild.channels.get(channelsFile.get('server_log')).send({
@@ -57,7 +57,7 @@ module.exports = (client, oldMessage, newMessage) => {
                                 fields: [
                                     {
                                         name: 'Old message',
-                                        value: `${oldMessage}`
+                                        value: `${oldMessage.content}`
                                     },
                                     {
                                         name: 'New message',
@@ -69,29 +69,48 @@ module.exports = (client, oldMessage, newMessage) => {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
                             }
-                        });
+                        }).catch(console.error);
                     } else {
-                        oldMessage.guild.channels.get(channelsFile.get('server_log')).send({
-                            embed: {
-                                color: config.color_info,
-                                author: {
-                                    name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
-                                    icon_url: oldMessage.author.displayAvatarURL,
-                                },
-                                title: 'Message edit',
-                                description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n`,
-                                fields: [
-                                    {
-                                        name: 'New message',
-                                        value: `[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                        if (oldMessage.content.length < 1800) {
+                            oldMessage.guild.channels.get(channelsFile.get('server_log')).send({
+                                embed: {
+                                    color: config.color_info,
+                                    author: {
+                                        name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
+                                        icon_url: oldMessage.author.displayAvatarURL,
+                                    },
+                                    title: 'Message edit',
+                                    description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n
+                                    **Old message:**\n ${oldMessage.content}\n\n[New message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`,
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${config.version}`
                                 }
-                            }
-                        });
+                            }).catch(console.error);
+                        } else {
+                            oldMessage.guild.channels.get(channelsFile.get('server_log')).send({
+                                embed: {
+                                    color: config.color_info,
+                                    author: {
+                                        name: `${oldMessage.author.username}#${oldMessage.author.discriminator}`,
+                                        icon_url: oldMessage.author.displayAvatarURL,
+                                    },
+                                    title: 'Message edit',
+                                    description: `Message sent by ${oldMessage.author} (${oldMessage.author.username}#${oldMessage.author.discriminator} ${oldMessage.author.id}) edited in ${oldMessage.channel}\n`,
+                                    fields: [
+                                        {
+                                            name: 'New message',
+                                            value: `[Jump to Message](https://discordapp.com/channels/${newMessage.guild.id}/${newMessage.channel.id}/${newMessage.id})`
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                        }
                     }
                 }
             }
