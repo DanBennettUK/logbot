@@ -57,7 +57,7 @@ exports.run = async (client, message, args) => {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
                     return;
                 }
-                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ? ORDER BY timestamp DESC LIMIT 22`, id, 
+                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
                 async function(err, rows, results) {
                     if (err) throw err;
                     if (rows && rows.length > 0) {
