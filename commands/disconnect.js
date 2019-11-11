@@ -4,11 +4,7 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Admins', 'Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_DISCONNECT')) {
-<<<<<<< HEAD
             if (args.length > 0) {    
-=======
-            if (args) {    
->>>>>>> 6d5d44aedeec27de64f20bf3f3b835254a64b704
                 var user = functionsFile.parseUserTag(client, guild, args.join(' '));
                 var guildUser = guild.member(user);
 
