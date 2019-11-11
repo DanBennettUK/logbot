@@ -4,7 +4,7 @@ exports.run = async (client, message, args) => {
     const modulesFile = client.modulesFile;
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         if (modulesFile.get('COMMAND_VCLOG')) {
-            if (args) {
+            if (args.length > 0) {
                 var id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
                 if (id == 'err') {
                     if (args.length < 3 && !/[0-9]/.test(args.slice(args.length, 1).join(' '))) {
@@ -57,7 +57,7 @@ exports.run = async (client, message, args) => {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
                     return;
                 }
-                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
+                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ? ORDER BY timestamp DESC LIMIT 22`, id, 
                 async function(err, rows, results) {
                     if (err) throw err;
                     if (rows && rows.length > 0) {
@@ -74,6 +74,7 @@ exports.run = async (client, message, args) => {
                             }
                             users += `${user}\n`;
                             joinTime += `${row.timestamp.toUTCString()}\n`;
+                            i++;
                         }
                         message.channel.send({
                             embed: {
