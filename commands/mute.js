@@ -203,7 +203,7 @@ exports.run = (client, message, args) => {
                 }
             } else functionsFile.syntaxErr(client, message, 'mute');
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     } else if (message.member.roles.some(role => ['Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_HELPER_MUTE')) {
@@ -352,7 +352,7 @@ exports.run = (client, message, args) => {
                 }
             } else functionsFile.syntaxErr(client, message, 'mute (helper)');
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

@@ -71,7 +71,7 @@ exports.run = (client, message, args) => {
                     }
                 );
             } else {
-                message.channel.send(`That module (${command}) is disabled.`);
+                message.channel.send(`:x: That module is disabled.`).catch(console.error);
             }
         } //End of permission checking statement
     }
@@ -80,7 +80,7 @@ exports.run = (client, message, args) => {
             if (modulesFile.get('COMMAND_USER_UPDATE')) {
                 functionsFile.updateUserTable(client, 'user', message.channel.id);
             } else {
-                message.channel.send(`That module (${command}) is disabled.`);
+                message.channel.send(`:x: That module is disabled.`).catch(console.error);
             }
         }
     }

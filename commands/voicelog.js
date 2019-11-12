@@ -174,7 +174,7 @@ exports.run = (client, message, args) => {
                 }).catch(() => message.channel.send(`An invalid user was provided. Please try again.`).catch(console.error));
             }
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

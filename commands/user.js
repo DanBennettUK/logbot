@@ -3292,7 +3292,7 @@ exports.run = async (client, message, args) => {
                 });
             }
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

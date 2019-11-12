@@ -31,13 +31,13 @@ exports.run = async (client, message, args) => {
                                     message.channel.send(`Channel ${channel} successfully locked`);
                                 }
                             ).catch(console.error);
-                    } else message.channel.send(`Channel ${channelObj} is already locked.`);
+                    } else message.channel.send(`Channel ${channelObj} is already locked.`).catch(console.error);
                 } else {
-                    message.channel.send(`Channel ${key} could not be found/resolved and will be removed from the list.`);
+                    message.channel.send(`Channel ${key} could not be found/resolved and will be removed from the list.`).catch(console.error);
                     LFGRoomsFile.unset(key);
                     LFGRoomsFile.save();
                 }
             }
-        } else message.channel.send(`That module (${command}) is disabled.`);
+        } else message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

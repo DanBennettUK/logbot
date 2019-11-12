@@ -5,13 +5,13 @@ exports.run = (client, message, args) => {
 
         switch (outcome) {
             case 0:
-                message.channel.send('Heads!');
+                message.channel.send('Heads!').catch(console.error);
                 break;
             case 1:
-                message.channel.send('Tails!');
+                message.channel.send('Tails!').catch(console.error);
                 break;
         }
     } else {
-        message.channel.send(`That module (${command}) is disabled.`);
+        message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

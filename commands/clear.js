@@ -52,13 +52,13 @@ exports.run = async (client, message, args) => {
                             }
                         }).catch(console.error);
                 } else {
-                    message.channel.send('The user provided was not found in this guild');
+                    message.channel.send('The user provided was not found in this guild').catch(console.error);
                 }
             } else {
                 functionsFile.syntaxErr(client, message, 'clear');
             }
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

@@ -38,6 +38,6 @@ exports.run = async (client, message, args) => {
                     LFGRoomsFile.save();
                 }
             }
-        } else message.channel.send(`That module (${command}) is disabled.`);
+        } else message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

@@ -261,7 +261,7 @@ exports.run = async (client, message, args) => {
                                             await msg.delete();
                                             message.channel.send('Action cancelled').then(msg2 => {
                                                 setTimeout(function() {msg2.delete();}, 5000);
-                                            });
+                                            }).catch(console.error);
                                         }
                                     });
                                 });
@@ -274,7 +274,7 @@ exports.run = async (client, message, args) => {
                 return;
             }
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);;
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }
