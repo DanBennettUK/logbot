@@ -2,7 +2,7 @@ exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const functionsFile = client.functionsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_NOTE')) {
@@ -24,33 +24,64 @@ exports.run = (client, message, args) => {
                     var data = [user, message.author.id, note, identifier, 0, new Date(), user];
                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                     function (err, results) {
-                        if (err) throw err;
-
-                        message.channel.send({
-                            embed: {
-                                color: config.color_success,
-                                author: {
-                                    name: client.user.username,
-                                    icon_url: client.user.displayAvatarURL
-                                },
-                                title: '[Action] Note added',
-                                description: `A note was added to ${client.users.get(user)} by ${message.author}`,
-                                fields: [
-                                    {
-                                        name: 'Content',
-                                        value: note
-                                    },
-                                    {
-                                        name: 'Identifier',
-                                        value: identifier
+                        if (err) {
+                            connection = functionsFile.establishConnection(client);
+                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                            function (err, results) {
+                                if (err) throw err;
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_success,
+                                        author: {
+                                            name: client.user.username,
+                                            icon_url: client.user.displayAvatarURL
+                                        },
+                                        title: '[Action] Note added',
+                                        description: `A note was added to ${client.users.get(user)} by ${message.author}`,
+                                        fields: [
+                                            {
+                                                name: 'Content',
+                                                value: note
+                                            },
+                                            {
+                                                name: 'Identifier',
+                                                value: identifier
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
                                     }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }).catch(console.error);
+                            });
+                        } else {
+                            message.channel.send({
+                                embed: {
+                                    color: config.color_success,
+                                    author: {
+                                        name: client.user.username,
+                                        icon_url: client.user.displayAvatarURL
+                                    },
+                                    title: '[Action] Note added',
+                                    description: `A note was added to ${client.users.get(user)} by ${message.author}`,
+                                    fields: [
+                                        {
+                                            name: 'Content',
+                                            value: note
+                                        },
+                                        {
+                                            name: 'Identifier',
+                                            value: identifier
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
                                 }
-                            }
-                        }).catch(console.error);
+                            }).catch(console.error);
+                        }
                     });
                 } else {
                     message.channel.send('The note needs a reason!');

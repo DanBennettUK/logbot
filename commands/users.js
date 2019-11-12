@@ -1,6 +1,6 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const functionsFile = client.functionsFile;
     if (args[0] && args[0].toLowerCase() == 'count') {
@@ -8,32 +8,65 @@ exports.run = (client, message, args) => {
             if (modulesFile.get('COMMAND_USER_COUNT')) {
                 connection.query('SELECT COUNT(*) AS TotalUsers FROM users',
                     function (err, result) {
-                        if (err) throw err;
-                        if (result) {
-                            message.channel.send({
-                                embed: {
-                                    color: config.color_info,
-                                    author: {
-                                        name: client.user.username,
-                                        icon_url: client.user.displayAvatarURL
-                                    },
-                                    title: '[COMMAND] User count',
-                                    description: 'The current count of users known to us',
-                                    fields: [{
-                                            name: 'Total user count',
-                                            value: result[0].TotalUsers
-                                        },
-                                        {
-                                            name: 'Note',
-                                            value: 'This number includes users past and present.'
+                        if (err) {
+                            connection = functionsFile.establishConnection(client);
+                            connection.query('SELECT COUNT(*) AS TotalUsers FROM users',
+                            function (err, result) {
+                                if (err) throw err;
+                                if (result) {
+                                    message.channel.send({
+                                        embed: {
+                                            color: config.color_info,
+                                            author: {
+                                                name: client.user.username,
+                                                icon_url: client.user.displayAvatarURL
+                                            },
+                                            title: '[COMMAND] User count',
+                                            description: 'The current count of users known to us',
+                                            fields: [{
+                                                    name: 'Total user count',
+                                                    value: result[0].TotalUsers
+                                                },
+                                                {
+                                                    name: 'Note',
+                                                    value: 'This number includes users past and present.'
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
                                         }
-                                    ],
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                                    }
+                                    }).catch(console.error);
                                 }
-                            }).catch(console.error);
+                            });
+                        } else {
+                            if (result) {
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: client.user.username,
+                                            icon_url: client.user.displayAvatarURL
+                                        },
+                                        title: '[COMMAND] User count',
+                                        description: 'The current count of users known to us',
+                                        fields: [{
+                                                name: 'Total user count',
+                                                value: result[0].TotalUsers
+                                            },
+                                            {
+                                                name: 'Note',
+                                                value: 'This number includes users past and present.'
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }
                         }
                     }
                 );

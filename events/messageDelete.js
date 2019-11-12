@@ -1,14 +1,21 @@
 module.exports = async (client, message) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const channelsFile = client.channelsFile;
+    const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()];
         connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         if (channelsFile.get('server_log')) {
@@ -16,6 +23,7 @@ module.exports = async (client, message) => {
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {
+                if (message.type.toLowerCase() == 'pins_add') return;
                 var dsc = `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}`;
                 const entry = await message.guild.fetchAuditLogs({
                     type: 'MESSAGE_DELETE'

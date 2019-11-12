@@ -1,14 +1,21 @@
 module.exports = (client, oldMessage, newMessage) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const channelsFile = client.channelsFile;
+    const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_MESSAGE_UPDATE')) {
         if (newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [newMessage.author.id, newMessage.id, newMessage.content, oldMessage.content, newMessage.channel.id, 2, new Date()];
         connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         if (channelsFile.get('server_log')) {

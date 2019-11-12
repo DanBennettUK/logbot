@@ -1,6 +1,6 @@
 exports.run = async (client, message, args) => {
     const functionsFile = client.functionsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const modulesFile = client.modulesFile;
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         if (modulesFile.get('COMMAND_VCLOG')) {
@@ -56,49 +56,98 @@ exports.run = async (client, message, args) => {
                 if (!channel) {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
                     return;
+                } else if (channel.type != 'voice') {
+                    message.channel.send(`The provided channel \`${args.join(' ')}\` is not a voice channel.`).catch(console.error);
+                    return;
                 }
                 connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
                 async function(err, rows, results) {
-                    if (err) throw err;
-                    if (rows && rows.length > 0) {
-                        var users = '';
-                        var joinTime = '';
-                        var i = 0;
-                        for (row of rows) {
-                            if (i == 30) break;
-                            var user;
-                            try {
-                                user = await client.fetchUser(row.userID);
-                            } catch (e) {
-                                message.channel.send(`${row.userID} could not be found.`).catch(console.error);
-                            }
-                            users += `${user}\n`;
-                            joinTime += `${row.timestamp.toUTCString()}\n`;
-                            i++;
-                        }
-                        message.channel.send({
-                            embed: {
-                                color: client.config.color_info,
-                                title: `Viewing the logs of ${message.guild.channels.get(id).name}`,
-                                fields: [
-                                    {
-                                        name: 'User',
-                                        value: `${users}`,
-                                        inline: true
-                                    },
-                                    {
-                                        name: 'Joined at',
-                                        value: `${joinTime}`,
-                                        inline: true
+                    if (err) {
+                        connection = functionsFile.establishConnection(client);
+                        connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
+                        async function(err, rows, results) {
+                            if (err) throw err;
+                            if (rows && rows.length > 0) {
+                                var users = '';
+                                var joinTime = '';
+                                var i = 0;
+                                for (row of rows) {
+                                    if (i == 30) break;
+                                    var user;
+                                    try {
+                                        user = await client.fetchUser(row.userID);
+                                    } catch (e) {
+                                        message.channel.send(`${row.userID} could not be found.`).catch(console.error);
                                     }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    users += `${user}\n`;
+                                    joinTime += `${row.timestamp.toUTCString()}\n`;
+                                    i++;
                                 }
+                                message.channel.send({
+                                    embed: {
+                                        color: client.config.color_info,
+                                        title: `Viewing the logs of ${message.guild.channels.get(id).name}`,
+                                        fields: [
+                                            {
+                                                name: 'User',
+                                                value: `${users}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Joined at',
+                                                value: `${joinTime}`,
+                                                inline: true
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            } else message.channel.send('No users were in that channel.').catch(console.error);
+                        });
+                    } else {
+                        if (rows && rows.length > 0) {
+                            var users = '';
+                            var joinTime = '';
+                            var i = 0;
+                            for (row of rows) {
+                                if (i == 30) break;
+                                var user;
+                                try {
+                                    user = await client.fetchUser(row.userID);
+                                } catch (e) {
+                                    message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                }
+                                users += `${user}\n`;
+                                joinTime += `${row.timestamp.toUTCString()}\n`;
+                                i++;
                             }
-                        }).catch(console.error);
-                    } else message.channel.send('No users were in that channel.').catch(console.error);
+                            message.channel.send({
+                                embed: {
+                                    color: client.config.color_info,
+                                    title: `Viewing the logs of ${message.guild.channels.get(id).name}`,
+                                    fields: [
+                                        {
+                                            name: 'User',
+                                            value: `${users}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Joined at',
+                                            value: `${joinTime}`,
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                        } else message.channel.send('No users were in that channel.').catch(console.error);
+                    }
                 });
             } else functionsFile.syntaxErr(client, message, 'vclog');
         } else message.channel.send(':x: That module is disabled.').catch(console.error);

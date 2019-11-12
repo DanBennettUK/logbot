@@ -1,6 +1,6 @@
 exports.run = async (client, message, args) => {
     const functionsFile = client.functionsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const guild = message.guild;
     const modulesFile = client.modulesFile;
@@ -35,7 +35,13 @@ exports.run = async (client, message, args) => {
                                 var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
                                 connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data,
                                 function (err, results) {
-                                    if (err) throw err;
+                                    if (err) {
+                                        connection = functionsFile.establichConnection(client);
+                                        connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data,
+                                        function (err, results) {
+                                            if (err) throw err;
+                                        });
+                                    }
                                 });
                             } else {
                                 message.channel.send('The command executed successfully but no messages were removed. Ensure the correct channel was used.').then(msg => {

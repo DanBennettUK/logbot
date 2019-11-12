@@ -4,7 +4,7 @@ exports.run = async (client, message, args) => {
     const cryptoRandomString = client.cryptoRandomString;
     const config = client.config;
     const guild = message.guild;
-    const connection = client.connection;
+    var connection = client.connection;
     const bannedUsersFile = client.bannedUsersFile;
     if (message.member.roles.some(role=>['Moderators'].includes(role.name))) {
         if(modulesFile.get('COMMAND_BAN')) {
@@ -46,7 +46,13 @@ exports.run = async (client, message, args) => {
                                         var data = [user, `Title: ${dm.embeds[0].title}`, 2, 0, identifier, new Date(), new Date()];
                                         connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                         function(err, results) {
-                                            if(err) throw err;
+                                            if(err) {
+                                                connection = functionsFile.establishConnection(client);
+                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
+                                                function(err, results) {
+                                                    if(err) throw err;
+                                                });
+                                            }
                                         });
     
                                         guild.ban(user, { days: 1, reason: reason }).then(async result => {
@@ -92,8 +98,14 @@ exports.run = async (client, message, args) => {
     
                                             var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                             connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                                            function(err, results){
-                                                if(err) throw err;
+                                            function(err, results) {
+                                                if(err) {
+                                                    connection = functionsFile.establishConnection(client);
+                                                    connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                                    function(err, results) {
+                                                        if (err) throw err;
+                                                    });
+                                                }
                                             });
     
                                             //Adding the user to our banned users JSON
@@ -148,8 +160,14 @@ exports.run = async (client, message, args) => {
 
                                         var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                         connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                                        function(err, results){
-                                            if(err) throw err;
+                                        function(err, results) {
+                                            if(err) {
+                                                connection = functionsFile.establishConnection(client);
+                                                connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                                function(err, results) {
+                                                    if (err) throw err;
+                                                });
+                                            }
                                         });
 
                                         //Adding the user to our banned users JSON
@@ -224,7 +242,13 @@ exports.run = async (client, message, args) => {
                                                     var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                                     connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                                                     function(err, results) {
-                                                        if(err) throw err;
+                                                        if(err) {
+                                                            connection = functionsFile.establishConnection(client);
+                                                            connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                                            function(err, results) {
+                                                                if (err) throw err;
+                                                            });
+                                                        }
                                                     });
 
                                                     //Adding the user to our banned users JSON

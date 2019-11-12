@@ -1,22 +1,37 @@
 module.exports = (client, guild, user) => {
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const modulesFile = client.modulesFile;
     const bannedUsersFile = client.bannedUsersFile;
+    const functionsFile = client.functionsFile;
     const channelsFile = client.channelsFile;
     var identifier = cryptoRandomString({length: 10});
     var data = [user.id, '001', "SYSTEM UNBAN", identifier, 0, new Date()];
     connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
     function(err, results){
-        if(err) throw err;
+        if(err) {
+            connection = functionsFile.establishConnection(client);
+            connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+            function(err, results){
+                if(err) throw err;
+            });
+        }
     });
     connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id,
     function(err, rows, results){
-        if(err) throw err;
-
-        bannedUsersFile.set(rows[0].identifier, '');
-        bannedUsersFile.save();
+        if(err) {
+            connection = functionsFile.establishConnection(client);
+            connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id,
+            function(err, rows, results){
+                if(err) throw err;
+                bannedUsersFile.set(rows[0].identifier, '');
+                bannedUsersFile.save();
+            });
+        } else {
+            bannedUsersFile.set(rows[0].identifier, '');
+            bannedUsersFile.save();    
+        }
     });
     if (channelsFile.get('server_log')) {
         if (!guild.channels.get(channelsFile.get('server_log'))) {
