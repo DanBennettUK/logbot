@@ -52,7 +52,7 @@ exports.run = async (client, message, args) => {
                 }
                 id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
                 var channel;
-                if (id != 'err') channel = message.guild.channels.get(id);
+                if (id != 'err') channel = await message.guild.channels.get(id);
                 if (!channel) {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
                     return;
@@ -86,7 +86,7 @@ exports.run = async (client, message, args) => {
                                 message.channel.send({
                                     embed: {
                                         color: client.config.color_info,
-                                        title: `Viewing the logs of ${message.guild.channels.get(id).name}`,
+                                        title: `Viewing the logs of ${channel.name}`,
                                         fields: [
                                             {
                                                 name: 'User',
@@ -127,7 +127,7 @@ exports.run = async (client, message, args) => {
                             message.channel.send({
                                 embed: {
                                     color: client.config.color_info,
-                                    title: `Viewing the logs of ${message.guild.channels.get(id).name}`,
+                                    title: `Viewing the logs of ${channel.name}`,
                                     fields: [
                                         {
                                             name: 'User',

@@ -23,7 +23,6 @@ module.exports = async (client, message) => {
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {
-                if (message.type.toLowerCase() == 'pins_add') return;
                 var dsc = `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}`;
                 const entry = await message.guild.fetchAuditLogs({
                     type: 'MESSAGE_DELETE'
@@ -33,7 +32,8 @@ module.exports = async (client, message) => {
                     dsc += ` by ${entry.executor}\n`
                 }
                 var messageContent = '';
-                if (message.content.length == 0) {
+                if (message.type.toLowerCase() == 'pins_add') messageContent = '**AUTOMATED DISCORD MESSAGE**\n📌 A message has been pinned.'
+                else if (message.content.length == 0) {
                     if (message.embeds.length > 0) {
                         var embed = msg.embeds[0];
                         var fields = '';
