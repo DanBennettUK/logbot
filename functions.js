@@ -1190,3 +1190,53 @@ exports.establishConnection = (client) => {
     client.connection = connection;
     return connection;
 }
+
+exports.checkLive = (client) => {
+    const channelsFile = client.channelsFile;
+    const guild = client.guilds.get(client.config.guildid);
+    const request = client.request;
+    var options = {
+        url: `https://api.twitch.tv/helix/streams/?user_login=${client.config.streamer}`,
+        headers: {
+            'Client-ID': client.config.clientId
+        }
+    };
+
+    request(options, (error, response, body) => {
+        if (!error) {
+            var channel = JSON.parse(body);
+            if (channel.data.length > 0) {
+                if (client.live == false) {
+                    if (channelsFile.get('action_log')) {
+                        var chnl = guild.channels.get(channelsFile.get('action_log'))
+                        if (chnl) {
+                            chnl.send({
+                                embed: {
+                                    title: `${channel.data[0].user_name} is live`,
+                                    fields: [
+                                        {
+                                            name: 'Stream',
+                                            value: `[${channel.data[0].title}](https://www.twitch.tv/${channel.data[0].user_name.toLowerCase()})`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Started at',
+                                            value: new Date(channel.data[0].started_at).toUTCString(),
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                            chnl.send('<@198862223521742848> <@201134814328258560>').catch(console.error);
+                            client.live = true;
+                        }
+                    }
+                }
+            } else client.live = false;
+        } else console.log(error);
+    });
+}
