@@ -4,18 +4,16 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         var client_PING = Math.floor(client.ping);
-        var db_PING;
-        connection.query('SELECT * FROM log_note WHERE userID = 0', function (err, rows, results) { // Forcefully allowing it to reconnect
-            if (err) {
-                connection = functionsFile.establishConnection(client);
-                connection.query('SELECT * FROM log_note WHERE userID = 0', function (err, rows, results) {
-                    if (err) throw err;
-                    db_PING = connection.ping();
-                });
-            } else {
-                db_PING = connection.ping();
+        connection.on('error', (err) => {
+            console.log(err);
+            if (err.code == 'PROTOCOL_CONNECTION_LOST') {
+                setTimeout(() => {
+                    connection = functionsFile.establishConnection(client);
+                    connection.ping()
+                }, 5000);
             }
-        })
+        });
+        var db_PING = connection.ping();
         var client_STATUS;
         var db_STATUS;
 
