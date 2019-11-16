@@ -3,7 +3,7 @@ exports.run = (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VC')) {
-            if (args) {
+            if (args.length > 0) {
                 var user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
                 var guildUser = message.guild.member(user);
                 if (user !== 'err' && guildUser) {

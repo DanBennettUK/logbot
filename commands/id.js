@@ -3,7 +3,7 @@ exports.run = async (client, message, args) => {
     const modulesFile = client.modulesFile;
     if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) {
         if (modulesFile.get('COMMAND_ID')) {
-            if (args) {
+            if (args.length > 0) {
                 var user;
                 if (args.length == 1 && /[0-9]/.test(args[0])) {
                     try {

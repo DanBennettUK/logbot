@@ -6,7 +6,7 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
-            if (args) var dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
+            if (args.length > 0) var dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
             else var dsc = '';
             var everyone = guild.roles.find( role => role.name === '@everyone');
             var LFGRoomsObject = LFGRoomsFile.read();
@@ -31,13 +31,13 @@ exports.run = async (client, message, args) => {
                                     message.channel.send(`Channel ${channel} successfully locked`);
                                 }
                             ).catch(console.error);
-                    } else message.channel.send(`Channel ${channelObj} is already locked.`);
+                    } else message.channel.send(`Channel ${channelObj} is already locked.`).catch(console.error);
                 } else {
-                    message.channel.send(`Channel ${key} could not be found/resolved and will be removed from the list.`);
+                    message.channel.send(`Channel ${key} could not be found/resolved and will be removed from the list.`).catch(console.error);
                     LFGRoomsFile.unset(key);
                     LFGRoomsFile.save();
                 }
             }
-        } else message.channel.send(`That module (${command}) is disabled.`);
+        } else message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

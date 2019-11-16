@@ -4,7 +4,7 @@ exports.run = async (client, message, args) => {
     const _ = client.underscore;
     const config = client.config;
     if (message.member.roles.some(r => r.name == 'Moderators')) {
-        if (args) {
+        if (args.length > 0) {
             if (args[0].toLowerCase() == 'add') {
                 if (args.length < 5) {
                     functionsFile.syntaxErr(client, message, 'reactions add');

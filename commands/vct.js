@@ -4,7 +4,7 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VCT')) {
-            if (args) {
+            if (args.length > 0) {
                 var user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
                 var guildUser = message.guild.member(user);
                 var msg;

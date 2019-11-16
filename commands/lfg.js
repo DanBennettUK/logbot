@@ -10,6 +10,6 @@ exports.run = (client, message, args) => {
                     })
                 }).catch(console.error);
             }).catch(console.error);
-        } else message.channel.send(`:x: That module is disabled.`);
+        } else message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

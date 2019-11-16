@@ -1,5 +1,5 @@
 exports.setupTables = function setupTables(client) {
-    const connection = client.connection;
+    var connection = client.connection;
     connection.query(
         `CREATE TABLE IF NOT EXISTS users
         (
@@ -429,7 +429,7 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
 
 exports.updateUserTable = function updateUserTable(client, invoker, channel) {
     const config = client.config;
-    const connection = client.connection;
+    var connection = client.connection;
     var memberArray = [];
     var guild = client.guilds.get(config.guildid);
 
@@ -485,7 +485,7 @@ exports.updateUserTable = function updateUserTable(client, invoker, channel) {
 
 exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, channel) {
     const config = client.config;
-    const connection = client.connection;
+    var connection = client.connection;
     var banArray = [];
     var guild = client.guilds.get(config.guildid);
 
@@ -560,7 +560,7 @@ exports.isNull = function isNull(value, def) {
 
 exports.checkMessageContent = function checkMessageContent(client, message) {
     const badWordsFile = client.badWordsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
@@ -685,7 +685,7 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
     const channelsFile = client.channelsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
     var mutes = mutedFile.read();
     for (key in mutes) {
@@ -789,7 +789,7 @@ exports.checkReminders = async function checkReminders(client) {
 }
 
 exports.importWarnings = function importWarnings(client) {
-    const connection = client.connection;
+    var connection = client.connection;
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
     var warnings = usercardsFile.get();
@@ -819,7 +819,7 @@ exports.importWarnings = function importWarnings(client) {
 
 exports.importMutes = function importMutes(client) {
     const usercardsFile = client.usercardsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
     var mutes = usercardsFile.get();
     var insert = [];
@@ -870,7 +870,7 @@ exports.importMutes = function importMutes(client) {
 exports.importNotes = function importNotes(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     var notes = usercardsFile.get();
     var insert = [];
 
@@ -897,7 +897,7 @@ exports.importNotes = function importNotes(client) {
 exports.importBans = function importBans(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     var bans = usercardsFile.get();
     var insert = [];
 
@@ -926,7 +926,7 @@ exports.importBans = function importBans(client) {
 exports.importUnbans = function importUnbans(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     var unbans = usercardsFile.get();
     var insert = [];
 
@@ -1066,7 +1066,7 @@ exports.parseRoleTag = (client, guild, tag) => {
 
 exports.inviteLinkDetection = (client, message) => {
     const channelsFile = client.channelsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     if (message.author.bot) return;
     if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
     if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
@@ -1166,4 +1166,77 @@ exports.inviteLinkDetection = (client, message) => {
             );
         }).catch(console.error);
     }
+}
+
+exports.establishConnection = (client) => {
+    let connection = client.connection;
+    const mysql = client.mysql;
+    const config = client.config;
+
+    console.log(`[${new Date().toUTCString()}] [establishConnection()] Database connection lost. Reconnecting...`);
+    connection = mysql.createConnection({
+        host: config.host,
+        user: config.user,
+        password: config.password,
+        database: config.database,
+        multipleStatements: config.multipleStatements
+    });
+    connection.connect(function (err) {
+        console.log(`[${new Date().toUTCString()}] [establishConnection()] Successfully connected to database.`);
+        if (err) {
+            throw err;
+        }
+    });
+    client.connection = connection;
+    return connection;
+}
+
+exports.checkLive = (client) => {
+    const channelsFile = client.channelsFile;
+    const guild = client.guilds.get(client.config.guildid);
+    const request = client.request;
+    var options = {
+        url: `https://api.twitch.tv/helix/streams/?user_login=${client.config.streamer}`,
+        headers: {
+            'Client-ID': client.config.clientId
+        }
+    };
+
+    request(options, (error, response, body) => {
+        if (!error) {
+            var channel = JSON.parse(body);
+            if (channel.data.length > 0) {
+                if (client.live == false) {
+                    if (channelsFile.get('action_log')) {
+                        var chnl = guild.channels.get(channelsFile.get('action_log'))
+                        if (chnl) {
+                            chnl.send({
+                                embed: {
+                                    title: `${channel.data[0].user_name} is live`,
+                                    fields: [
+                                        {
+                                            name: 'Stream',
+                                            value: `[${channel.data[0].title}](https://www.twitch.tv/${channel.data[0].user_name.toLowerCase()})`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Started at',
+                                            value: new Date(channel.data[0].started_at).toUTCString(),
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                            chnl.send('<@198862223521742848> <@201134814328258560>').catch(console.error);
+                            client.live = true;
+                        }
+                    }
+                }
+            } else client.live = false;
+        } else console.log(error);
+    });
 }

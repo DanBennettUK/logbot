@@ -1,14 +1,21 @@
 module.exports = async (client, message) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const channelsFile = client.channelsFile;
+    const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()];
         connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         if (channelsFile.get('server_log')) {
@@ -25,7 +32,8 @@ module.exports = async (client, message) => {
                     dsc += ` by ${entry.executor}\n`
                 }
                 var messageContent = '';
-                if (message.content.length == 0) {
+                if (message.type.toLowerCase() == 'pins_add') messageContent = '**AUTOMATED DISCORD MESSAGE**\n📌 A message has been pinned.'
+                else if (message.content.length == 0) {
                     if (message.embeds.length > 0) {
                         var embed = msg.embeds[0];
                         var fields = '';
