@@ -4,6 +4,14 @@ module.exports = (client, oldMessage, newMessage) => {
     const config = client.config;
     const channelsFile = client.channelsFile;
     const functionsFile = client.functionsFile;
+
+    if (modulesFile.get('EVENT_CHECK_MESSAGE_CONTENT')) {
+        functionsFile.checkMessageContent(client, newMessage);
+    }
+    if (modulesFile.get('EVENT_INVITE_LINK_DETECTION')) {
+        functionsFile.inviteLinkDetection(client, newMessage);
+    }
+
     if (modulesFile.get('EVENT_MESSAGE_UPDATE')) {
         if (newMessage.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [newMessage.author.id, newMessage.id, newMessage.content, oldMessage.content, newMessage.channel.id, 2, new Date()];
