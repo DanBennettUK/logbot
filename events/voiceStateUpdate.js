@@ -22,6 +22,8 @@ module.exports = (client, oldMember, newMember) => {
                         }
                     } 
                 }
+            } else {
+                data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()];
             }
         } else {
             if (newMember.voiceChannel) {
