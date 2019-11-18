@@ -959,12 +959,12 @@ exports.checkStreamers = function checkStreamers(client) {
     var streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
     var spotlighters = guild.members.filter(m => m.roles.has(spotlightRole.id));
     streamers.forEach(s => {
-        if (s.user.presence.status != 'offline' && s.user.presence.game && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.details == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
+        if (s.user.presence.status != 'offline' && s.user.presence.game && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.state == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
             s.addRole(spotlightRole);
         }
     });
     spotlighters.forEach(s => {
-        if (s.user.presence.status == 'offline' || !s.user.presence.game || !(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.details != 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
+        if (s.user.presence.status == 'offline' || !s.user.presence.game || !(/.*twitch.tv.*/.test(s.user.presence.game.url)) || s.user.presence.game.state != 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
             s.removeRole(spotlightRole);
         }
     });
