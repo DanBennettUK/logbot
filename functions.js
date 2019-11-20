@@ -352,12 +352,15 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
 
     if (/(<@(!)*)+\w+(>)/.test(tag)) {
         return trimMe.replace(/[^0-9.]/gi, '');
-    } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
+    } else if (/.+(#\d\d\d\d)+$/.test(tag)) {
         var split = tag.split('#');
-        var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
+        var disc = split[split.length - 1];
+        split.pop();
+        split = split.join('#');
+        var usernameResolve = client.users.find(obj => (obj.username === split) && (obj.discriminator == disc));
 
         if (usernameResolve == null) {
-            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split[0].toLowerCase()) && (obj.discriminator == split[1]));
+            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split.toLowerCase()) && (obj.discriminator == disc));
             if (usernameResolve == null) {
                 return 'err';
             } else {
