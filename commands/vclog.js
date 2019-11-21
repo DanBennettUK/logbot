@@ -9,9 +9,9 @@ exports.run = async (client, message, args) => {
                 if (id == 'err') {
                     if (args.length < 3 && !/[0-9]/.test(args.slice(args.length, 1).join(' '))) {
                         switch(args[0].toLowerCase()) {
-                            case 'the': 
+                            case 'the':
                                 switch(args[1].toLowerCase()) {
-                                    case 'office': 
+                                    case 'office':
                                         args.unshift('🔒');
                                         break;
                                     case 'cabin':
@@ -20,7 +20,7 @@ exports.run = async (client, message, args) => {
                                     case 'studio':
                                         args.unshift('🎤');
                                         break;
-            
+
                                 }
                                 break;
                             case 'general':
@@ -28,6 +28,9 @@ exports.run = async (client, message, args) => {
                                 break;
                             case 'squad':
                                 args.unshift('🔫');
+                                break;
+                            case 'duo':
+                                args.unshift('👥');
                                 break;
                             case 'customs':
                                 args.unshift('🛠');
