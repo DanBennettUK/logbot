@@ -4,7 +4,7 @@ exports.run = (client, message, args) => {
     const cryptoRandomString = client.cryptoRandomString;
     const guild = message.guild;
     const functionsFile = client.functionsFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const bannedUsersFile = client.bannedUsersFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNBAN')) {
@@ -64,20 +64,33 @@ exports.run = (client, message, args) => {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                     }
                                 }
-                            });
+                            }).catch(console.error);
 
                             var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                             connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                             function (err, results) {
-                                if (err) throw err;
+                                if (err) {
+                                    connection = functionsFile.establishConnection(client);
+                                    connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+                                    function (err, results) {
+                                        if (err) throw err;
+                                    });
+                                }
                             });
                             connection.query( 'select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', result.id,
                             function (err, rows, results) {
-                                if (err) throw err;
-
-                                //var file = bannedUsersFile.get();
-                                bannedUsersFile.set(rows[0].identifier, '');
-                                bannedUsersFile.save();
+                                if (err) {
+                                    connection = functionsFile.establishConnection(client);
+                                    connection.query( 'select identifier from log_guildbans where userid = ? order by timestamp desc limit 1', result.id,
+                                    function (err, rows, results) {
+                                        if (err) throw err;
+                                        bannedUsersFile.set(rows[0].identifier, '');
+                                        bannedUsersFile.save();
+                                    });
+                                } else {
+                                    bannedUsersFile.set(rows[0].identifier, '');
+                                    bannedUsersFile.save();
+                                }
                             });
                         }).catch(err => {
                             if (err.message === 'Unknown Ban') {
@@ -94,7 +107,7 @@ exports.run = (client, message, args) => {
                 }
             }
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

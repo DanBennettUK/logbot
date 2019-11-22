@@ -1,34 +1,40 @@
 module.exports = async (client, message) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const channelsFile = client.channelsFile;
+    const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_MESSAGE_DELETE')) {
         if (message.author.bot) return; //If the author is a bot, return. Avoid bot-ception
         var data = [message.author.id, message.id, '', message.content, message.channel.id, 3, new Date()];
         connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         if (channelsFile.get('server_log')) {
             if (!message.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_MESSAGE_DELETE_LOG')) {
+                var dsc = `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}`;
                 const entry = await message.guild.fetchAuditLogs({
                     type: 'MESSAGE_DELETE'
                 }).then(audit => audit.entries.first());
-                var user = '';
                 if (entry.extra.channel.id === message.channel.id &&
                 (entry.target.id == message.author.id) && (entry.createdTimestamp > (Date.now() - 5000))) {
-                    user = entry.executor
-                } else user = message.author;
+                    dsc += ` by ${entry.executor}\n`
+                }
                 var messageContent = '';
-                if (message.content.length == 0) {
-                    if (message.content.embeds.length > 0) {
+                if (message.type.toLowerCase() == 'pins_add') messageContent = '**AUTOMATED DISCORD MESSAGE**\n📌 A message has been pinned.'
+                else if (message.content.length == 0) {
+                    if (message.embeds.length > 0) {
                         var embed = msg.embeds[0];
                         var fields = '';
                         var title = 'This embed has no title';
@@ -44,7 +50,8 @@ module.exports = async (client, message) => {
                         \n`;
                     } else messageContent = message.attachments.first().filename;
                 } else messageContent = message.content;
-                if (messageContent.length > 1900) messageContent = 'Message too long ( > 2000 characters)';
+                if (messageContent.length > 1800) messageContent = 'Message too long ( > 1800 characters)';
+                dsc += `\n**Content:**\n\n${messageContent}`;
                 message.guild.channels.get(channelsFile.get('server_log')).send({
                     embed: {
                         color: config.color_warning,
@@ -53,23 +60,13 @@ module.exports = async (client, message) => {
                             icon_url: message.author.displayAvatarURL
                         },
                         title: `Message deletion`,
-                        description: `Message sent by user ${message.author} (${message.author.username}#${message.author.discriminator} ${message.author.id}) deleted in ${message.channel}\n`,
-                        fields: [
-                            {
-                                name: 'Deleted by',
-                                value: `${user}`
-                            },
-                            {
-                                name: 'Deleted message',
-                                value: messageContent
-                            }
-                        ],
+                        description: dsc,
                         timestamp: new Date(),
                         footer: {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }

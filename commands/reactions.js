@@ -4,7 +4,7 @@ exports.run = async (client, message, args) => {
     const _ = client.underscore;
     const config = client.config;
     if (message.member.roles.some(r => r.name == 'Moderators')) {
-        if (args) {
+        if (args.length > 0) {
             if (args[0].toLowerCase() == 'add') {
                 if (args.length < 5) {
                     functionsFile.syntaxErr(client, message, 'reactions add');
@@ -55,7 +55,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });
+                                            }).catch(console.error);
                                         } else {
                                             message.channel.send(':x: An invalid role was provided.');
                                         }
@@ -107,7 +107,7 @@ exports.run = async (client, message, args) => {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
                                         }
                                     }
-                                });                            
+                                }).catch(console.error);                         
                             } else {
                                 try {
                                     var msg = chnl.fetchMessage(args[2]);
@@ -143,7 +143,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            });                                        
+                                            }).catch(console.error);                                      
                                         } else {
                                             var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
@@ -179,7 +179,7 @@ exports.run = async (client, message, args) => {
                                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                                 }
                                                             }
-                                                        });                                                    
+                                                        }).catch(console.error);                                                   
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -270,7 +270,7 @@ exports.run = async (client, message, args) => {
                                                 amount = 0;
                                                 sent = true;
                                             }
-                                            dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url})\n`;
+                                            dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url}) in ${chnl}\n`;
                                             amount ++;
                                         } else {
                                             reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);

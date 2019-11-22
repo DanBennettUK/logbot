@@ -1,7 +1,8 @@
 module.exports = (client, member) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
+    const functionsFile = client.functionsFile;
     const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE')) {
         var data = [member.user.id, new Date()];
@@ -9,18 +10,28 @@ module.exports = (client, member) => {
 
         connection.query('INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)', data,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)', data,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         connection.query('UPDATE users SET exist = ? WHERE userID = ?', userLeave,
             function (err, results) {
-                if (err) throw err;
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('UPDATE users SET exist = ? WHERE userID = ?', userLeave,
+                    function (err, results) {
+                        if (err) throw err;
+                    });
+                }
             }
         );
         if (channelsFile.get('server_log')) {
             if (!member.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE_LOG')) {
@@ -41,7 +52,7 @@ module.exports = (client, member) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }

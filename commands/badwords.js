@@ -90,23 +90,49 @@ exports.run = (client, message, args) => {
     }
     if (args[0] && args[0].toLowerCase() === 'list') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-            var currentWords = badWordsFile.get(`badWords`).join(`\n`);
-            if (currentWords) {
-                message.channel.send({
-                    embed: {
-                        color: config.color_info,
-                        author: {
-                            name: client.user.username,
-                            icon_url: client.user.displayAvatarURL
-                        },
-                        title: `Current bad words:`,
-                        description: `${currentWords}`,
-                        timestamp: new Date(),
-                        footer: {
-                            text: `Marvin's Little Brother | Current version: ${config.version}`
+            var currentWords = '';
+            var currentWordsArray = badWordsFile.get(`badWords`);
+            if (currentWordsArray.length > 0) {
+                currentWordsArray.forEach((word, i) => {
+                    if (currentWords.length > 1900) {
+                        message.channel.send({
+                            embed: {
+                                color: config.color_info,
+                                author: {
+                                    name: client.user.username,
+                                    icon_url: client.user.displayAvatarURL
+                                },
+                                title: `Current bad words:`,
+                                description: `${currentWords}`,
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                        currentWords = '';
+                    }                
+                    currentWords += `${word}\n`
+                    if (i == (currentWordsArray.length - 1)) {
+                        if (currentWords.length > 0) {
+                            message.channel.send({
+                                embed: {
+                                    color: config.color_info,
+                                    author: {
+                                        name: client.user.username,
+                                        icon_url: client.user.displayAvatarURL
+                                    },
+                                    title: `Current bad words:`,
+                                    description: `${currentWords}`,
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
                         }
                     }
-                });
+                })
             } else {
                 message.channel.send({
                     embed: {
@@ -122,7 +148,7 @@ exports.run = (client, message, args) => {
                             text: `Marvin's Little Brother | Current version: ${config.version }`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }

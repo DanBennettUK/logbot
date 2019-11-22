@@ -1,10 +1,19 @@
 exports.run = (client, message, args) => {
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
+    const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         var client_PING = Math.floor(client.ping);
+        connection.on('error', (err) => {
+            console.log(err);
+            if (err.code == 'PROTOCOL_CONNECTION_LOST') {
+                setTimeout(() => {
+                    connection = functionsFile.establishConnection(client);
+                    connection.ping()
+                }, 5000);
+            }
+        });
         var db_PING = connection.ping();
-
         var client_STATUS;
         var db_STATUS;
 
@@ -31,6 +40,6 @@ exports.run = (client, message, args) => {
                     text: `Marvin's Little Brother | Current version: ${config.version}`
                 }
             }
-        });
+        }).catch(console.error);
     }
 }

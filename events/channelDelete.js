@@ -6,8 +6,6 @@ module.exports = (client, channel) => {
         if (modulesFile.get('EVENT_CHANNEL_DELETE_LOG')) {
             if (![`dm`, `group`].includes(channel.type)) {
                 if (!channel.guild.channels.get(channelsFile.get('server_log'))) {
-                    channelsFile.set('server_log', '');
-                    channelsFile.save();
                     return;
                 }
                 var channelType = 'Channel'

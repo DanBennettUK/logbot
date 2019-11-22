@@ -79,6 +79,7 @@ client.request = request;
 client.cryptoRandomString = cryptoRandomString;
 client.reactionsFile = reactionsFile;
 client.channelsFile = channelsFile;
+client.live = false;
 
 fs.readdir(`./events/`, (err, files) => {
     if (err) return console.error(err);

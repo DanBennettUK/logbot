@@ -4,8 +4,8 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VCT')) {
-            if (args[0]) {
-                var user = functionsFile.parseUserTag(client, message.guild, args[0]);
+            if (args.length > 0) {
+                var user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
                 var guildUser = message.guild.member(user);
                 var msg;
                 if (user !== 'err' && guildUser) {
@@ -32,8 +32,8 @@ exports.run = async (client, message, args) => {
                     const checkVC = setInterval(() => {
                         if (guildUser.voiceChannel != vc || (guildUser.voiceChannel && guildUser.voiceChannel.members.size != size)) {
                             vc = guildUser.voiceChannel;
-                            size = vc.members.size;
                             if (vc != undefined) {
+                                size = vc.members.size;
                                 switch (size) {
                                     case 1:
                                         msg.edit(`User ${guildUser} is in voice channel **${vc.name}**`).catch(console.error);
@@ -47,7 +47,8 @@ exports.run = async (client, message, args) => {
                     const autoStop = setTimeout(()=> {
                         clearInterval(checkVC);
                         msg.clearReactions();
-                        msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct <user>\` User ${guildUser} was last seen in **${vc.name}**.`);
+                        if (vc) msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct <user>\` User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
+                        else msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct <user>\` User ${guildUser} was **not in a voice channel**.`).catch(console.error);
                     }, 300000);
                     const filter = (reaction, user) => !user.bot
                     const collector = msg.createReactionCollector(filter);
@@ -56,8 +57,8 @@ exports.run = async (client, message, args) => {
                             clearTimeout(autoStop);
                             clearInterval(checkVC);
                             msg.clearReactions();
-                            msg.edit(`Tracking stopped. User ${guildUser} was last seen in **${vc.name}**.`);
-                        }
+                            if (vc) msg.edit(`Tracking stopped. User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
+                            else msg.edit(`Tracking stopped. User ${guildUser} was **not in a voice channel**.`).catch(console.error);                        }
                     });
                 } else message.channel.send(':x: Thes user provided was not found');
             } else functionsFile.syntaxErr(client, message, 'vct');

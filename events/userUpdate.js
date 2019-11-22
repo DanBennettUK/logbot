@@ -1,6 +1,6 @@
 module.exports = (client, oldUser, newUser) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const guild = client.guilds.get(config.guildid)
     const bannedUsersFile = client.bannedUsersFile;
@@ -8,18 +8,24 @@ module.exports = (client, oldUser, newUser) => {
     const _ = client.underscore;
     const cryptoRandomString = client.cryptoRandomString;
     const channelsFile = client.channelsFile;
+    const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {
             var data = [newUser.id, newUser.username, oldUser.username, new Date()];
             connection.query('INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)', data, function (err, results) {
-                    if (err) throw err;
+                    if (err) {
+                        connection = functionsFile.establishConnection(client);
+                        connection.query('INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)', 
+                        [newUser.id, newUser.username, oldUser.username, new Date()], 
+                        function (err, results) {
+                            if (err) throw err;
+                        });
+                    }
                 }
             );
             if (channelsFile.get('server_log')) {
                 if (!guild.channels.get(channelsFile.get('server_log'))) {
-                    channelsFile.set('server_log', '');
-                    channelsFile.save();
                     return;
                 }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
@@ -83,35 +89,78 @@ module.exports = (client, oldUser, newUser) => {
         
                     connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
                     function (err, rows, results) {
-                        if (err) throw err;
-                        if (rows.length == 0) return;
-                        for (var b = 0; b < rows.length; b++) {
-                            var row = rows[b];
-                            msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
-                        }
-                        if (channelsFile.get('action_log')) {
-                            if (!guild.channels.get(channelsFile.get('action_log'))) {
-                                channelsFile.set('action_log', '');
-                                channelsFile.save();
-                                return;
-                            }
-                            guild.channels.get(channelsFile.get('action_log')).send({
-                                embed: {
-                                    color: config.color_warning,
-                                    title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
-                                    description: msg.join(' '),
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `Marvin's Little Brother | Current version: ${config.version}`
-                                    }
+                        if (err) {
+                            connection = functionsFile.establishConnection(client);
+                            connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
+                            function (err, rows, results) {
+                                if (err) throw err;
+                                if (rows.length == 0) return;
+                                for (var b = 0; b < rows.length; b++) {
+                                    var row = rows[b];
+                                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
                                 }
-                            }).catch(console.error);
+                                if (channelsFile.get('action_log')) {
+                                    if (!guild.channels.get(channelsFile.get('action_log'))) {
+                                        return;
+                                    }
+                                    guild.channels.get(channelsFile.get('action_log')).send({
+                                        embed: {
+                                            color: config.color_warning,
+                                            title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
+                                            description: msg.join(' '),
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                }
+                                var identifier = cryptoRandomString({length: 10});
+                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                                function(err, results) {
+                                    if (err) {
+                                        connection = functionsFile.establishConnection(client);
+                                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                                        function(err, results) {
+                                            if (err) throw err;
+                                        });
+                                    }
+                                });
+                            });
+                        } else {
+                            if (rows.length == 0) return;
+                            for (var b = 0; b < rows.length; b++) {
+                                var row = rows[b];
+                                msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                            }
+                            if (channelsFile.get('action_log')) {
+                                if (!guild.channels.get(channelsFile.get('action_log'))) {
+                                    return;
+                                }
+                                guild.channels.get(channelsFile.get('action_log')).send({
+                                    embed: {
+                                        color: config.color_warning,
+                                        title: `❗ ${newUser.username}#${newUser.discriminator} matches one or more previous ban record(s)`,
+                                        description: msg.join(' '),
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }
+                            var identifier = cryptoRandomString({length: 10});
+                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                            function(err, results) {
+                                if (err) {
+                                    connection = functionsFile.establishConnection(client);
+                                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                                    function(err, results) {
+                                        if (err) throw err;
+                                    });
+                                }
+                            });
                         }
-                        var identifier = cryptoRandomString({length: 10});
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', msg.join(' '), identifier, 0, new Date()],
-                        function(err, results){
-                            if (err) throw err;
-                        });
                     });
                 }
             }
@@ -122,10 +171,19 @@ module.exports = (client, oldUser, newUser) => {
             var data = [newUser.avatar, new Date(), newUser.id];
             connection.query('UPDATE users SET avatar = ?, updated = ? WHERE userID = ?', data,
                 function (err, results) {
-                    if (err) throw err;
+                    if (err) {
+                        connection = functionsFile.establishConnection(client);
+                        connection.query('UPDATE users SET avatar = ?, updated = ? WHERE userID = ?', data,
+                        function (err, results) {
+                            if (err) throw err;
+                        });
+                    }
                 }
             );
             if (channelsFile.get('server_log')) {
+                if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    return;
+                }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
                     guild.channels.get(channelsFile.get('server_log')).send({
                         embed: {
@@ -150,6 +208,9 @@ module.exports = (client, oldUser, newUser) => {
         }
         if (oldUser.discriminator !== newUser.discriminator) {
             if (channelsFile.get('server_log')) {
+                if (!guild.channels.get(channelsFile.get('server_log'))) {
+                    return;
+                }
                 if (modulesFile.get('EVENT_USER_UPDATE_LOG')) {
                     guild.channels.get(channelsFile.get('server_log')).send({
                         embed: {

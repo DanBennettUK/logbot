@@ -42,7 +42,7 @@ exports.run = (client, message, args) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
                 joinedNames = '';
                 joinedValues = '';
                 amount = 0;
@@ -80,7 +80,7 @@ exports.run = (client, message, args) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         });
         

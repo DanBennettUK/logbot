@@ -6,7 +6,7 @@ exports.run = (client, message, args) => {
     const mutedFile = client.mutedFile;
     const _ = client.underscore;
     const config = client.config;
-    const connection = client.connection;
+    var connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_MUTE')) {
             if (args[0]) {
@@ -64,66 +64,67 @@ exports.run = (client, message, args) => {
                                     var data = [user, message.author.id, reason, seconds, identifier, 0, new Date(), user /*SP arg*/];
                                     connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
                                     function (err, results) {
-                                        if (err) throw err;
-
-                                        message.channel.send({
-                                            embed: {
-                                                color: config.color_success,
-                                                author: {
-                                                    name: client.user.username,
-                                                    icon_url: client.user.displayAvatarURL
-                                                },
-                                                title: '[Action] User Muted',
-                                                description: `${member} was muted by ${message.author} for ${args[1]}. User now has **${results[1][0].total}** records`,
-                                                fields: [
-                                                    {
-                                                        name: 'Reason',
-                                                        value: reason
-                                                    },
-                                                    {
-                                                        name: 'Identifier',
-                                                        value: identifier,
-                                                        inline: true
-                                                    },
-                                                    {
-                                                        name: 'Note',
-                                                        value: `I also attempted to disconnect the user from their voice channel`,
-                                                        inline: true
+                                        if (err) {
+                                            connection = functionsFile.establishConnection(client);
+                                            connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
+                                            function (err, results) {
+                                                if (err) throw err;
+                                                message.channel.send({
+                                                    embed: {
+                                                        color: config.color_success,
+                                                        author: {
+                                                            name: client.user.username,
+                                                            icon_url: client.user.displayAvatarURL
+                                                        },
+                                                        title: '[Action] User Muted',
+                                                        description: `${member} was muted by ${message.author} for ${args[1]}. User now has **${results[1][0].total}** records`,
+                                                        fields: [
+                                                            {
+                                                                name: 'Reason',
+                                                                value: reason
+                                                            },
+                                                            {
+                                                                name: 'Identifier',
+                                                                value: identifier,
+                                                                inline: true
+                                                            },
+                                                            {
+                                                                name: 'Note',
+                                                                value: `I also attempted to disconnect the user from their voice channel`,
+                                                                inline: true
+                                                            }
+                                                        ],
+                                                        timestamp: new Date(),
+                                                        footer: {
+                                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                        }
                                                     }
-                                                ],
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
-                                                }
-                                            }
-                                        });
-                                    });
-
-                                    try {
-                                        var chnl = await member.createDM();
-                                            await chnl.send({
+                                                }).catch(console.error);
+                                            });
+                                        } else {
+                                            message.channel.send({
                                                 embed: {
-                                                    color: config.color_caution,
-                                                    title: `You have been muted in ${guild.name}`,
-                                                    description: `Details regarding the mute can be found below:`,
+                                                    color: config.color_success,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: '[Action] User Muted',
+                                                    description: `${member} was muted by ${message.author} for ${args[1]}. User now has **${results[1][0].total}** records`,
                                                     fields: [
                                                         {
                                                             name: 'Reason',
-                                                            value: reason,
-                                                            inline: true
-                                                        },
-                                                        {
-                                                            name: 'Length',
-                                                            value: args[1],
-                                                            inline: true
+                                                            value: reason
                                                         },
                                                         {
                                                             name: 'Identifier',
-                                                            value: `\`${identifier}\``
+                                                            value: identifier,
+                                                            inline: true
                                                         },
                                                         {
-                                                            name: 'Want to dispute?',
-                                                            value: 'This mute can be disputed reasonably by contacting ModMail (<@407690548401405962>). Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
+                                                            name: 'Note',
+                                                            value: `I also attempted to disconnect the user from their voice channel`,
+                                                            inline: true
                                                         }
                                                     ],
                                                     timestamp: new Date(),
@@ -131,21 +132,63 @@ exports.run = (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            }).then(dm => {
-                                                if (dm.embeds[0].type === 'rich') {
-                                                    var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
-                                                } else {
-                                                    var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
-                                                }
-                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
-                                                    function (err, results) {
-                                                        if (err) throw err;
+                                            }).catch(console.error);
+                                        }
+                                    });
+
+                                    member.createDM().then(chnl => {
+                                        chnl.send({
+                                            embed: {
+                                                color: config.color_caution,
+                                                title: `You have been muted in ${guild.name}`,
+                                                description: `Details regarding the mute can be found below:`,
+                                                fields: [
+                                                    {
+                                                        name: 'Reason',
+                                                        value: reason,
+                                                        inline: true
+                                                    },
+                                                    {
+                                                        name: 'Length',
+                                                        value: args[1],
+                                                        inline: true
+                                                    },
+                                                    {
+                                                        name: 'Identifier',
+                                                        value: `\`${identifier}\``
+                                                    },
+                                                    {
+                                                        name: 'Want to dispute?',
+                                                        value: 'This mute can be disputed reasonably by contacting ModMail (<@407690548401405962>). Please quote your identifier, which can be found above, in your initial message to us. \nThank you.'
                                                     }
-                                                );
-                                            });
-                                    } catch (e) {
-                                        message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
-                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).then(dm => {
+                                            if (dm.embeds[0].type === 'rich') {
+                                                var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                                            } else {
+                                                var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
+                                            }
+                                            connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
+                                                function (err, results) {
+                                                    if (err) {
+                                                        connection = functionsFile.establishConnection(client);
+                                                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
+                                                        function (err, results) {
+                                                            if (err) throw err;
+                                                        });
+                                                    }
+                                                }
+                                            );
+                                        }).catch(error => {
+                                            if (error.message == 'Cannot send messages to this user') message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.').catch(console.error);
+                                            else console.error;
+                                        });
+                                    }).catch(console.error);
                                 }).catch(console.error);
                             } else {
                                 message.channel.send('Please provide a reason for the mute.');
@@ -160,7 +203,7 @@ exports.run = (client, message, args) => {
                 }
             } else functionsFile.syntaxErr(client, message, 'mute');
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     } else if (message.member.roles.some(role => ['Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_HELPER_MUTE')) {
@@ -227,11 +270,17 @@ exports.run = (client, message, args) => {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                 }
                                             }
-                                        });
+                                        }).catch(console.error);
                                         var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
                                         connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data,
                                         function (err, results) {
-                                            if (err) throw err;
+                                            if (err) {
+                                                connection = functionsFile.establishConnection(client);
+                                                connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data,
+                                                function (err, results) {
+                                                    if (err) throw err;
+                                                });
+                                            }
                                         });
 
                                         member.createDM().then(async chnl => {
@@ -273,9 +322,17 @@ exports.run = (client, message, args) => {
                                                 }
                                                 connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                                 function (err, results) {
-                                                    if (err)
-                                                        throw err;
+                                                    if (err) {
+                                                        connection = functionsFile.establishConnection(client);
+                                                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
+                                                        function (err, results) {
+                                                            if (err) throw err;
+                                                        });
+                                                    }
                                                 });
+                                            }).catch(error => {
+                                                if (error.message == 'Cannot send messages to this user') message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.').catch(console.error);
+                                                else console.error;
                                             });
                                         }).catch(console.error);
                                     }).catch(console.error);
@@ -295,7 +352,7 @@ exports.run = (client, message, args) => {
                 }
             } else functionsFile.syntaxErr(client, message, 'mute (helper)');
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

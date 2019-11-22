@@ -140,12 +140,12 @@ exports.run = (client, message, args) => {
                             ],
                             timestamp: new Date(),
                             footer: {
-                            text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
                             }
                         }
-                    });
+                    }).catch(console.error);
                 }
             }
-        } else message.channel.send(`:x: This module is disabled`);
+        } else message.channel.send(`:x: That module is disabled.`).catch(console.error);
     }
 }

@@ -5,8 +5,6 @@ module.exports = async (client, oldRole, newRole) => {
     const channelsFile = client.channelsFile;
     if (channelsFile.get('server_log')) {
         if (!oldRole.guild.channels.get(channelsFile.get('server_log'))) {
-            channelsFile.set('server_log', '');
-            channelsFile.save();
             return;
         }
         if (modulesFile.get('EVENT_ROLE_UPDATE_LOG')) {

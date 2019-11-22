@@ -37,4 +37,7 @@ module.exports = client => {
     if (modulesFile.get('EVENT_CHECK_STREAMERS')) {
         setInterval(() => functionsFile.checkStreamers(client), 60000);
     }
+    if (modulesFile.get('EVENT_CHECK_LIVE')) {
+        setInterval(() => functionsFile.checkLive(client), 120000);
+    }
 }

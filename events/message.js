@@ -1,6 +1,6 @@
 module.exports = (client, message) => {
     const _ = client.underscore;
-    const connection = client.connection;
+    var connection = client.connection;
     const functionsFile = client.functionsFile;
     const badWordsFile = client.badWordsFile;
     const customCommands = client.customCommands;
@@ -14,7 +14,13 @@ module.exports = (client, message) => {
     var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()];
     connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
     function (err, results) {
-        if (err) throw err;
+        if (err) {
+            connection = functionsFile.establishConnection(client);
+            connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
+            function (err, results) {
+                if (err) throw err;
+            });
+        }
     });
 
     if (modulesFile.get('EVENT_CHECK_MESSAGE_CONTENT')) {
@@ -24,7 +30,7 @@ module.exports = (client, message) => {
         functionsFile.inviteLinkDetection(client, message);
     }
 
-    var publicCommands = ['bugreport', 'forums', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
+    var publicCommands = ['bugreport', 'forums', 'invite', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
 
     if ((!message.content.startsWith('!') || !message.content.length > 1 || !publicCommands.includes(message.content.slice(1).toLowerCase())) && //Allow usage of '!' for general commands (invite, report...)
     ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `)))) return; //If the message content doesn't start with our prefix, return.

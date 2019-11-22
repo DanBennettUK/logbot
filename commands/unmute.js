@@ -6,7 +6,7 @@ exports.run = (client, message, args) => {
     const config = client.config;
     const _ = client.underscore;
     const cryptoRandomString = client.cryptoRandomString;
-    const connection = client.connection;
+    var connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNMUTE')) {
             if (args[0]) {
@@ -31,34 +31,68 @@ exports.run = (client, message, args) => {
                                 var data = [user, message.author.id, reason, identifier, 0, new Date(), user /*SP arg*/];
                                 connection.query('INSERT INTO log_unmutes(userID, actioner, description, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?);',
                                 data, function (err, results) {
-                                    if (err) throw err;
-                                    message.channel.send({
-                                        embed: {
-                                            color: config.color_success,
-                                            author: {
-                                                name: client.user.username,
-                                                icon_url: client.user.displayAvatarURL
-                                            },
-                                            title: '[Action] User Unmuted',
-                                            description: `${member} was unmuted by ${message.author}.`,
-                                            fields: [
-                                                {
-                                                    name: 'Reason',
-                                                    value: reason,
-                                                    inline: true
-                                                },
-                                                {
-                                                    name: 'Identifier',
-                                                    value: identifier,
-                                                    inline: true
+                                    if (err) {
+                                        connection = functionsFile.establishConnection(client);
+                                        connection.query('INSERT INTO log_unmutes(userID, actioner, description, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?);',
+                                        data, function (err, results) {
+                                            if (err) throw err;
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_success,
+                                                    author: {
+                                                        name: client.user.username,
+                                                        icon_url: client.user.displayAvatarURL
+                                                    },
+                                                    title: '[Action] User Unmuted',
+                                                    description: `${member} was unmuted by ${message.author}.`,
+                                                    fields: [
+                                                        {
+                                                            name: 'Reason',
+                                                            value: reason,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Identifier',
+                                                            value: identifier,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
                                                 }
-                                            ],
-                                            timestamp: new Date(),
-                                            footer: {
-                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }).catch(console.error);
+                                        });
+                                    } else {
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_success,
+                                                author: {
+                                                    name: client.user.username,
+                                                    icon_url: client.user.displayAvatarURL
+                                                },
+                                                title: '[Action] User Unmuted',
+                                                description: `${member} was unmuted by ${message.author}.`,
+                                                fields: [
+                                                    {
+                                                        name: 'Reason',
+                                                        value: reason,
+                                                        inline: true
+                                                    },
+                                                    {
+                                                        name: 'Identifier',
+                                                        value: identifier,
+                                                        inline: true
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
                                             }
-                                        }
-                                    });
+                                        }).catch(console.error);
+                                    }
                                 });
                                 member.createDM().then(async chnl => {
                                     await chnl.send({
@@ -90,9 +124,14 @@ exports.run = (client, message, args) => {
                                             var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
                                         }
                                         connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
-                                            if (err) throw err;
+                                            if (err) {
+                                                connection = functionsFile.establishConnection(client);
+                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
+                                                    if (err) throw err;
+                                                });
+                                            }
                                         });
-                                    });
+                                    }).catch(console.error);
                                 }).catch(console.error);
                             }).catch(console.error);
                         } else {
@@ -106,7 +145,7 @@ exports.run = (client, message, args) => {
                 }
             } else functionsFile.syntaxErr(client, message, 'unmute');
         } else {
-            message.channel.send(`That module (${command}) is disabled.`);
+            message.channel.send(`:x: That module is disabled.`).catch(console.error);
         }
     }
 }

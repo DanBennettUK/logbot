@@ -4,8 +4,6 @@ module.exports = (client, role) => {
     const channelsFile = client.channelsFile;
     if (channelsFile.get('server_log')) {
         if (!role.guild.channels.get(channelsFile.get('server_log'))) {
-            channelsFile.set('server_log', '');
-            channelsFile.save();
             return;
         }
         if (modulesFile.get('EVENT_ROLE_DELETE_LOG')) {

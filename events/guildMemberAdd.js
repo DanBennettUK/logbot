@@ -1,10 +1,11 @@
 module.exports = (client, member) => {
     const modulesFile = client.modulesFile;
-    const connection = client.connection;
+    var connection = client.connection;
     const config = client.config;
     const bannedUsersFile = client.bannedUsersFile;
     const stringSimilarity = client.stringSimilarity;
     const _ = client.underscore;
+    const functionsFile = client.functionsFile;
     const cryptoRandomString = client.cryptoRandomString;
     const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
@@ -13,12 +14,18 @@ module.exports = (client, member) => {
         UPDATE users SET exist = 1 WHERE userID = ?;
         INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);`, params,
         function (err, results) {
-            if (err) throw err;
+            if (err) {
+                connection = functionsFile.establishConnection(client);
+                connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
+                UPDATE users SET exist = 1 WHERE userID = ?;
+                INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);`, params,
+                function (err, results) {
+                    if (err) throw err;
+                });
+            }
         });
         if (channelsFile.get('server_log')) {
             if (!member.guild.channels.get(channelsFile.get('server_log'))) {
-                channelsFile.set('server_log', '');
-                channelsFile.save();
                 return;
             }
             if (modulesFile.get('EVENT_GUILD_MEMBER_ADD_LOG')) {
@@ -39,7 +46,7 @@ module.exports = (client, member) => {
                             text: `Marvin's Little Brother | Current version: ${config.version}`
                         }
                     }
-                });
+                }).catch(console.error);
             }
         }
     }
@@ -72,35 +79,78 @@ module.exports = (client, member) => {
 
             connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
             function (err, rows, results) {
-                if (err) throw err;
-                if (rows.length == 0) return;
-                for (var b = 0; b < rows.length; b++) {
-                    var row = rows[b];
-                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
-                }
-                if (channelsFile.get('action_log')) {
-                    if (!member.guild.channels.get(channelsFile.get('action_log'))) {
-                        channelsFile.set('action_log', '');
-                        channelsFile.save();
-                        return;
-                    }
-                    member.guild.channels.get(channelsFile.get('action_log')).send({
-                        embed: {
-                            color: config.color_warning,
-                            title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
-                            description: msg.join(' '),
-                            timestamp: new Date(),
-                            footer: {
-                                text: `Marvin's Little Brother | Current version: ${config.version}`
-                            }
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
+                    function (err, rows, results) {
+                        if (err) throw err;
+                        if (rows.length == 0) return;
+                        for (var b = 0; b < rows.length; b++) {
+                            var row = rows[b];
+                            msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
                         }
-                    }).catch(console.error);
+                        if (channelsFile.get('action_log')) {
+                            if (!member.guild.channels.get(channelsFile.get('action_log'))) {
+                                return;
+                            }
+                            member.guild.channels.get(channelsFile.get('action_log')).send({
+                                embed: {
+                                    color: config.color_warning,
+                                    title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
+                                    description: msg.join(' '),
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
+                        }
+                        var identifier = cryptoRandomString({length: 10});
+                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                        function(err, results) {
+                            if (err) {
+                                connection = functionsFile.establishConnection(client);
+                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                                function(err, results) {
+                                    if (err) throw err;
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    if (rows.length == 0) return;
+                    for (var b = 0; b < rows.length; b++) {
+                        var row = rows[b];
+                        msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                    }
+                    if (channelsFile.get('action_log')) {
+                        if (!member.guild.channels.get(channelsFile.get('action_log'))) {
+                            return;
+                        }
+                        member.guild.channels.get(channelsFile.get('action_log')).send({
+                            embed: {
+                                color: config.color_warning,
+                                title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
+                                description: msg.join(' '),
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                    }
+                    var identifier = cryptoRandomString({length: 10});
+                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                    function(err, results) {
+                        if (err) {
+                            connection = functionsFile.establishConnection(client);
+                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
+                            function(err, results) {
+                                if (err) throw err;
+                            });
+                        }
+                    });
                 }
-                var identifier = cryptoRandomString({length: 10});
-                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' '), identifier, 0, new Date()],
-                function(err, results){
-                    if (err) throw err;
-                });
             });
         }
     }
@@ -147,11 +197,9 @@ module.exports = (client, member) => {
             }
             if (channelsFile.get('action_log')) {
                 if (!member.guild.channels.get(channelsFile.get('action_log'))) {
-                    channelsFile.set('action_log', '');
-                    channelsFile.save();
                     return;
                 }
-                member.guild.channels.get(config.channel_serverlog).send({
+                member.guild.channels.get(channelsFile.get('action_log')).send({
                     embed: {
                         color: config.color_warning,
                         author: {
@@ -181,8 +229,14 @@ module.exports = (client, member) => {
             var message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
             var identifier = cryptoRandomString({length: 10});
             connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', message, identifier, 0, new Date()],
-            function(err, results){
-                if (err) throw err;
+            function(err, results) {
+                if (err) {
+                    connection = functionsFile.establishConnection(client);
+                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', message, identifier, 0, new Date()],
+                    function(err, results) {
+                        if (err) throw err;
+                    });
+                }
             });
         }
     }
