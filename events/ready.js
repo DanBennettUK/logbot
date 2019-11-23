@@ -28,7 +28,7 @@ module.exports = client => {
     //importBans();
     //importUnbans();
 
-    functionsFile.updateUserTable(client, 'system', null);
+    //functionsFile.updateUserTable(client, 'system', null);
 
     functionsFile.setReactionRoles(client);
 
