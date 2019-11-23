@@ -6,9 +6,9 @@ module.exports = client => {
     functionsFile.setupTables(client);
 
     if (config.test) {
-        console.log(`[TEST VERSION] [${new Date()}] Bot Active.`);
+        console.log(`[TEST VERSION] [${new Date().toUTCString()}] Bot Active.`);
     } else {
-        console.log(`[${new Date()}] Bot Active.`);
+        console.log(`[${new Date().toUTCString()}] Bot Active.`);
     }
     
     if ((!channelsFile.read()) || Object.keys(channelsFile.read()).length == 0) {
