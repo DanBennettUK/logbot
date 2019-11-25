@@ -1,4 +1,5 @@
 module.exports = async (client, message) => {
+    if (_.indexOf(['dm', 'group'], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
     const modulesFile = client.modulesFile;
     var connection = client.connection;
     const config = client.config;
