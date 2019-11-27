@@ -977,6 +977,11 @@ exports.setReactionRoles = async function setReactionRoles (client) {
     const guild = client.guilds.get(client.config.guildid);
     const reactionsFile = client.reactionsFile;
     const reactionsObject = reactionsFile.read();
+    const channelsFile = client.channelsFile;
+    var actnChnl;
+    if (channelsFile.get('action-log')) {
+        actnChnl = guild.channels.get(channelsFile.get('action-log'));
+    }
     for (cKey in reactionsObject) {
         var chnl = guild.channels.get(cKey);
         if (chnl) {
@@ -996,20 +1001,32 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                             if (role) {
                                 await msg.react(emoji).catch(console.error);
                             } else {
+                                if (actnChnl) {
+                                    actnChnl.send(`:x: Unable to set ${emoji} reaction for **INVALID ROLE** (${roleId}) set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
+                                }
                                 //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                 //reactionsFile.save();
                             }
                         } else {
+                            if (actnChnl) {
+                                actnChnl.send(`:x: Unable to set **INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
+                            }
                             //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                             //reactionsFile.save();
                         }
                     }
                 } else {
+                    if (actnChnl) {
+                        actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}`).catch(console.error);
+                    }
                     //reactionsFile.unset(`${cKey}.${mKey}`);
                     //reactionsFile.save();
                 }
             }
         } else {
+            if (actnChnl) {
+                actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})`).catch(console.error);
+            }
             //reactionsFile.unset(`${cKey}`);
             //reactionsFile.save();
         }
