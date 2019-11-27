@@ -107,7 +107,7 @@ exports.run = async (client, message, args) => {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
                                         }
                                     }
-                                }).catch(console.error);                         
+                                }).catch(console.error);
                             } else {
                                 try {
                                     var msg = chnl.fetchMessage(args[2]);
@@ -143,7 +143,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            }).catch(console.error);                                      
+                                            }).catch(console.error);
                                         } else {
                                             var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
@@ -179,7 +179,7 @@ exports.run = async (client, message, args) => {
                                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                                 }
                                                             }
-                                                        }).catch(console.error);                                                   
+                                                        }).catch(console.error);
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -273,22 +273,22 @@ exports.run = async (client, message, args) => {
                                             dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url}) in ${chnl}\n`;
                                             amount ++;
                                         } else {
-                                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                            reactionsFile.save();
+                                            //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                            //reactionsFile.save();
                                         }
                                     } else {
-                                        reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                        reactionsFile.save();
+                                        //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                        //reactionsFile.save();
                                     }
                                 }
                             } else {
-                                reactionsFile.unset(`${cKey}.${mKey}`);
-                                reactionsFile.save();
+                                //reactionsFile.unset(`${cKey}.${mKey}`);
+                                //reactionsFile.save();
                             }
                         }
                     } else {
-                        reactionsFile.unset(`${cKey}`);
-                        reactionsFile.save();
+                        //reactionsFile.unset(`${cKey}`);
+                        //reactionsFile.save();
                     }
                 }
                 if (dsc.length > 0) {

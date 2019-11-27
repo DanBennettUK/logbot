@@ -996,22 +996,22 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                             if (role) {
                                 await msg.react(emoji);
                             } else {
-                                reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                reactionsFile.save();
+                                //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                //reactionsFile.save();
                             }
                         } else {
-                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                            reactionsFile.save();
+                            //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                            //reactionsFile.save();
                         }
                     }
                 } else {
-                    reactionsFile.unset(`${cKey}.${mKey}`);
-                    reactionsFile.save();
+                    //reactionsFile.unset(`${cKey}.${mKey}`);
+                    //reactionsFile.save();
                 }
             }
         } else {
-            reactionsFile.unset(`${cKey}`);
-            reactionsFile.save();
+            //reactionsFile.unset(`${cKey}`);
+            //reactionsFile.save();
         }
     }
 }
