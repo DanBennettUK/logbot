@@ -29,7 +29,7 @@ exports.run = async (client, message, args) => {
                                         if (role) {
                                             reactionsFile.set(`${chnl}.${args[2]}.${emojiID}`, roleID);
                                             reactionsFile.save();
-                                            await msg.react(emoji);
+                                            await msg.react(emoji).catch(console.error);
                                             message.channel.send({
                                                 embed: {
                                                     color: config.color_info,
@@ -207,8 +207,8 @@ exports.run = async (client, message, args) => {
                     message.channel.send('Are you sure you want to unset all reactions in all channels?').then(async m => {
                         const filter = (reaction, user) => !user.bot;
                         const collector = m.createReactionCollector(filter);
-                        await m.react('✅');
-                        await m.react('❌');
+                        await m.react('✅').catch(console.error);
+                        await m.react('❌').catch(console.error);
                         collector.on('collect', r => {
                             if (r.emoji.name == '✅') {
                                 m.delete();

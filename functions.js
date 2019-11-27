@@ -994,7 +994,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                             const roleId = messagesObject[rKey];
                             var role = guild.roles.get(roleId);
                             if (role) {
-                                await msg.react(emoji);
+                                await msg.react(emoji).catch(console.error);
                             } else {
                                 //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                 //reactionsFile.save();
