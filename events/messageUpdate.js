@@ -1,10 +1,13 @@
 module.exports = (client, oldMessage, newMessage) => {
-    if (_.indexOf(['dm', 'group'], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
     const modulesFile = client.modulesFile;
     var connection = client.connection;
     const config = client.config;
     const channelsFile = client.channelsFile;
     const functionsFile = client.functionsFile;
+    const _ = client.underscore;
+
+    if (_.indexOf(['dm', 'group'], newMessage.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
+
 
     if (modulesFile.get('EVENT_CHECK_MESSAGE_CONTENT')) {
         functionsFile.checkMessageContent(client, newMessage);
