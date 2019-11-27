@@ -273,20 +273,28 @@ exports.run = async (client, message, args) => {
                                             dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url}) in ${chnl}\n`;
                                             amount ++;
                                         } else {
+                                            dsc += `${emoji} reaction for role **INVALID ROLE** (${roleID}) set on [this message](${msg.url}) in ${chnl}\n`;
+                                            amount ++;
                                             //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                             //reactionsFile.save();
                                         }
                                     } else {
+                                        dsc += `**INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}\n`;
+                                        amount ++;
                                         //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                         //reactionsFile.save();
                                     }
                                 }
                             } else {
+                                dsc += `**UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}\n`;
+                                amount ++;
                                 //reactionsFile.unset(`${cKey}.${mKey}`);
                                 //reactionsFile.save();
                             }
                         }
                     } else {
+                        dsc += `**UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})\n`;
+                        amount ++;
                         //reactionsFile.unset(`${cKey}`);
                         //reactionsFile.save();
                     }
