@@ -49,6 +49,7 @@ exports.run = async (client, message, args) => {
                 }
                 if (userObject.user.presence.game) {
                     app = userObject.user.presence.game.name;
+                    if (app == 'Custom Status') app += `:\n${userObject.user.presence.game.state}`;
                 } else {
                     app = 'None';
                 }
