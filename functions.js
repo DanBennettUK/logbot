@@ -583,7 +583,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                                 await msg.delete();
                             }, 5000);
                         }).catch(console.error);
-    
+
                     var data = [message.author.id, message.channel.id, message.content, new Date()];
                     connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                         function (err, results) {
