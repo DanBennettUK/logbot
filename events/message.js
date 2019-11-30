@@ -54,8 +54,14 @@ module.exports = (client, message) => {
             content = content.replace(/\\\\n/gi, temp);
             content = content.replace(/\\n/gi, '\n');
             content = content.replace(re, '\\n');
-            message.channel.send(`${content}`);
-            message.delete();
+            if (args[0]) {
+                var channel = message.guild.channels.get(functionsFile.parseChannelTag(client, message.guild, args[0]));
+                if (channel) channel.send(`${content}`).catch(console.error);
+                else message.channel.send(':x: I could not parse that channel.').catch(console.error);
+            } else {
+                message.channel.send(`${content}`).catch(console.error);
+                message.delete().catch(console.error);
+            }
         }
     }
 

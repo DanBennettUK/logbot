@@ -57,7 +57,8 @@ exports.run = (client, message, args) => {
         ${config.prefix}channels list
         ${config.prefix}lfg
         ${config.prefix}lock
-        ${config.prefix}unlock`;
+        ${config.prefix}unlock
+        ${config.prefix}edit <channel> <message> <content>`;
 
         message.channel.send({
             embed: {

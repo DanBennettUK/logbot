@@ -29,7 +29,7 @@ exports.run = async (client, message, args) => {
                                         if (role) {
                                             reactionsFile.set(`${chnl}.${args[2]}.${emojiID}`, roleID);
                                             reactionsFile.save();
-                                            await msg.react(emoji);
+                                            await msg.react(emoji).catch(console.error);
                                             message.channel.send({
                                                 embed: {
                                                     color: config.color_info,
@@ -107,7 +107,7 @@ exports.run = async (client, message, args) => {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
                                         }
                                     }
-                                }).catch(console.error);                         
+                                }).catch(console.error);
                             } else {
                                 try {
                                     var msg = chnl.fetchMessage(args[2]);
@@ -143,7 +143,7 @@ exports.run = async (client, message, args) => {
                                                         text: `Marvin's Little Brother | Current version: ${config.version}`
                                                     }
                                                 }
-                                            }).catch(console.error);                                      
+                                            }).catch(console.error);
                                         } else {
                                             var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
@@ -179,7 +179,7 @@ exports.run = async (client, message, args) => {
                                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
                                                                 }
                                                             }
-                                                        }).catch(console.error);                                                   
+                                                        }).catch(console.error);
                                                     } else {
                                                         message.channel.send(`${emoji} is not set.`);
                                                     }
@@ -207,8 +207,8 @@ exports.run = async (client, message, args) => {
                     message.channel.send('Are you sure you want to unset all reactions in all channels?').then(async m => {
                         const filter = (reaction, user) => !user.bot;
                         const collector = m.createReactionCollector(filter);
-                        await m.react('✅');
-                        await m.react('❌');
+                        await m.react('✅').catch(console.error);
+                        await m.react('❌').catch(console.error);
                         collector.on('collect', r => {
                             if (r.emoji.name == '✅') {
                                 m.delete();
@@ -273,22 +273,30 @@ exports.run = async (client, message, args) => {
                                             dsc += `${emoji} reaction for role ${role} set on [this message](${msg.url}) in ${chnl}\n`;
                                             amount ++;
                                         } else {
-                                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                            reactionsFile.save();
+                                            dsc += `${emoji} reaction for role **INVALID ROLE** (${roleID}) set on [this message](${msg.url}) in ${chnl}\n`;
+                                            amount ++;
+                                            //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                            //reactionsFile.save();
                                         }
                                     } else {
-                                        reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                        reactionsFile.save();
+                                        dsc += `**INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}\n`;
+                                        amount ++;
+                                        //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                        //reactionsFile.save();
                                     }
                                 }
                             } else {
-                                reactionsFile.unset(`${cKey}.${mKey}`);
-                                reactionsFile.save();
+                                dsc += `**UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}\n`;
+                                amount ++;
+                                //reactionsFile.unset(`${cKey}.${mKey}`);
+                                //reactionsFile.save();
                             }
                         }
                     } else {
-                        reactionsFile.unset(`${cKey}`);
-                        reactionsFile.save();
+                        dsc += `**UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})\n`;
+                        amount ++;
+                        //reactionsFile.unset(`${cKey}`);
+                        //reactionsFile.save();
                     }
                 }
                 if (dsc.length > 0) {

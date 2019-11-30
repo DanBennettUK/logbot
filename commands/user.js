@@ -49,6 +49,7 @@ exports.run = async (client, message, args) => {
                 }
                 if (userObject.user.presence.game) {
                     app = userObject.user.presence.game.name;
+                    if (app == 'Custom Status') app += `:\n${userObject.user.presence.game.state}`;
                 } else {
                     app = 'None';
                 }
@@ -369,7 +370,7 @@ exports.run = async (client, message, args) => {
                                         async function (err, rows, results) {
                                             if (err) throw err;
                                             var notes = [];
-                                            
+
                                             var max = 5;
                                             var extra;
 
@@ -420,7 +421,7 @@ exports.run = async (client, message, args) => {
                                         });
                                     } else {
                                         var notes = [];
-                                    
+
                                         var max = 5;
                                         var extra;
 
@@ -481,16 +482,16 @@ exports.run = async (client, message, args) => {
                                     async function (err, rows, results) {
                                         if (err) throw err;
                                         var notes = [];
-        
+
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= max) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
@@ -651,13 +652,13 @@ exports.run = async (client, message, args) => {
                                         var names = [];
                                         var max = 0;
                                         var extra;
-        
+
                                         if (rows.length <= 5) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             switch(row.type) {
@@ -672,7 +673,7 @@ exports.run = async (client, message, args) => {
                                                 names.push(`...${extra} more`);
                                             }
                                         }
-        
+
                                         if (!_.isEmpty(names)) {
                                             await msg.edit({
                                                 embed: {
@@ -709,13 +710,13 @@ exports.run = async (client, message, args) => {
                                     var names = [];
                                     var max = 0;
                                     var extra;
-    
+
                                     if (rows.length <= 5) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         switch(row.type) {
@@ -730,7 +731,7 @@ exports.run = async (client, message, args) => {
                                             names.push(`...${extra} more`);
                                         }
                                     }
-    
+
                                     if (!_.isEmpty(names)) {
                                         await msg.edit({
                                             embed: {
@@ -776,13 +777,13 @@ exports.run = async (client, message, args) => {
                                         var history = [];
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= 5) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             switch (row.Status) {
@@ -833,13 +834,13 @@ exports.run = async (client, message, args) => {
                                     var history = [];
                                     var max = 5;
                                     var extra;
-    
+
                                     if (rows.length <= 5) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         switch (row.Status) {
@@ -950,13 +951,13 @@ exports.run = async (client, message, args) => {
                                             var events = [];
                                             var max = 5;
                                             var extra;
-        
+
                                             if (rows.length <= max) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
                                                 if (row.type == 'warn') {
@@ -1007,13 +1008,13 @@ exports.run = async (client, message, args) => {
                                         var events = [];
                                         var max = 5;
                                         var extra;
-    
+
                                         if (rows.length <= max) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-    
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             if (row.type == 'warn') {
@@ -1079,13 +1080,13 @@ exports.run = async (client, message, args) => {
                                         var events = [];
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= max) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             switch(row.type) {
@@ -1136,13 +1137,13 @@ exports.run = async (client, message, args) => {
                                     var events = [];
                                     var max = 5;
                                     var extra;
-    
+
                                     if (rows.length <= max) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         switch(row.type) {
@@ -1203,16 +1204,16 @@ exports.run = async (client, message, args) => {
                                     async function (err, rows, results) {
                                         if (err) throw err;
                                         var notes = [];
-        
+
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= max) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -1257,13 +1258,13 @@ exports.run = async (client, message, args) => {
 
                                     var max = 5;
                                     var extra;
-    
+
                                     if (rows.length <= max) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -1316,13 +1317,13 @@ exports.run = async (client, message, args) => {
                                         var notes = [];
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= max) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
@@ -1366,13 +1367,13 @@ exports.run = async (client, message, args) => {
                                     var notes = [];
                                     var max = 5;
                                     var extra;
-    
+
                                     if (rows.length <= max) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
@@ -1427,13 +1428,13 @@ exports.run = async (client, message, args) => {
                                         var names = [];
                                         var max = 0;
                                         var extra;
-        
+
                                         if (rows.length <= 5) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             switch(row.type) {
@@ -1448,7 +1449,7 @@ exports.run = async (client, message, args) => {
                                                 names.push(`...${extra} more`);
                                             }
                                         }
-        
+
                                         if (!_.isEmpty(names)) {
                                             await msg.edit({
                                                 embed: {
@@ -1485,13 +1486,13 @@ exports.run = async (client, message, args) => {
                                     var names = [];
                                     var max = 0;
                                     var extra;
-    
+
                                     if (rows.length <= 5) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         switch(row.type) {
@@ -1506,7 +1507,7 @@ exports.run = async (client, message, args) => {
                                             names.push(`...${extra} more`);
                                         }
                                     }
-    
+
                                     if (!_.isEmpty(names)) {
                                         await msg.edit({
                                             embed: {
@@ -1549,8 +1550,20 @@ exports.run = async (client, message, args) => {
                                         name: globalUser.username,
                                         icon_url: globalUser.displayAvatarURL
                                     },
-                                    title: `${userID}`,
+                                    title: `${globalUser.username}#${globalUser.discriminator}`,
                                     description: `The user you provided is not currently camping in this guild.`,
+                                    fields: [
+                                        {
+                                            name: 'Created',
+                                            value: globalUser.createdAt.toUTCString(),
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'ID',
+                                            value: globalUser.id,
+                                            inline: true
+                                        }
+                                    ],
                                     timestamp: new Date(),
                                     footer: {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -1569,13 +1582,13 @@ exports.run = async (client, message, args) => {
                                         var history = [];
                                         var max = 5;
                                         var extra;
-        
+
                                         if (rows.length <= 5) {
                                             max = rows.length;
                                         } else {
                                             extra = rows.length - max;
                                         }
-        
+
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
                                             switch (row.Status) {
@@ -1627,13 +1640,13 @@ exports.run = async (client, message, args) => {
                                     var history = [];
                                     var max = 5;
                                     var extra;
-    
+
                                     if (rows.length <= 5) {
                                         max = rows.length;
                                     } else {
                                         extra = rows.length - max;
                                     }
-    
+
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
                                         switch (row.Status) {
@@ -1732,14 +1745,14 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             }).then(async msg => {
-        
+
                                 const filter = (reaction, user) => !user.bot;
                                 const collector = msg.createReactionCollector(filter);
-        
+
                                 collector.on('collect', async r => {
                                     if (r.emoji.name == '👮') {
                                         await r.remove(r.users.last());
-        
+
                                         connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                             SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
                                             SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -1754,13 +1767,13 @@ exports.run = async (client, message, args) => {
                                                         var events = [];
                                                         var max = 5;
                                                         var extra;
-                
+
                                                         if (rows.length <= max) {
                                                             max = rows.length;
                                                         } else {
                                                             extra = rows.length - max;
                                                         }
-                
+
                                                         for (var i = 0; i < max; i++) {
                                                             var row = rows[i];
                                                             if (row.type == 'warn') {
@@ -1810,13 +1823,13 @@ exports.run = async (client, message, args) => {
                                                     var events = [];
                                                     var max = 5;
                                                     var extra;
-            
+
                                                     if (rows.length <= max) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-            
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         if (row.type == 'warn') {
@@ -1866,7 +1879,7 @@ exports.run = async (client, message, args) => {
                                         );
                                     } else if (r.emoji.name == '🔈') {
                                         await r.remove(r.users.last());
-        
+
                                         connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                         SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                         gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -1881,13 +1894,13 @@ exports.run = async (client, message, args) => {
                                                     var events = [];
                                                     var max = 5;
                                                     var extra;
-                
+
                                                     if (rows.length <= max) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-                
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         switch(row.type) {
@@ -1938,13 +1951,13 @@ exports.run = async (client, message, args) => {
                                                 var events = [];
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch(row.type) {
@@ -2005,16 +2018,16 @@ exports.run = async (client, message, args) => {
                                                 async function (err, rows, results ) {
                                                     if (err) throw err;
                                                     var notes = [];
-                
+
                                                     var max = 5;
                                                     var extra;
-                
+
                                                     if (rows.length <= max) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-                
+
                                                     for ( var i = 0; i < max; i++ ) {
                                                         var row = rows[i];
                                                         await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -2056,16 +2069,16 @@ exports.run = async (client, message, args) => {
                                                 });
                                             } else {
                                                 var notes = [];
-        
+
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for ( var i = 0; i < max; i++ ) {
                                                     var row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -2116,16 +2129,16 @@ exports.run = async (client, message, args) => {
                                                 async function (err, rows, results) {
                                                     if (err) throw err;
                                                     var notes = [];
-                
+
                                                     var max = 5;
                                                     var extra;
-                
+
                                                     if (rows.length <= max) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-                
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
@@ -2167,16 +2180,16 @@ exports.run = async (client, message, args) => {
                                                 });
                                             } else {
                                                 var notes = [];
-        
+
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
@@ -2231,13 +2244,13 @@ exports.run = async (client, message, args) => {
                                                     var names = [];
                                                     var max = 0;
                                                     var extra;
-                
+
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-                
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         switch(row.type) {
@@ -2288,13 +2301,13 @@ exports.run = async (client, message, args) => {
                                                 var names = [];
                                                 var max = 0;
                                                 var extra;
-            
+
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch(row.type) {
@@ -2371,13 +2384,13 @@ exports.run = async (client, message, args) => {
                                                     var history = [];
                                                     var max = 5;
                                                     var extra;
-        
+
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-        
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         switch (row.Status) {
@@ -2428,13 +2441,13 @@ exports.run = async (client, message, args) => {
                                                 var history = [];
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch (row.Status) {
@@ -2526,14 +2539,14 @@ exports.run = async (client, message, args) => {
                                 }
                             }
                         }).then(async msg => {
-    
+
                             const filter = (reaction, user) => !user.bot;
                             const collector = msg.createReactionCollector(filter);
-    
+
                             collector.on('collect', async r => {
                                 if (r.emoji.name == '👮') {
                                     await r.remove(r.users.last());
-    
+
                                     connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                         SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
                                         SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2548,13 +2561,13 @@ exports.run = async (client, message, args) => {
                                                     var events = [];
                                                     var max = 5;
                                                     var extra;
-            
+
                                                     if (rows.length <= max) {
                                                         max = rows.length;
                                                     } else {
                                                         extra = rows.length - max;
                                                     }
-            
+
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
                                                         if (row.type == 'warn') {
@@ -2604,13 +2617,13 @@ exports.run = async (client, message, args) => {
                                                 var events = [];
                                                 var max = 5;
                                                 var extra;
-        
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-        
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     if (row.type == 'warn') {
@@ -2660,7 +2673,7 @@ exports.run = async (client, message, args) => {
                                     );
                                 } else if (r.emoji.name == '🔈') {
                                     await r.remove(r.users.last());
-    
+
                                     connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                     SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                     gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2675,13 +2688,13 @@ exports.run = async (client, message, args) => {
                                                 var events = [];
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch(row.type) {
@@ -2732,13 +2745,13 @@ exports.run = async (client, message, args) => {
                                             var events = [];
                                             var max = 5;
                                             var extra;
-        
+
                                             if (rows.length <= max) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
                                                 switch(row.type) {
@@ -2799,16 +2812,16 @@ exports.run = async (client, message, args) => {
                                             async function (err, rows, results ) {
                                                 if (err) throw err;
                                                 var notes = [];
-            
+
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for ( var i = 0; i < max; i++ ) {
                                                     var row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -2850,16 +2863,16 @@ exports.run = async (client, message, args) => {
                                             });
                                         } else {
                                             var notes = [];
-    
+
                                             var max = 5;
                                             var extra;
-        
+
                                             if (rows.length <= max) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for ( var i = 0; i < max; i++ ) {
                                                 var row = rows[i];
                                                 await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
@@ -2910,16 +2923,16 @@ exports.run = async (client, message, args) => {
                                             async function (err, rows, results) {
                                                 if (err) throw err;
                                                 var notes = [];
-            
+
                                                 var max = 5;
                                                 var extra;
-            
+
                                                 if (rows.length <= max) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
@@ -2961,16 +2974,16 @@ exports.run = async (client, message, args) => {
                                             });
                                         } else {
                                             var notes = [];
-    
+
                                             var max = 5;
                                             var extra;
-        
+
                                             if (rows.length <= max) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
                                                 await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
@@ -3025,13 +3038,13 @@ exports.run = async (client, message, args) => {
                                                 var names = [];
                                                 var max = 0;
                                                 var extra;
-            
+
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-            
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch(row.type) {
@@ -3082,13 +3095,13 @@ exports.run = async (client, message, args) => {
                                             var names = [];
                                             var max = 0;
                                             var extra;
-        
+
                                             if (rows.length <= 5) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
                                                 switch(row.type) {
@@ -3165,13 +3178,13 @@ exports.run = async (client, message, args) => {
                                                 var history = [];
                                                 var max = 5;
                                                 var extra;
-    
+
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
                                                 } else {
                                                     extra = rows.length - max;
                                                 }
-    
+
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
                                                     switch (row.Status) {
@@ -3222,13 +3235,13 @@ exports.run = async (client, message, args) => {
                                             var history = [];
                                             var max = 5;
                                             var extra;
-        
+
                                             if (rows.length <= 5) {
                                                 max = rows.length;
                                             } else {
                                                 extra = rows.length - max;
                                             }
-        
+
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
                                                 switch (row.Status) {
