@@ -19,7 +19,7 @@ exports.run = (client, message, args) => {
                         message.channel.send(answer['file']);
                     });
                     break;
-            }        
+            }
         }
     } // End of permission checking statement
 }

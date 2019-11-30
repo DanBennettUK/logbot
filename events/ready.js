@@ -10,7 +10,7 @@ module.exports = client => {
     } else {
         console.log(`[${new Date().toUTCString()}] Bot Active.`);
     }
-    
+
     if ((!channelsFile.read()) || Object.keys(channelsFile.read()).length == 0) {
         channelsFile.set('server_log', '');
         channelsFile.set('action_log', '');

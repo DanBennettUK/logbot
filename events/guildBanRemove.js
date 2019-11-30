@@ -20,17 +20,21 @@ module.exports = (client, guild, user) => {
     });
     connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id,
     function(err, rows, results){
-        if(err) {
+        if (err) {
             connection = functionsFile.establishConnection(client);
             connection.query('SELECT identifier FROM log_guildbans WHERE userid = ? ORDER BY timestamp DESC LIMIT 1', user.id,
             function(err, rows, results){
                 if(err) throw err;
-                bannedUsersFile.set(rows[0].identifier, '');
-                bannedUsersFile.save();
+                if (rows.length > 0) {
+                    bannedUsersFile.set(rows[0].identifier, '');
+                    bannedUsersFile.save();
+                }
             });
         } else {
-            bannedUsersFile.set(rows[0].identifier, '');
-            bannedUsersFile.save();    
+            if (rows.length > 0) {
+                bannedUsersFile.set(rows[0].identifier, '');
+                bannedUsersFile.save();
+            }
         }
     });
     if (channelsFile.get('server_log')) {

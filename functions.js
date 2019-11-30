@@ -352,12 +352,15 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
 
     if (/(<@(!)*)+\w+(>)/.test(tag)) {
         return trimMe.replace(/[^0-9.]/gi, '');
-    } else if (/[\w\d\\\/\_\|]+(#\d\d\d\d)+$/.test(tag)) {
+    } else if (/.+(#\d\d\d\d)+$/.test(tag)) {
         var split = tag.split('#');
-        var usernameResolve = client.users.find(obj => (obj.username === split[0]) && (obj.discriminator == split[1]));
+        var disc = split[split.length - 1];
+        split.pop();
+        split = split.join('#');
+        var usernameResolve = client.users.find(obj => (obj.username === split) && (obj.discriminator == disc));
 
         if (usernameResolve == null) {
-            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split[0].toLowerCase()) && (obj.discriminator == split[1]));
+            usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split.toLowerCase()) && (obj.discriminator == disc));
             if (usernameResolve == null) {
                 return 'err';
             } else {
@@ -580,7 +583,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                                 await msg.delete();
                             }, 5000);
                         }).catch(console.error);
-    
+
                     var data = [message.author.id, message.channel.id, message.content, new Date()];
                     connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                         function (err, results) {
@@ -974,6 +977,11 @@ exports.setReactionRoles = async function setReactionRoles (client) {
     const guild = client.guilds.get(client.config.guildid);
     const reactionsFile = client.reactionsFile;
     const reactionsObject = reactionsFile.read();
+    const channelsFile = client.channelsFile;
+    var actnChnl;
+    if (channelsFile.get('action-log')) {
+        actnChnl = guild.channels.get(channelsFile.get('action-log'));
+    }
     for (cKey in reactionsObject) {
         var chnl = guild.channels.get(cKey);
         if (chnl) {
@@ -991,24 +999,36 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                             const roleId = messagesObject[rKey];
                             var role = guild.roles.get(roleId);
                             if (role) {
-                                await msg.react(emoji);
+                                await msg.react(emoji).catch(console.error);
                             } else {
-                                reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                                reactionsFile.save();
+                                if (actnChnl) {
+                                    actnChnl.send(`:x: Unable to set ${emoji} reaction for **INVALID ROLE** (${roleId}) set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
+                                }
+                                //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                                //reactionsFile.save();
                             }
                         } else {
-                            reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
-                            reactionsFile.save();
+                            if (actnChnl) {
+                                actnChnl.send(`:x: Unable to set **INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
+                            }
+                            //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
+                            //reactionsFile.save();
                         }
                     }
                 } else {
-                    reactionsFile.unset(`${cKey}.${mKey}`);
-                    reactionsFile.save();
+                    if (actnChnl) {
+                        actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}`).catch(console.error);
+                    }
+                    //reactionsFile.unset(`${cKey}.${mKey}`);
+                    //reactionsFile.save();
                 }
             }
         } else {
-            reactionsFile.unset(`${cKey}`);
-            reactionsFile.save();
+            if (actnChnl) {
+                actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})`).catch(console.error);
+            }
+            //reactionsFile.unset(`${cKey}`);
+            //reactionsFile.save();
         }
     }
 }
