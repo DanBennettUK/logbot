@@ -45,6 +45,7 @@ console.log(`[${new Date().toUTCString()}] Initializing...`);
 
 const connection = mysql.createConnection({
     host: config.host,
+    port: config.port,
     user: config.user,
     password: config.password,
     database: config.database,
