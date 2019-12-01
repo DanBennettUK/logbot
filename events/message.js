@@ -60,7 +60,7 @@ module.exports = (client, message) => {
                 var channel = message.guild.channels.get(functionsFile.parseChannelTag(client, message.guild, args[0]));
                 if (channel) {
                     channel.send(`${content}`).catch(console.error);
-                    await message.channel.send(`:white_check_mark: Custom command \`${command}\` successfully run in ${channel}.`);
+                    message.channel.send(`:white_check_mark: Custom command \`${command}\` successfully run in ${channel}.`);
                 } else message.channel.send(':x: I could not parse that channel.').catch(console.error);
             } else {
                 message.channel.send(`${content}`).catch(console.error);
