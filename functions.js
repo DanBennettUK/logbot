@@ -566,7 +566,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     var connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
-    if (message.member && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
+    if (message.member && message.member != null && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
     if (badWordList == undefined) {
