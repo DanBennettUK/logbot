@@ -181,7 +181,7 @@ exports.run = async (client, message, args) => {
                                 }).catch(console.error);
                             }
                         });
-                })
+                }).catch(console.error);
             } else functionsFile.syntaxErr(client, message, 'vclog');
         } else message.channel.send(':x: That module is disabled.').catch(console.error);
     }
