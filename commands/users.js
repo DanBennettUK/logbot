@@ -17,10 +17,6 @@ exports.run = (client, message, args) => {
                                     message.channel.send({
                                         embed: {
                                             color: config.color_info,
-                                            author: {
-                                                name: client.user.username,
-                                                icon_url: client.user.displayAvatarURL
-                                            },
                                             title: '[COMMAND] User count',
                                             description: 'The current count of users known to us',
                                             fields: [{
@@ -45,10 +41,6 @@ exports.run = (client, message, args) => {
                                 message.channel.send({
                                     embed: {
                                         color: config.color_info,
-                                        author: {
-                                            name: client.user.username,
-                                            icon_url: client.user.displayAvatarURL
-                                        },
                                         title: '[COMMAND] User count',
                                         description: 'The current count of users known to us',
                                         fields: [{

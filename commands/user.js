@@ -12,10 +12,14 @@ exports.run = async (client, message, args) => {
                 functionsFile.syntaxErr(client, message, 'user');
                 return;
             }
-            var globalUser;
-            try {
-                globalUser = await client.fetchUser(userID);
-            } catch (e) {}
+            var globalUser = client.users.get(userID);
+            if (!globalUser) {
+                try {
+                    globalUser = await client.fetchUser(userID);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
             if (userID == 'err') {
                 message.channel.send({
                     embed: {

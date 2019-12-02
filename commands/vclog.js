@@ -87,11 +87,13 @@ exports.run = async (client, message, args) => {
                                             var i = 0;
                                             for (row of rows) {
                                                 if (i == 30) break;
-                                                var user;
-                                                try {
-                                                    user = await client.fetchUser(row.userID);
-                                                } catch (e) {
-                                                    message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                                var user = client.users.get(row.userID);
+                                                if (!user) {
+                                                    try {
+                                                        user = await client.fetchUser(row.userID);
+                                                    } catch (e) {
+                                                        message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                                    }
                                                 }
                                                 users += `${user}\n`;
                                                 joinTime += `${row.timestamp.toUTCString()}\n`;
@@ -137,11 +139,13 @@ exports.run = async (client, message, args) => {
                                     var i = 0;
                                     for (row of rows) {
                                         if (i == 30) break;
-                                        var user;
-                                        try {
-                                            user = await client.fetchUser(row.userID);
-                                        } catch (e) {
-                                            message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                        var user = client.users.get(row.userID);
+                                        if (!user) {
+                                            try {
+                                                user = await client.fetchUser(row.userID);
+                                            } catch (e) {
+                                                message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                            }
                                         }
                                         users += `${user}\n`;
                                         joinTime += `${row.timestamp.toUTCString()}\n`;
