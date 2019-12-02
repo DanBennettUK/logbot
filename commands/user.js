@@ -32,7 +32,7 @@ exports.run = async (client, message, args) => {
             }
             var userObject = guild.member(globalUser);
 
-            if (userObject) {
+            if (userObject && userObject != null) {
                 var nickname;
                 var voiceChannel;
                 var app;

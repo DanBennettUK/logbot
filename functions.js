@@ -566,7 +566,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     var connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
-    if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
+    if (message.member && message.member != null && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
     if (badWordList == undefined) {
@@ -1088,7 +1088,7 @@ exports.inviteLinkDetection = (client, message) => {
     const channelsFile = client.channelsFile;
     var connection = client.connection;
     if (message.author.bot) return;
-    if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
+    if (message.member && message.member != null && message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
     if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
         message.delete().then(() => {
             message.channel.send(`${message.author} no invite links`).then(msg => {
