@@ -10,7 +10,7 @@ exports.run = (client, message, args) => {
                     function (error, response, body) {
                         answer = JSON.parse(body);
                         message.channel.send(answer['link']);
-                    }); 
+                    });
                     break;
                 case 1:
                     request(`https://dog.ceo/api/breeds/image/random`,
@@ -19,7 +19,7 @@ exports.run = (client, message, args) => {
                         message.channel.send(answer['message']);
                     });
                     break;
-            }         
+            }
         }
     } // End of permission checking statement
 }

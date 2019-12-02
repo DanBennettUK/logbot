@@ -7,7 +7,7 @@ exports.run = (client, message, args) => {
             function (error, response, body) {
                 answer = JSON.parse(body);
                 message.channel.send(answer['link']);
-            });            
+            });
         }
     } // End of permission checking statement
 }

@@ -4,7 +4,7 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_ANIMAL_PICTURE')) {
             var random = Math.floor(Math.random() * Math.floor(2));
-            switch(random) {
+            switch (random) {
                 case 0:
                     request(`https://some-random-api.ml/img/cat`,
                     function (error, response, body) {
