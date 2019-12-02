@@ -176,7 +176,7 @@ module.exports = (client, member) => {
             switch (d) {
                 case 0:
                     switch (h) {
-                        case 0: 
+                        case 0:
                             switch (m) {
                                 case 0:
                                     time = `${s}s`;
@@ -186,7 +186,7 @@ module.exports = (client, member) => {
                                     break;
                             }
                             break;
-                        default: 
+                        default:
                             time = `${h}h${m}m${s}s`
                             break;
                     }

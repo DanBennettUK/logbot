@@ -70,9 +70,9 @@ module.exports = (client, oldUser, newUser) => {
                 var data = [];
                 var msg = [];
                 var description;
-        
+
                 var match = stringSimilarity.findBestMatch(newUser.username, usernames);
-        
+
                 for (var a = 0; a < match['ratings'].length; a++) {
                     if (match['ratings'][a].rating >= 0.5) {
                         hits.push({
@@ -83,10 +83,10 @@ module.exports = (client, oldUser, newUser) => {
                         identifiers.push(ids[a]);
                     }
                 }
-        
+
                 if (identifiers.length > 0) {
                     data.push(identifiers); //If this work - ew.....you motherfucker, it did.
-        
+
                     connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
                     function (err, rows, results) {
                         if (err) {

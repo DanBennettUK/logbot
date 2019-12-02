@@ -2,7 +2,7 @@ module.exports = (client, oldEmoji, newEmoji) => {
     const modulesFile = client.modulesFile;
     const channelsFile = client.channelsFile;
     const guild = oldEmoji.guild;
-  
+
     if (modulesFile.get('EVENT_EMOJI_UPDATE')) {
       if (channelsFile.get('server_log')) {
         if (guild.channels.get(channelsFile.get('server_log'))) {

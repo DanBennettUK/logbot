@@ -11,7 +11,7 @@ module.exports = (client, oldMember, newMember) => {
                     data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, oldMember.voiceChannel.id, oldMember.voiceChannel.name, 2, new Date()];
                     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
                         if (channelsFile.get('voice_log')) {
-                            if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {    
+                            if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {
                                 var voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
                                 if (voiceLogChannel.members.has(newMember.id)) {
                                         voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6].toUTCString()}`);
@@ -20,7 +20,7 @@ module.exports = (client, oldMember, newMember) => {
                                 }
                             }
                         }
-                    } 
+                    }
                 }
             } else {
                 data = [newMember.id, '', '', oldMember.voiceChannel.id, oldMember.voiceChannel.name, 3, new Date()];
@@ -30,7 +30,7 @@ module.exports = (client, oldMember, newMember) => {
                 data = [newMember.id, newMember.voiceChannel.id, newMember.voiceChannel.name, '', '', 1, new Date()];
                 if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
                     if (channelsFile.get('voice_log')) {
-                        if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {    
+                        if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {
                             var voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
                             if (voiceLogChannel.members.has(newMember.id)) {
                                 voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>** | ${data[6].toUTCString()}`);

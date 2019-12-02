@@ -16,7 +16,7 @@ module.exports = async (client, oldMember, newMember) => {
                 function (err, results) {
                     if (err) {
                         connection = functionsFile.establishConnection(client);
-                        connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)', 
+                        connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)',
                         [newMember.user.id, newMember.displayName, oldMember.displayName, new Date()],
                         function (err, results) {
                             if (err) throw err
@@ -70,9 +70,9 @@ module.exports = async (client, oldMember, newMember) => {
                 var data = [];
                 var msg = [];
                 var description;
-        
+
                 var match = stringSimilarity.findBestMatch(newMember.displayName, usernames);
-        
+
                 for (var a = 0; a < match['ratings'].length; a++) {
                     if (match['ratings'][a].rating >= 0.5) {
                         hits.push({
@@ -83,10 +83,10 @@ module.exports = async (client, oldMember, newMember) => {
                         identifiers.push(ids[a]);
                     }
                 }
-        
+
                 if (identifiers.length > 0) {
                     data.push(identifiers); //If this work - ew.....you motherfucker, it did.
-        
+
                     connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
                     function (err, rows, results) {
                         if (err) {

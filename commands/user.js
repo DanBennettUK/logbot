@@ -132,12 +132,20 @@ exports.run = async (client, message, args) => {
 
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
+                                                var actioner = client.users.get(row.actioner);
+                                                if (!actioner) {
+                                                    try {
+                                                        actioner = await client.fetchUser(row.actioner);
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
                                                 if (row.type == 'warn') {
-                                                    await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                    await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                 } else if (row.type == 'ban') {
-                                                    await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                    await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                 } else {
-                                                    await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                    await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                 }
                                                 if (i == max - 1 && extra > 0) {
                                                     events.push(`...${extra} more`);
@@ -188,12 +196,20 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
                                             if (row.type == 'warn') {
-                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             } else if (row.type == 'ban') {
-                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             } else {
-                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             }
                                             if (i == max - 1 && extra > 0) {
                                                 events.push(`...${extra} more`);
@@ -259,12 +275,20 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
                                             switch(row.type) {
                                                 case 'mute':
-                                                    await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     break;
                                                 case 'unmute':
-                                                    await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     break;
                                             }
                                             if (i == max - 1 && extra > 0) {
@@ -316,12 +340,20 @@ exports.run = async (client, message, args) => {
 
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
+                                        var actioner = client.users.get(row.actioner);
+                                        if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(row.actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                        }
                                         switch(row.type) {
                                             case 'mute':
-                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                             case 'unmute':
-                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
@@ -358,7 +390,7 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                    }  
+                                    }
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
@@ -386,7 +418,15 @@ exports.run = async (client, message, args) => {
 
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
-                                                await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                var actioner = client.users.get(row.actioner);
+                                                if (!actioner) {
+                                                    try {
+                                                        actioner = await client.fetchUser(row.actioner);
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
+                                                await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 if (i == max - 1 && extra > 0) {
                                                     notes.push(`...${extra} more`);
                                                 }
@@ -437,7 +477,15 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
-                                            await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
+                                            await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                             if (i == max - 1 && extra > 0) {
                                                 notes.push(`...${extra} more`);
                                             }
@@ -964,13 +1012,21 @@ exports.run = async (client, message, args) => {
 
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
+                                                var actioner = client.users.get(row.actioner);
+                                                if (!actioner) {
+                                                    try {
+                                                        actioner = await client.fetchUser(row.actioner);
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
                                                 if (row.type == 'warn') {
-                                                    await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`
+                                                    await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`
                                                     );
                                                 } else if (row.type == 'ban') {
-                                                    await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                    await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                 } else {
-                                                    await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                    await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                 }
                                                 if (i == max - 1 && extra > 0) {
                                                     events.push(`...${extra} more`);
@@ -1021,13 +1077,21 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
                                             if (row.type == 'warn') {
-                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`
+                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`
                                                 );
                                             } else if (row.type == 'ban') {
-                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             } else {
-                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                             }
                                             if (i == max - 1 && extra > 0) {
                                                 events.push(`...${extra} more`);
@@ -1093,12 +1157,20 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
-                                            switch(row.type) {
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
+                                            switch (row.type) {
                                                 case 'mute':
-                                                    await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     break;
                                                 case 'unmute':
-                                                    await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     break;
                                             }
                                             if (i == max - 1 && extra > 0) {
@@ -1150,12 +1222,20 @@ exports.run = async (client, message, args) => {
 
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
-                                        switch(row.type) {
+                                        var actioner = client.users.get(row.actioner);
+                                        if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(row.actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                        }
+                                        switch (row.type) {
                                             case 'mute':
-                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                             case 'unmute':
-                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
                                         }
                                         if (i == max - 1 && extra > 0) {
@@ -1220,7 +1300,15 @@ exports.run = async (client, message, args) => {
 
                                         for (var i = 0; i < max; i++) {
                                             var row = rows[i];
-                                            await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                            var actioner = client.users.get(row.actioner);
+                                            if (!actioner) {
+                                                try {
+                                                    actioner = await client.fetchUser(row.actioner);
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
+                                            await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                             if (i == max - 1 && extra > 0) {
                                                 notes.push(`...${extra} more`);
                                             }
@@ -1271,7 +1359,15 @@ exports.run = async (client, message, args) => {
 
                                     for (var i = 0; i < max; i++) {
                                         var row = rows[i];
-                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                        var actioner = client.users.get(row.actioner);
+                                        if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(row.actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                        }
+                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                         if (i == max - 1 && extra > 0) {
                                             notes.push(`...${extra} more`);
                                         }
@@ -1780,12 +1876,20 @@ exports.run = async (client, message, args) => {
 
                                                         for (var i = 0; i < max; i++) {
                                                             var row = rows[i];
+                                                            var actioner = client.users.get(row.actioner);
+                                                            if (!actioner) {
+                                                                try {
+                                                                    actioner = await client.fetchUser(row.actioner);
+                                                                } catch (e) {
+                                                                    console.log(e);
+                                                                }
+                                                            }
                                                             if (row.type == 'warn') {
-                                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                                await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                             } else if (row.type == 'ban') {
-                                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                                await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                             } else {
-                                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                                await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                             }
                                                             if (i == max - 1 && extra > 0) {
                                                                 events.push(`...${extra} more`);
@@ -1836,12 +1940,20 @@ exports.run = async (client, message, args) => {
 
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
+                                                        var actioner = client.users.get(row.actioner);
+                                                        if (!actioner) {
+                                                            try {
+                                                                actioner = await client.fetchUser(row.actioner);
+                                                            } catch (e) {
+                                                                console.log(e);
+                                                            }
+                                                        }
                                                         if (row.type == 'warn') {
-                                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         } else if (row.type == 'ban') {
-                                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         } else {
-                                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         }
                                                         if (i == max - 1 && extra > 0) {
                                                             events.push(`...${extra} more`);
@@ -1907,12 +2019,21 @@ exports.run = async (client, message, args) => {
 
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
-                                                        switch(row.type) {
+                                                        var row = rows[i];
+                                                        var actioner = client.users.get(row.actioner);
+                                                        if (!actioner) {
+                                                            try {
+                                                                actioner = await client.fetchUser(row.actioner);
+                                                            } catch (e) {
+                                                                console.log(e);
+                                                            }
+                                                        }
+                                                        switch (row.type) {
                                                             case 'mute':
-                                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                                await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                                 break;
                                                             case 'unmute':
-                                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                                await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                                 break;
                                                         }
                                                         if (i == max - 1 && extra > 0) {
@@ -1964,12 +2085,20 @@ exports.run = async (client, message, args) => {
 
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
-                                                    switch(row.type) {
+                                                    var actioner = client.users.get(row.actioner);
+                                                    if (!actioner) {
+                                                        try {
+                                                            actioner = await client.fetchUser(row.actioner);
+                                                        } catch (e) {
+                                                            console.log(e);
+                                                        }
+                                                    }
+                                                    switch (row.type) {
                                                         case 'mute':
-                                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                             break;
                                                         case 'unmute':
-                                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                             break;
                                                     }
                                                     if (i == max - 1 && extra > 0) {
@@ -2034,7 +2163,15 @@ exports.run = async (client, message, args) => {
 
                                                     for ( var i = 0; i < max; i++ ) {
                                                         var row = rows[i];
-                                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                        var actioner = client.users.get(row.actioner);
+                                                        if (!actioner) {
+                                                            try {
+                                                                actioner = await client.fetchUser(row.actioner);
+                                                            } catch (e) {
+                                                                console.log(e);
+                                                            }
+                                                        }
+                                                        await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                         if (i == max - 1 && extra > 0) {
                                                             notes.push(`...${extra} more`);
                                                         }
@@ -2085,7 +2222,15 @@ exports.run = async (client, message, args) => {
 
                                                 for ( var i = 0; i < max; i++ ) {
                                                     var row = rows[i];
-                                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    var actioner = client.users.get(row.actioner);
+                                                    if (!actioner) {
+                                                        try {
+                                                            actioner = await client.fetchUser(row.actioner);
+                                                        } catch (e) {
+                                                            console.log(e);
+                                                        }
+                                                    }
+                                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     if (i == max - 1 && extra > 0) {
                                                         notes.push(`...${extra} more`);
                                                     }
@@ -2574,12 +2719,20 @@ exports.run = async (client, message, args) => {
 
                                                     for (var i = 0; i < max; i++) {
                                                         var row = rows[i];
+                                                        var actioner = client.users.get(row.actioner);
+                                                        if (!actioner) {
+                                                            try {
+                                                                actioner = await client.fetchUser(row.actioner);
+                                                            } catch (e) {
+                                                                console.log(e);
+                                                            }
+                                                        }
                                                         if (row.type == 'warn') {
-                                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         } else if (row.type == 'ban') {
-                                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         } else {
-                                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                            await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                         }
                                                         if (i == max - 1 && extra > 0) {
                                                             events.push(`...${extra} more`);
@@ -2630,12 +2783,20 @@ exports.run = async (client, message, args) => {
 
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
+                                                    var actioner = client.users.get(row.actioner);
+                                                    if (!actioner) {
+                                                        try {
+                                                            actioner = await client.fetchUser(row.actioner);
+                                                        } catch (e) {
+                                                            console.log(e);
+                                                        }
+                                                    }
                                                     if (row.type == 'warn') {
-                                                        await events.push(`\`${row.identifier}\` ❗ Warning by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                        await events.push(`\`${row.identifier}\` ❗ Warning by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                     } else if (row.type == 'ban') {
-                                                        await events.push(`\`${row.identifier}\` ⚔ Banned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                        await events.push(`\`${row.identifier}\` ⚔ Banned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                     } else {
-                                                        await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
+                                                        await events.push(`\`${row.identifier}\` 🛡 Unbanned by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n`);
                                                     }
                                                     if (i == max - 1 && extra > 0) {
                                                         events.push(`...${extra} more`);
@@ -2701,12 +2862,19 @@ exports.run = async (client, message, args) => {
 
                                                 for (var i = 0; i < max; i++) {
                                                     var row = rows[i];
-                                                    switch(row.type) {
+                                                    if (!actioner) {
+                                                        try {
+                                                            actioner = await client.fetchUser(row.actioner);
+                                                        } catch (e) {
+                                                            console.log(e);
+                                                        }
+                                                    }
+                                                    switch (row.type) {
                                                         case 'mute':
-                                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                            await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                             break;
                                                         case 'unmute':
-                                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                            await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                             break;
                                                     }
                                                     if (i == max - 1 && extra > 0) {
@@ -2758,12 +2926,19 @@ exports.run = async (client, message, args) => {
 
                                             for (var i = 0; i < max; i++) {
                                                 var row = rows[i];
-                                                switch(row.type) {
+                                                if (!actioner) {
+                                                    try {
+                                                        actioner = await client.fetchUser(row.actioner);
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
+                                                switch (row.type) {
                                                     case 'mute':
-                                                        await events.push(`\`${row.identifier}\` 🔇 Mute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                        await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                         break;
                                                     case 'unmute':
-                                                        await events.push(`\`${row.identifier}\` 🔊 Unmute by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                        await events.push(`\`${row.identifier}\` 🔊 Unmute by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                         break;
                                                 }
                                                 if (i == max - 1 && extra > 0) {
@@ -2828,7 +3003,14 @@ exports.run = async (client, message, args) => {
 
                                                 for ( var i = 0; i < max; i++ ) {
                                                     var row = rows[i];
-                                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                    if (!actioner) {
+                                                        try {
+                                                            actioner = await client.fetchUser(row.actioner);
+                                                        } catch (e) {
+                                                            console.log(e);
+                                                        }
+                                                    }
+                                                    await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     if (i == max - 1 && extra > 0) {
                                                         notes.push(`...${extra} more`);
                                                     }
@@ -2879,7 +3061,14 @@ exports.run = async (client, message, args) => {
 
                                             for ( var i = 0; i < max; i++ ) {
                                                 var row = rows[i];
-                                                await notes.push(`\`${row.identifier}\` 📌 Note by ${client.users.get(row.actioner)} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
+                                                if (!actioner) {
+                                                    try {
+                                                        actioner = await client.fetchUser(row.actioner);
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
+                                                await notes.push(`\`${row.identifier}\` 📌 Note by ${actioner} on ${row.timestamp.toUTCString()} \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 if (i == max - 1 && extra > 0) {
                                                     notes.push(`...${extra} more`);
                                                 }

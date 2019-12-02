@@ -24,7 +24,7 @@ exports.run = (client, message, args) => {
                             connection.query('SELECT * from log_voice WHERE userID = ? ORDER BY timestamp DESC LIMIT 22', user,
                             async function (err, rows, results) {
                                 if (err) throw err;
-        
+
                                 var times = [];
                                 var current = [];
                                 var timestamps = [];
@@ -34,18 +34,18 @@ exports.run = (client, message, args) => {
                                 ];
                                 for (var i = rows.length - 1; i >= 0; i--) {
                                     var row = rows[i];
-        
+
                                     if (rows[i - 1]) {
                                         //We have a next event
                                         var next = rows[i - 1];
-        
+
                                         if (row.type !== 3 && [2, 3].indexOf(next.type) > -1) {
                                             //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
                                             var time1 = row.timestamp;
                                             var time2 = next.timestamp;
-        
+
                                             var diff = time2.getTime() - time1.getTime();
-        
+
                                             var msec = diff;
                                             var hh = Math.floor(msec / 1000 / 60 / 60);
                                             msec -= hh * 1000 * 60 * 60;
@@ -53,7 +53,7 @@ exports.run = (client, message, args) => {
                                             msec -= mm * 1000 * 60;
                                             var ss = Math.floor(msec / 1000);
                                             msec -= ss * 1000;
-        
+
                                             times.push(`${hh}:${mm}:${ss}`);
                                             current.push(row.newChannel);
                                             timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
@@ -68,7 +68,7 @@ exports.run = (client, message, args) => {
                                 times.reverse();
                                 current.reverse();
                                 timestamps.reverse();
-        
+
                                 var longest = 0;
                                 for (var i = 0; i < current.length; i++) {
                                     if (current[i].length > longest) {
@@ -79,7 +79,7 @@ exports.run = (client, message, args) => {
                                     var howManyToAdd = longest - current[j].length;
                                     current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
                                 }
-        
+
                                 var longestTime = 0;
                                 for (var i = 0; i < timestamps.length; i++) {
                                     if (current[i].length > longestTime) {
@@ -90,7 +90,7 @@ exports.run = (client, message, args) => {
                                     var howManyToAdd = longestTime - timestamps[j].length;
                                     timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                                 }
-        
+
                                 for (var i = 0; i < times.length; i++) {
                                     msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`);
                                 }
@@ -107,18 +107,18 @@ exports.run = (client, message, args) => {
                             ];
                             for (var i = rows.length - 1; i >= 0; i--) {
                                 var row = rows[i];
-    
+
                                 if (rows[i - 1]) {
                                     //We have a next event
                                     var next = rows[i - 1];
-    
+
                                     if (row.type !== 3 && [2, 3].indexOf(next.type) > -1) {
                                         //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
                                         var time1 = row.timestamp;
                                         var time2 = next.timestamp;
-    
+
                                         var diff = time2.getTime() - time1.getTime();
-    
+
                                         var msec = diff;
                                         var hh = Math.floor(msec / 1000 / 60 / 60);
                                         msec -= hh * 1000 * 60 * 60;
@@ -126,7 +126,7 @@ exports.run = (client, message, args) => {
                                         msec -= mm * 1000 * 60;
                                         var ss = Math.floor(msec / 1000);
                                         msec -= ss * 1000;
-    
+
                                         times.push(`${hh}:${mm}:${ss}`);
                                         current.push(row.newChannel);
                                         timestamps.push(`${row.timestamp.toUTCString()} (${moment(row.timestamp.toUTCString()).fromNow()})`);
@@ -141,7 +141,7 @@ exports.run = (client, message, args) => {
                             times.reverse();
                             current.reverse();
                             timestamps.reverse();
-    
+
                             var longest = 0;
                             for (var i = 0; i < current.length; i++) {
                                 if (current[i].length > longest) {
@@ -152,7 +152,7 @@ exports.run = (client, message, args) => {
                                 var howManyToAdd = longest - current[j].length;
                                 current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
                             }
-    
+
                             var longestTime = 0;
                             for (var i = 0; i < timestamps.length; i++) {
                                 if (current[i].length > longestTime) {
@@ -163,7 +163,7 @@ exports.run = (client, message, args) => {
                                 var howManyToAdd = longestTime - timestamps[j].length;
                                 timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                             }
-    
+
                             for (var i = 0; i < times.length; i++) {
                                 msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`);
                             }
