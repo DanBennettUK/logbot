@@ -362,6 +362,10 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
         if (usernameResolve == null) {
             usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split.toLowerCase()) && (obj.discriminator == disc));
             if (usernameResolve == null) {
+                guild.fetchBans().then(u => {
+                    if (u.username == split && u.discriminator == disc) return u.id;
+                    else if (u.username.toLowerCase() == split.toLowerCase() && u.discriminator == disc) return u.id;
+                }).catch(console.error);
                 return 'err';
             } else {
                 return usernameResolve.id;
@@ -376,6 +380,10 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
         if (usernameResolve == null) {
             usernameResolve = client.users.find(obj => obj.username.toLowerCase() === tag.toLowerCase());
             if (usernameResolve == null) {
+                guild.fetchBans().then(u => {
+                    if (u.username == split && u.discriminator == disc) return u.id;
+                    else if (u.username.toLowerCase() == split.toLowerCase() && u.discriminator == disc) return u.id;
+                }).catch(console.error);
                 var nicknameResolve = guild.members.find(obj => obj.displayName === tag);
                 if (nicknameResolve == null) {
                     nicknameResolve = guild.members.find(obj => obj.displayName.toLowerCase() === tag.toLowerCase());
@@ -566,7 +574,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     var connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
-    if (message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
+    if (message.member && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
     if (badWordList == undefined) {
@@ -1088,7 +1096,7 @@ exports.inviteLinkDetection = (client, message) => {
     const channelsFile = client.channelsFile;
     var connection = client.connection;
     if (message.author.bot) return;
-    if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
+    if (message.member && message.member != null && message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
     if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
         message.delete().then(() => {
             message.channel.send(`${message.author} no invite links`).then(msg => {
