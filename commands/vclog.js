@@ -8,9 +8,9 @@ exports.run = async (client, message, args) => {
                 var id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
                 if (id == 'err') {
                     if (args.length < 3 && !/[0-9]/.test(args.slice(args.length, 1).join(' '))) {
-                        switch(args[0].toLowerCase()) {
+                        switch (args[0].toLowerCase()) {
                             case 'the':
-                                switch(args[1].toLowerCase()) {
+                                switch (args[1].toLowerCase()) {
                                     case 'office':
                                         args.unshift('🔒');
                                         break;
@@ -46,7 +46,7 @@ exports.run = async (client, message, args) => {
                                 args.unshift('the');
                                 args.unshift('🏠');
                                 break;
-                            case 'studio': 
+                            case 'studio':
                                 args.unshift('the');
                                 args.unshift('🎤');
                                 break;
@@ -63,95 +63,125 @@ exports.run = async (client, message, args) => {
                     message.channel.send(`The provided channel \`${args.join(' ')}\` is not a voice channel.`).catch(console.error);
                     return;
                 }
-                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
-                async function(err, rows, results) {
-                    if (err) {
-                        connection = functionsFile.establishConnection(client);
-                        connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`, 
-                        async function(err, rows, results) {
-                            if (err) throw err;
-                            if (rows && rows.length > 0) {
-                                var users = '';
-                                var joinTime = '';
-                                var i = 0;
-                                for (row of rows) {
-                                    if (i == 30) break;
-                                    var user;
-                                    try {
-                                        user = await client.fetchUser(row.userID);
-                                    } catch (e) {
-                                        message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                message.channel.send({
+                    embed: {
+                        color: client.config.color_info,
+                        title: `Viewing the logs of ${channel.name}`,
+                        description: `Loading data...`,
+                        timestamp: new Date(),
+                        footer: {
+                            text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                        }
+                    }
+                }).then(async msg => {
+                    connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`,
+                        async function (err, rows, results) {
+                            if (err) {
+                                connection = functionsFile.establishConnection(client);
+                                connection.query(`SELECT * FROM log_voice WHERE newChannelID = ${id} ORDER BY timestamp DESC LIMIT 30`,
+                                    async function (err, rows, results) {
+                                        if (err) throw err;
+                                        if (rows && rows.length > 0) {
+                                            var users = '';
+                                            var joinTime = '';
+                                            var i = 0;
+                                            for (row of rows) {
+                                                if (i == 30) break;
+                                                var user;
+                                                try {
+                                                    user = await client.fetchUser(row.userID);
+                                                } catch (e) {
+                                                    message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                                }
+                                                users += `${user}\n`;
+                                                joinTime += `${row.timestamp.toUTCString()}\n`;
+                                                i++;
+                                            }
+                                            msg.edit({
+                                                embed: {
+                                                    color: client.config.color_info,
+                                                    title: `Viewing the logs of ${channel.name}`,
+                                                    fields: [{
+                                                            name: 'User',
+                                                            value: `${users}`,
+                                                            inline: true
+                                                        },
+                                                        {
+                                                            name: 'Joined at',
+                                                            value: `${joinTime}`,
+                                                            inline: true
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        } else msg.edit({
+                                            embed: {
+                                                color: client.config.color_info,
+                                                title: `Viewing the logs of ${channel.name}`,
+                                                description: `No users were in the specified channel.`,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    });
+                            } else {
+                                if (rows && rows.length > 0) {
+                                    var users = '';
+                                    var joinTime = '';
+                                    var i = 0;
+                                    for (row of rows) {
+                                        if (i == 30) break;
+                                        var user;
+                                        try {
+                                            user = await client.fetchUser(row.userID);
+                                        } catch (e) {
+                                            message.channel.send(`${row.userID} could not be found.`).catch(console.error);
+                                        }
+                                        users += `${user}\n`;
+                                        joinTime += `${row.timestamp.toUTCString()}\n`;
+                                        i++;
                                     }
-                                    users += `${user}\n`;
-                                    joinTime += `${row.timestamp.toUTCString()}\n`;
-                                    i++;
-                                }
-                                message.channel.send({
+                                    msg.edit({
+                                        embed: {
+                                            color: client.config.color_info,
+                                            title: `Viewing the logs of ${channel.name}`,
+                                            fields: [{
+                                                    name: 'User',
+                                                    value: `${users}`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Joined at',
+                                                    value: `${joinTime}`,
+                                                    inline: true
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                } else msg.edit({
                                     embed: {
                                         color: client.config.color_info,
                                         title: `Viewing the logs of ${channel.name}`,
-                                        fields: [
-                                            {
-                                                name: 'User',
-                                                value: `${users}`,
-                                                inline: true
-                                            },
-                                            {
-                                                name: 'Joined at',
-                                                value: `${joinTime}`,
-                                                inline: true
-                                            }
-                                        ],
+                                        description: `No users were in the specified channel.`,
                                         timestamp: new Date(),
                                         footer: {
                                             text: `Marvin's Little Brother | Current version: ${client.config.version}`
                                         }
                                     }
                                 }).catch(console.error);
-                            } else message.channel.send('No users were in that channel.').catch(console.error);
-                        });
-                    } else {
-                        if (rows && rows.length > 0) {
-                            var users = '';
-                            var joinTime = '';
-                            var i = 0;
-                            for (row of rows) {
-                                if (i == 30) break;
-                                var user;
-                                try {
-                                    user = await client.fetchUser(row.userID);
-                                } catch (e) {
-                                    message.channel.send(`${row.userID} could not be found.`).catch(console.error);
-                                }
-                                users += `${user}\n`;
-                                joinTime += `${row.timestamp.toUTCString()}\n`;
-                                i++;
                             }
-                            message.channel.send({
-                                embed: {
-                                    color: client.config.color_info,
-                                    title: `Viewing the logs of ${channel.name}`,
-                                    fields: [
-                                        {
-                                            name: 'User',
-                                            value: `${users}`,
-                                            inline: true
-                                        },
-                                        {
-                                            name: 'Joined at',
-                                            value: `${joinTime}`,
-                                            inline: true
-                                        }
-                                    ],
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
-                                    }
-                                }
-                            }).catch(console.error);
-                        } else message.channel.send('No users were in that channel.').catch(console.error);
-                    }
-                });
+                        });
+                }).catch(console.error);
             } else functionsFile.syntaxErr(client, message, 'vclog');
         } else message.channel.send(':x: That module is disabled.').catch(console.error);
     }

@@ -574,7 +574,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
     var connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
-    if (message.member && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
+    if (message.member && message.member != null && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
     var wholeMessage = message.content.split(' ');
     var badWordList = badWordsFile.get(`badWords`);
     if (badWordList == undefined) {
@@ -796,7 +796,7 @@ exports.checkReminders = async function checkReminders(client) {
             reminderFile.unset(key);
             await reminderFile.save();
         }
-    }   
+    }
 }
 
 exports.importWarnings = function importWarnings(client) {
@@ -1089,7 +1089,7 @@ exports.parseRoleTag = (client, guild, tag) => {
             if (role) return role.id;
             else return 'err';
         }
-    } 
+    }
 }
 
 exports.inviteLinkDetection = (client, message) => {
