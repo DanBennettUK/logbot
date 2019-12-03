@@ -98,8 +98,8 @@ module.exports = async (client, oldMember, newMember) => {
                                 for (var b = 0; b < rows.length; b++) {
                                     var row = rows[b];
                                     msg.push({
-                                        name: `**${hits[b].identifier}**`,
-                                        value: `\`Match:\` ${hits[b].rating.toString().substring(0, 5) * 100}%\n\`Username:\` ${hits[b].username}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                                        name: `**${hits[b].username}**`,
+                                        value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
                                     });
                                 }
                                 if (channelsFile.get('action_log')) {
@@ -120,7 +120,7 @@ module.exports = async (client, oldMember, newMember) => {
                                 }
                                 msg.forEach(m => {
                                     var identifier = cryptoRandomString({length: 10});
-                                    var desc = `BANNED USER DETECTION\nIdentifier: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                    var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
                                     function(err, results) {
                                         if (err) {
@@ -138,8 +138,8 @@ module.exports = async (client, oldMember, newMember) => {
                             for (var b = 0; b < rows.length; b++) {
                                 var row = rows[b];
                                 msg.push({
-                                    name: `**${hits[b].identifier}**`,
-                                    value: `\`Match:\` ${hits[b].rating.toString().substring(0, 5) * 100}%\n\`Username:\` ${hits[b].username}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                                    name: `**${hits[b].username}**`,
+                                    value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
                                 });
                             }
                             if (channelsFile.get('action_log')) {
@@ -160,7 +160,7 @@ module.exports = async (client, oldMember, newMember) => {
                             }
                             msg.forEach(m => {
                                 var identifier = cryptoRandomString({length: 10});
-                                var desc = `BANNED USER DETECTION\nIdentifier: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                 connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
                                 function(err, results) {
                                     if (err) {
