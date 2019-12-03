@@ -40,6 +40,7 @@ exports.run = async (client, message, args) => {
                 var nickname;
                 var voiceChannel;
                 var app;
+                var joined;
 
                 if (userObject.nickname) {
                     nickname = userObject.nickname;
@@ -57,6 +58,9 @@ exports.run = async (client, message, args) => {
                 } else {
                     app = 'None';
                 }
+                if (userObject.joinedAt) {
+                    joined = userObject.joinedAt.toUTCString();
+                } else joined = 'UNKNOWN';
 
                 message.channel.send({
                     embed: {
@@ -65,7 +69,7 @@ exports.run = async (client, message, args) => {
                             name: `${userObject.user.username} (${nickname})`,
                             icon_url: userObject.user.displayAvatarURL
                         },
-                        description: `${userObject.user} joined the guild on ${userObject.joinedAt.toUTCString()}`,
+                        description: `${userObject.user} joined the guild on ${joined}`,
                         thumbnail: {
                             url: userObject.user.displayAvatarURL
                         },
@@ -654,7 +658,7 @@ exports.run = async (client, message, args) => {
                                         name: `${userObject.user.username} (${nickname})`,
                                         icon_url: userObject.user.displayAvatarURL
                                     },
-                                    description: `${userObject.user} joined the guild on ${userObject.joinedAt.toUTCString()}`,
+                                    description: `${userObject.user} joined the guild on ${joined}`,
                                     thumbnail: {
                                         url: userObject.user.displayAvatarURL
                                     },
