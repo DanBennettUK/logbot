@@ -60,7 +60,7 @@ exports.run = async (client, message, args) => {
                             if (vc) msg.edit(`Tracking stopped. User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
                             else msg.edit(`Tracking stopped. User ${guildUser} was **not in a voice channel**.`).catch(console.error);                        }
                     });
-                } else message.channel.send(':x: Thes user provided was not found');
+                } else message.channel.send(':x: The user provided was not found');
             } else functionsFile.syntaxErr(client, message, 'vct');
         }
     }
