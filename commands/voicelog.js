@@ -122,7 +122,7 @@ exports.run = (client, message, args) => {
                                                 inline: true
                                             },
                                             {
-                                                name: 'Duration (H:M:S)',
+                                                name: 'Duration',
                                                 value: `${times.join('\n')}`,
                                                 inline: true
                                             }
@@ -232,7 +232,7 @@ exports.run = (client, message, args) => {
                                             inline: true
                                         },
                                         {
-                                            name: 'Duration (H:M:S)',
+                                            name: 'Duration',
                                             value: `${times.join('\n')}`,
                                             inline: true
                                         }
