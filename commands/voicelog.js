@@ -28,10 +28,10 @@ exports.run = (client, message, args) => {
                                 var times = [];
                                 var current = [];
                                 var timestamps = [];
-                                var msg = [
+                                /*var msg = [
                                     'Channel        |                     Timestamp                     | Duration (H:M:S)',
                                     '------------------------------------------------------------------------------------------------'
-                                ];
+                                ];*/
                                 for (var i = rows.length - 1; i >= 0; i--) {
                                     var row = rows[i];
 
@@ -49,10 +49,16 @@ exports.run = (client, message, args) => {
                                             var msec = diff;
                                             var hh = Math.floor(msec / 1000 / 60 / 60);
                                             msec -= hh * 1000 * 60 * 60;
+                                            hh = hh.toString();
+                                            if (hh.length == 1) hh = `0${hh}`;
                                             var mm = Math.floor(msec / 1000 / 60);
                                             msec -= mm * 1000 * 60;
+                                            mm = mm.toString();
+                                            if (mm.length == 1) mm = `0${mm}`;
                                             var ss = Math.floor(msec / 1000);
                                             msec -= ss * 1000;
+                                            ss = ss.toString();
+                                            if (ss.length == 1) ss = `0${ss}`;
 
                                             times.push(`${hh}:${mm}:${ss}`);
                                             current.push(row.newChannel);
@@ -91,20 +97,51 @@ exports.run = (client, message, args) => {
                                     timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                                 }
 
-                                for (var i = 0; i < times.length; i++) {
+                                /*for (var i = 0; i < times.length; i++) {
                                     msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`);
                                 }
                                 var joinedMessage = msg.join('\n');
-                                message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);
+                                message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);*/
+                                message.channel.send({
+                                    embed: {
+                                        author: {
+                                            name: `${u.username}#${u.discriminator}`,
+                                            icon_url: `${u.displayAvatarURL}`
+                                        },
+                                        title: `🎙 Viewing the voice logs of`,
+                                        description: `${u}`,
+                                        fields: [
+                                            {
+                                                name: 'Channel',
+                                                value: `${current.join('\n')}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Timestamp',
+                                                value: `${timestamps.join('\n')}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Duration (H:M:S)',
+                                                value: `${times.join('\n')}`,
+                                                inline: true
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
                             });
                         } else {
                             var times = [];
                             var current = [];
                             var timestamps = [];
-                            var msg = [
+                            /*var msg = [
                                 'Channel        |                     Timestamp                     | Duration (H:M:S)',
                                 '------------------------------------------------------------------------------------------------'
-                            ];
+                            ];*/
                             for (var i = rows.length - 1; i >= 0; i--) {
                                 var row = rows[i];
 
@@ -122,10 +159,16 @@ exports.run = (client, message, args) => {
                                         var msec = diff;
                                         var hh = Math.floor(msec / 1000 / 60 / 60);
                                         msec -= hh * 1000 * 60 * 60;
+                                        hh = hh.toString();
+                                        if (hh.length == 1) hh = `0${hh}`;
                                         var mm = Math.floor(msec / 1000 / 60);
                                         msec -= mm * 1000 * 60;
+                                        mm = mm.toString();
+                                        if (mm.length == 1) mm = `0${mm}`;
                                         var ss = Math.floor(msec / 1000);
                                         msec -= ss * 1000;
+                                        ss = ss.toString();
+                                        if (ss.length == 1) ss = `0${ss}`;
 
                                         times.push(`${hh}:${mm}:${ss}`);
                                         current.push(row.newChannel);
@@ -164,11 +207,42 @@ exports.run = (client, message, args) => {
                                 timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                             }
 
-                            for (var i = 0; i < times.length; i++) {
+                            /*for (var i = 0; i < times.length; i++) {
                                 msg.push(`${current[i]}|     ${timestamps[i]}     | ${times[i]}`);
                             }
                             var joinedMessage = msg.join('\n');
-                            message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);
+                            message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);*/
+                            message.channel.send({
+                                embed: {
+                                    author: {
+                                        name: `${u.username}#${u.discriminator}`,
+                                        icon_url: `${u.displayAvatarURL}`
+                                    },
+                                    title: `🎙 Viewing the voice logs of`,
+                                    description: `${u}`,
+                                    fields: [
+                                        {
+                                            name: 'Channel',
+                                            value: `${current.join('\n')}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Timestamp',
+                                            value: `${timestamps.join('\n')}`,
+                                            inline: true
+                                        },
+                                        {
+                                            name: 'Duration (H:M:S)',
+                                            value: `${times.join('\n')}`,
+                                            inline: true
+                                        }
+                                    ],
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: `Marvin's Little Brother | Current version: ${client.config.version}`
+                                    }
+                                }
+                            }).catch(console.error);
                         }
                     });
                 }).catch(() => message.channel.send(`An invalid user was provided. Please try again.`).catch(console.error));
