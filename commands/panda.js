@@ -6,28 +6,29 @@ exports.run = (client, message, args) => {
             var random = Math.floor(Math.random() * Math.floor(2));
             switch (random) {
                 case 0:
-                    request(`https://some-random-api.ml/img/panda`,
-                    function (error, response, body) {
-                        answer = JSON.parse(body);
-                        const attachment = new client.Discord.Attachment(answer['link']);
-                        message.channel.send('Fetching picture...').then(msg => {
+                    message.channel.send('Fetching picture...').then(msg => {
+                        request(`https://some-random-api.ml/img/panda`,
+                        function (error, response, body) {
+                            answer = JSON.parse(body);
+                            const attachment = new client.Discord.Attachment(answer['link']);
                             message.channel.send(attachment).then(() => {
                                 msg.delete().catch(console.error);
                             }).catch(console.error);
-                        }).catch(console.error);
-                    });
+                        });
+                    }).catch(console.error);
+                    break;
                     break;
                 case 1:
-                    request(`https://some-random-api.ml/img/red_panda`,
-                    function (error, response, body) {
-                        answer = JSON.parse(body);
-                        const attachment = new client.Discord.Attachment(answer['link']);
-                        message.channel.send('Fetching picture...').then(msg => {
+                    message.channel.send('Fetching picture...').then(msg => {
+                        request(`https://some-random-api.ml/img/red_panda`,
+                        function (error, response, body) {
+                            answer = JSON.parse(body);
+                            const attachment = new client.Discord.Attachment(answer['link']);
                             message.channel.send(attachment).then(() => {
                                 msg.delete().catch(console.error);
                             }).catch(console.error);
-                        }).catch(console.error);
-                    });
+                        });
+                    }).catch(console.error);
                     break;
             }
         }
