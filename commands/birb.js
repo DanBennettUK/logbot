@@ -6,7 +6,12 @@ exports.run = (client, message, args) => {
             request(`https://some-random-api.ml/img/birb`,
             function (error, response, body) {
                 answer = JSON.parse(body);
-                message.channel.send(answer['link']);
+                const attachment = new client.Discord.Attachment(answer['link']);
+                message.channel.send('Fetching picture...').then(msg => {
+                    message.channel.send(attachment).then(() => {
+                        msg.delete().catch(console.error);
+                    }).catch(console.error);
+                }).catch(console.error);
             });
         }
     } // End of permission checking statement

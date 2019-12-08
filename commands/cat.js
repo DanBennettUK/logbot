@@ -9,14 +9,24 @@ exports.run = (client, message, args) => {
                     request(`https://some-random-api.ml/img/cat`,
                     function (error, response, body) {
                         answer = JSON.parse(body);
-                        message.channel.send(answer['link']);
+                        const attachment = new client.Discord.Attachment(answer['link']);
+                        message.channel.send('Fetching picture...').then(msg => {
+                            message.channel.send(attachment).then(() => {
+                                msg.delete().catch(console.error);
+                            }).catch(console.error);
+                        }).catch(console.error);
                     });
                     break;
                 case 1:
                     request(`http://aws.random.cat/meow`,
                     function (error, response, body) {
                         answer = JSON.parse(body);
-                        message.channel.send(answer['file']);
+                        const attachment = new client.Discord.Attachment(answer['file']);
+                        message.channel.send('Fetching picture...').then(msg => {
+                            message.channel.send(attachment).then(() => {
+                                msg.delete().catch(console.error);
+                            }).catch(console.error);
+                        }).catch(console.error);
                     });
                     break;
             }
