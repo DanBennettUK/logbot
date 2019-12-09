@@ -31,7 +31,7 @@ exports.run = (client, message, args) => {
                                 connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
                                 async function (err, results) {
                                     if (err) throw err;
-        
+
                                     message.channel.send({
                                         embed: {
                                             color: config.color_success,
@@ -167,7 +167,7 @@ exports.run = (client, message, args) => {
                                         if (error.message == 'Cannot send messages to this user') message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.').catch(console.error);
                                         else console.error;
                                     });
-                                }).catch(console.error);    
+                                }).catch(console.error);
                             }
                         });
                     } else {

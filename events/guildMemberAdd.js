@@ -87,7 +87,10 @@ module.exports = (client, member) => {
                         if (rows.length == 0) return;
                         for (var b = 0; b < rows.length; b++) {
                             var row = rows[b];
-                            msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                            msg.push({
+                                name: `${hits[b].username}`,
+                                value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                            });
                         }
                         if (channelsFile.get('action_log')) {
                             if (!member.guild.channels.get(channelsFile.get('action_log'))) {
@@ -97,7 +100,7 @@ module.exports = (client, member) => {
                                 embed: {
                                     color: config.color_warning,
                                     title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
-                                    description: msg.join(' '),
+                                    fields: msg,
                                     timestamp: new Date(),
                                     footer: {
                                         text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -105,23 +108,29 @@ module.exports = (client, member) => {
                                 }
                             }).catch(console.error);
                         }
-                        var identifier = cryptoRandomString({length: 10});
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                        function(err, results) {
-                            if (err) {
-                                connection = functionsFile.establishConnection(client);
-                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                                function(err, results) {
-                                    if (err) throw err;
-                                });
-                            }
+                        msg.forEach(m => {
+                            var identifier = cryptoRandomString({length: 10});
+                            var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
+                            function(err, results) {
+                                if (err) {
+                                    connection = functionsFile.establishConnection(client);
+                                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
+                                    function(err, results) {
+                                        if (err) throw err;
+                                    });
+                                }
+                            });
                         });
                     });
                 } else {
                     if (rows.length == 0) return;
                     for (var b = 0; b < rows.length; b++) {
                         var row = rows[b];
-                        msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                        msg.push({
+                            name: `${hits[b].username}`,
+                            value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                        });
                     }
                     if (channelsFile.get('action_log')) {
                         if (!member.guild.channels.get(channelsFile.get('action_log'))) {
@@ -131,7 +140,7 @@ module.exports = (client, member) => {
                             embed: {
                                 color: config.color_warning,
                                 title: `❗ ${member.user.username}#${member.user.discriminator} matches one or more previous ban record(s)`,
-                                description: msg.join(' '),
+                                fields: msg,
                                 timestamp: new Date(),
                                 footer: {
                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -139,16 +148,19 @@ module.exports = (client, member) => {
                             }
                         }).catch(console.error);
                     }
-                    var identifier = cryptoRandomString({length: 10});
-                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                    function(err, results) {
-                        if (err) {
-                            connection = functionsFile.establishConnection(client);
-                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                            function(err, results) {
-                                if (err) throw err;
-                            });
-                        }
+                    msg.forEach(m => {
+                        var identifier = cryptoRandomString({length: 10});
+                        var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
+                        function(err, results) {
+                            if (err) {
+                                connection = functionsFile.establishConnection(client);
+                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
+                                function(err, results) {
+                                    if (err) throw err;
+                                });
+                            }
+                        });
                     });
                 }
             });
@@ -176,7 +188,7 @@ module.exports = (client, member) => {
             switch (d) {
                 case 0:
                     switch (h) {
-                        case 0: 
+                        case 0:
                             switch (m) {
                                 case 0:
                                     time = `${s}s`;
@@ -186,7 +198,7 @@ module.exports = (client, member) => {
                                     break;
                             }
                             break;
-                        default: 
+                        default:
                             time = `${h}h${m}m${s}s`
                             break;
                     }

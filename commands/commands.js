@@ -52,7 +52,7 @@ exports.run = (client, message, args) => {
                 var re = new RegExp(temp);
                 content = content.replace(/\\\\n/gi, temp);
                 content = content.replace(/\\n/gi, '\n');
-                content = content.replace(re, '\\n');                
+                content = content.replace(re, '\\n');
                 numberOfCommands++;
                 allCommands +=`\n **${command}:** ${content}`;
                 if (numberOfCommands == 1) {

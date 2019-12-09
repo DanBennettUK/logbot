@@ -1,4 +1,4 @@
-exports.run = (client, message, args) => {
+exports.run = async (client, message, args) => {
     const modulesFile = client.modulesFile;
     const functionsFile = client.functionsFile;
     const cryptoRandomString = client.cryptoRandomString;
@@ -7,21 +7,33 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_NOTE')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, message.guild, args[0]);
+                var id = functionsFile.parseUserTag(client, message.guild, args[0]);
             } else {
                 message.channel.send(`Format: \`${config.prefix}note [User ID] [Note content]\``);
                 return;
             }
 
-            if (user == 'err') {
-                message.channel.send('An invalid user was provided. Please try again');
+            if (id == 'err') {
+                message.channel.send(':x: An invalid user was provided. Please try again').catch(console.error);
             } else {
+                var user = client.users.get(id);
+                if (!user) {
+                    try {
+                        user = await client.fetchUser(id);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                if (!user) {
+                    message.channel.send(':x: An invalid user was provided. Please try again').catch(console.error);
+                    return;
+                }
                 var tail = args.slice(1);
                 var note = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
 
                 if (tail.length > 0) {
                     var identifier = cryptoRandomString({ length: 10 });
-                    var data = [user, message.author.id, note, identifier, 0, new Date(), user];
+                    var data = [id, message.author.id, note, identifier, 0, new Date(), id];
                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                     function (err, results) {
                         if (err) {
@@ -32,12 +44,8 @@ exports.run = (client, message, args) => {
                                 message.channel.send({
                                     embed: {
                                         color: config.color_success,
-                                        author: {
-                                            name: client.user.username,
-                                            icon_url: client.user.displayAvatarURL
-                                        },
                                         title: '[Action] Note added',
-                                        description: `A note was added to ${client.users.get(user)} by ${message.author}`,
+                                        description: `A note was added to ${user} by ${message.author}`,
                                         fields: [
                                             {
                                                 name: 'Content',
@@ -59,12 +67,8 @@ exports.run = (client, message, args) => {
                             message.channel.send({
                                 embed: {
                                     color: config.color_success,
-                                    author: {
-                                        name: client.user.username,
-                                        icon_url: client.user.displayAvatarURL
-                                    },
                                     title: '[Action] Note added',
-                                    description: `A note was added to ${client.users.get(user)} by ${message.author}`,
+                                    description: `A note was added to ${user} by ${message.author}`,
                                     fields: [
                                         {
                                             name: 'Content',

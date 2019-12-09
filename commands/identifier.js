@@ -22,12 +22,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_caution,
                                                 title: `Warning for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` ❗ Warning by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` ❗ Warning by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -44,12 +52,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_caution,
                                                 title: `Note for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` 📌 Note by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` 📌 Note by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -66,12 +82,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_warning,
                                                 title: `Ban for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` ⚔ Banned by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` ⚔ Banned by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -88,12 +112,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_success,
                                                 title: `Unban for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` 🛡 Unbanned by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` 🛡 Unbanned by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -110,12 +142,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_caution,
                                                 title: `Mute for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` 🔇 Mute by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} for ${rows[0].length}s \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` 🔇 Mute by ${actioner} on ${rows[0].timestamp.toUTCString()} for ${rows[0].length}s \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -132,12 +172,20 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_success,
                                                 title: `Unmute for ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` Unmute by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                                description: `\`${rows[0].identifier}\` Unmute by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -154,13 +202,21 @@ exports.run = (client, message, args) => {
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
-                                        client.fetchUser(rows[0].userID).then(u => {
+                                        client.fetchUser(rows[0].userID).then(async u => {
+                                          var actioner = client.users.get(rows[0].actioner);
+                                          if (!actioner) {
+                                            try {
+                                                actioner = await client.fetchUser(rows[0].actioner);
+                                            } catch (e) {
+                                                console.log(e);
+                                            }
+                                          }
                                           var channel = guild.channels.find(chnl => chnl.id === rows[0].channel);
                                           message.channel.send({
                                             embed: {
                                                 color: config.color_success,
                                                 title: `Helper clear on ${u.username} (${u.id})`,
-                                                description: `\`${rows[0].identifier}\` ${rows[0].amount} messages cleared by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} from ${channel} \n`,
+                                                description: `\`${rows[0].identifier}\` ${rows[0].amount} messages cleared by ${actioner} on ${rows[0].timestamp.toUTCString()} from ${channel} \n`,
                                                 timestamp: new Date(),
                                                 footer: {
                                                     text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -185,12 +241,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_caution,
                                             title: `Warning for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` ❗ Warning by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` ❗ Warning by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -207,12 +271,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_caution,
                                             title: `Note for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` 📌 Note by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` 📌 Note by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -229,12 +301,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_warning,
                                             title: `Ban for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` ⚔ Banned by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` ⚔ Banned by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -251,12 +331,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_success,
                                             title: `Unban for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` 🛡 Unbanned by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` 🛡 Unbanned by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -273,12 +361,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_caution,
                                             title: `Mute for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` 🔇 Mute by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} for ${rows[0].length}s \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` 🔇 Mute by ${actioner} on ${rows[0].timestamp.toUTCString()} for ${rows[0].length}s \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -295,12 +391,20 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       message.channel.send({
                                         embed: {
                                             color: config.color_success,
                                             title: `Unmute for ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` Unmute by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
+                                            description: `\`${rows[0].identifier}\` Unmute by ${actioner} on ${rows[0].timestamp.toUTCString()} \n \`\`\`${rows[0].description}\`\`\`\n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -317,13 +421,21 @@ exports.run = (client, message, args) => {
                               function (err, rows, result) {
                                   if (err) throw err;
                                   if (rows) {
-                                    client.fetchUser(rows[0].userID).then(u => {
+                                    client.fetchUser(rows[0].userID).then(async u => {
+                                      var actioner = client.users.get(rows[0].actioner);
+                                      if (!actioner) {
+                                        try {
+                                            actioner = await client.fetchUser(rows[0].actioner);
+                                        } catch (e) {
+                                            console.log(e);
+                                        }
+                                      }
                                       var channel = guild.channels.find(chnl => chnl.id === rows[0].channel);
                                       message.channel.send({
                                         embed: {
                                             color: config.color_success,
                                             title: `Helper clear on ${u.username} (${u.id})`,
-                                            description: `\`${rows[0].identifier}\` ${rows[0].amount} messages cleared by ${client.users.get(rows[0].actioner)} on ${rows[0].timestamp.toUTCString()} from ${channel} \n`,
+                                            description: `\`${rows[0].identifier}\` ${rows[0].amount} messages cleared by ${actioner} on ${rows[0].timestamp.toUTCString()} from ${channel} \n`,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`

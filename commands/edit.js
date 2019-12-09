@@ -9,7 +9,7 @@ exports.run = (client, message, args) => {
                 var chnl = message.guild.channels.get(chID);
                 if (chnl) {
                     chnl.fetchMessage(args[1]).then(m => {
-                        if (m.author = client.user) {
+                        if (m.author == client.user) {
                             if (m.embeds.length > 0 && m.content.length == 0) {
                                 m.edit({
                                     embed: {

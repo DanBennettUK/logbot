@@ -111,7 +111,7 @@ exports.run = (client, message, args) => {
                             }
                         }).catch(console.error);
                         currentWords = '';
-                    }                
+                    }
                     currentWords += `${word}\n`
                     if (i == (currentWordsArray.length - 1)) {
                         if (currentWords.length > 0) {

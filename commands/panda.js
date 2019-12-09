@@ -7,7 +7,7 @@ exports.run = (client, message, args) => {
             switch (random) {
                 case 0:
                     message.channel.send('Fetching picture...').then(msg => {
-                        request(`https://some-random-api.ml/img/dog`,
+                        request(`https://some-random-api.ml/img/panda`,
                         function (error, response, body) {
                             answer = JSON.parse(body);
                             const attachment = new client.Discord.Attachment(answer['link']);
@@ -17,12 +17,13 @@ exports.run = (client, message, args) => {
                         });
                     }).catch(console.error);
                     break;
+                    break;
                 case 1:
                     message.channel.send('Fetching picture...').then(msg => {
-                        request(`https://dog.ceo/api/breeds/image/random`,
+                        request(`https://some-random-api.ml/img/red_panda`,
                         function (error, response, body) {
                             answer = JSON.parse(body);
-                            const attachment = new client.Discord.Attachment(answer['message']);
+                            const attachment = new client.Discord.Attachment(answer['link']);
                             message.channel.send(attachment).then(() => {
                                 msg.delete().catch(console.error);
                             }).catch(console.error);

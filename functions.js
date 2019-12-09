@@ -788,7 +788,7 @@ exports.checkReminders = async function checkReminders(client) {
             reminderFile.unset(key);
             await reminderFile.save();
         }
-    }   
+    }
 }
 
 exports.importWarnings = function importWarnings(client) {
@@ -1081,7 +1081,7 @@ exports.parseRoleTag = (client, guild, tag) => {
             if (role) return role.id;
             else return 'err';
         }
-    } 
+    }
 }
 
 exports.inviteLinkDetection = (client, message) => {
@@ -1225,7 +1225,7 @@ exports.checkLive = (client) => {
     request(options, (error, response, body) => {
         if (!error) {
             var channel = JSON.parse(body);
-            if (channel.data.length > 0) {
+            if (channel && channel.data && channel.data.length > 0) {
                 if (client.live == false) {
                     if (channelsFile.get('action_log')) {
                         var chnl = guild.channels.get(channelsFile.get('action_log'))
