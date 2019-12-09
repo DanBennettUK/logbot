@@ -212,6 +212,11 @@ exports.run = (client, message, args) => {
                             }
                             var joinedMessage = msg.join('\n');
                             message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);*/
+                            if (times.length == 0) {
+                                current.push('No results found');
+                                timestamps.push('No results found');
+                                times.push('No results found');
+                            }
                             message.channel.send({
                                 embed: {
                                     author: {
