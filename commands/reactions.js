@@ -10,22 +10,23 @@ exports.run = async (client, message, args) => {
                     functionsFile.syntaxErr(client, message, 'reactions add');
                     return;
                 }
-                var chnl = functionsFile.parseChannelTag(client, message.guild, args[1]);
+                const chnl = functionsFile.parseChannelTag(client, message.guild, args[1]);
                 if (chnl != 'err') {
-                    var channl = client.channels.get(chnl);
+                    const channl = client.channels.get(chnl);
                     if (channl) {
+                        let msg;
                         try {
-                            var msg = await channl.fetchMessage(args[2]);
+                            msg = await channl.fetchMessage(args[2]);
                         } catch (e) {}
                         if (msg) {
-                            var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
+                            const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                             if (emojiID != 'err') {
-                                if (/[0-9]+/.test(emojiID)) var emoji = client.emojis.get(emojiID);
-                                else emoji = emojiID;
+                                if (/[0-9]+/.test(emojiID)) const emoji = client.emojis.get(emojiID);
+                                const emoji = emojiID;
                                 if (emoji) {
-                                    var roleID = functionsFile.parseRoleTag(client, message.guild, args[4]);
+                                    const roleID = functionsFile.parseRoleTag(client, message.guild, args[4]);
                                     if (roleID != 'err') {
-                                        var role = message.guild.roles.get(roleID);
+                                        const role = message.guild.roles.get(roleID);
                                         if (role) {
                                             reactionsFile.set(`${chnl}.${args[2]}.${emojiID}`, roleID);
                                             reactionsFile.save();
@@ -80,8 +81,8 @@ exports.run = async (client, message, args) => {
             } else if (args[0].toLowerCase() == 'remove') {
                 const chnlKeys = _.keys(reactionsFile.read());
                 if (args[1]) {
-                    var chnl = parseChannelTag(args[1]);
-                    var channl = client.channels.get(chnl);
+                    let chnl = parseChannelTag(args[1]);
+                    const channl = client.channels.get(chnl);
                     if (!channl) chnl = 'err';
                     if (chnl != 'err') {
                         if (chnlKeys.length > 0 && chnlKeys.includes(chnl)) {
@@ -109,8 +110,9 @@ exports.run = async (client, message, args) => {
                                     }
                                 }).catch(console.error);
                             } else {
+                                let msg;
                                 try {
-                                    var msg = chnl.fetchMessage(args[2]);
+                                    msg = chnl.fetchMessage(args[2]);
                                 } catch (e) {}
                                 if (msg) {
                                     const msgKeys = _.keys(reactionsFile.get(`${chnl}`));
@@ -145,10 +147,10 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }).catch(console.error);
                                         } else {
-                                            var emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
+                                            const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
-                                                if (/[0-9]+/.test(emojiID)) var emoji = client.emojis.get(emojiID);
-                                                else emoji = emojiID;
+                                                if (/[0-9]+/.test(emojiID)) const emoji = client.emojis.get(emojiID);
+                                                else const emoji = emojiID;
                                                 if (emoji) {
                                                     const emojiKeys = _.keys(reactionsFile.get(`${chnl}.${args[2]}`));
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(emo[2])) {
@@ -227,30 +229,31 @@ exports.run = async (client, message, args) => {
                 }
             } else if (args[0].toLowerCase() == 'list') {
                 const reactionsObject = reactionsFile.read();
-                var dsc = '';
-                var amount = 0;
-                var sent = false;
+                let dsc = '';
+                let amount = 0;
+                let sent = false;
                 for (cKey in reactionsObject) {
                     const chnls = reactionsObject[cKey];
                     var chnl = client.channels.get(cKey);
                     if (chnl) {
                         for (mKey in chnls) {
                             const msgs = chnls[mKey];
+                            let msg;
                             try {
-                                var msg = await chnl.fetchMessage(mKey);
+                                msg = await chnl.fetchMessage(mKey);
                             } catch (e) {}
                             if (msg) {
                                 for (rKey in msgs) {
-                                    if (/[0-9]+/.test(rKey)) var emoji = client.emojis.get(rKey);
-                                    else var emoji = rKey;
+                                    if (/[0-9]+/.test(rKey)) const emoji = client.emojis.get(rKey);
+                                    else const emoji = rKey;
                                     if (emoji) {
                                         const roleID = msgs[rKey];
-                                        var role = message.guild.roles.find(r => r.id == roleID);
+                                        const role = message.guild.roles.find(r => r.id == roleID);
                                         if (role) {
                                             if (dsc.length > 1900) {
                                                 if (amount == 1) {
-                                                    var plural = 'reaction';
-                                                } else var plural = 'reactions';
+                                                    const plural = 'reaction';
+                                                } else const plural = 'reactions';
                                                 message.channel.send({
                                                     embed: {
                                                         color: config.color_info,
@@ -301,8 +304,8 @@ exports.run = async (client, message, args) => {
                 }
                 if (dsc.length > 0) {
                     if (amount == 1) {
-                        var plural = 'reaction';
-                    } else var plural = 'reactions';
+                        const plural = 'reaction';
+                    } else const plural = 'reactions';
                     message.channel.send({
                         embed: {
                             color: config.color_info,

@@ -6,11 +6,11 @@ exports.run = async (client, message, args) => {
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_REMINDME')) {
-            var user = message.author.id;
-            var end;
-            var ms;
+            const user = message.author.id;
+            let end;
+            let ms;
             if (args[0]) {
-                var int = args[0].replace(/[a-zA-Z]$/g, '');
+                const int = args[0].replace(/[a-zA-Z]$/g, '');
                 if (parseInt(int)) {
                     switch (args[0] && args[0].toLowerCase().charAt(args[0].length - 1)) {
                         case 'd':
@@ -31,7 +31,7 @@ exports.run = async (client, message, args) => {
                             break;
                     }
 
-                    var reminder = _.rest(args, 1).join(' ');
+                    const reminder = _.rest(args, 1).join(' ');
 
                     if (reminder.length > 1000) {
                         message.channel.send(':x: Please keep the reminder message under 1000 characters.');
