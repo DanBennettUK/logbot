@@ -8,18 +8,16 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
             let userID;
-            if (args.length > 0) userID = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+            const tag = args.join(' ');
+            if (args.length > 0) userID = functionsFile.parseUserTag(client, guild, tag);
             else {
                 functionsFile.syntaxErr(client, message, 'user');
                 return;
             }
-            let globalUser = client.users.get(userID);
-            if (!globalUser) {
-                try {
-                    globalUser = await client.fetchUser(userID);
-                } catch (e) {
-                    console.log(e);
-                }
+            if (userID == 'err') {
+                const IDArray = await functionsFile.parseBannedUserTag(client, guild, tag);
+                if (IDArray.length > 0) userID = IDArray[0];
+                if (IDArray.length > 1) message.channel.send(`Multiple matching users have been found. The first will be displayed. All IDs of matching users are displayed below:\n${IDArray.join(' ')}`).catch(console.error);
             }
             if (userID == 'err') {
                 message.channel.send({
@@ -34,6 +32,14 @@ exports.run = async (client, message, args) => {
                     }
                 }).catch(console.error);
                 return;
+            }
+            let globalUser = client.users.get(userID);
+            if (!globalUser) {
+                try {
+                    globalUser = await client.fetchUser(userID);
+                } catch (e) {
+                    console.log(e);
+                }
             }
             const userObject = guild.member(globalUser);
 

@@ -1239,3 +1239,20 @@ exports.checkLive = (client) => {
         } else console.log(error);
     });
 }
+
+exports.parseBannedUserTag = async function(client, guild, tag) {
+    let bans = await guild.fetchBans()
+    if (/.+(#\d\d\d\d)+$/.test(tag)) {
+        let split = tag.split('#');
+        const disc = split[split.length - 1];
+        split.pop();
+        split = split.join('#');
+        bans = bans.filter(u => (u.username == split || u.username.toLowerCase() == split.toLowerCase()) && u.discriminator == disc);
+        if (bans.size > 0) return bans.keyArray();
+        else return [];
+    } else {
+        bans = bans.filter(u => u.username == tag || u.username.toLowerCase() == tag.toLowerCase());
+        if (bans.size > 0) return bans.keyArray();
+        else return [];
+    }
+}
