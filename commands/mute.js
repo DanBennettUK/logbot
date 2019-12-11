@@ -6,21 +6,21 @@ exports.run = (client, message, args) => {
     const mutedFile = client.mutedFile;
     const _ = client.underscore;
     const config = client.config;
-    var connection = client.connection;
+    let connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_MUTE')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
-                var guildUser = guild.member(user);
+                const user = functionsFile.parseUserTag(client, guild, args[0]);
+                const guildUser = guild.member(user);
 
                 if (user !== 'err' && guildUser) {
                     if (mutedFile.get(user)) {
-                        var existingMute = mutedFile.get(user);
+                        const existingMute = mutedFile.get(user);
                         message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000).toUTCString()}`);
                     } else {
-                        var end;
-                        var seconds;
-                        var int = args[1].replace(/[a-zA-Z]$/g, '');
+                        let end;
+                        let seconds;
+                        const int = args[1].replace(/[a-zA-Z]$/g, '');
 
                         if (parseInt(int)) {
                             switch (args[1] && args[1].toLowerCase().charAt(args[1].length - 1)) {
@@ -42,10 +42,10 @@ exports.run = (client, message, args) => {
                                     break;
                             }
 
-                            var tail = _.rest(args, 2).join(' ');
+                            const tail = _.rest(args, 2).join(' ');
 
                             if (tail.length > 0) {
-                                var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
+                                const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                 mutedFile.set(`${user}.end`, end);
                                 mutedFile.set(`${user}.actioner`,message.author.id);
                                 mutedFile.set(`${user}.actionee`, user);
@@ -53,15 +53,15 @@ exports.run = (client, message, args) => {
                                 mutedFile.set(`${user}.isHelper`, 0);
                                 mutedFile.save();
 
-                                var mutedRole = guild.roles.find(val => val.name === 'Muted');
-                                var identifier = cryptoRandomString({ length: 10 });
+                                const mutedRole = guild.roles.find(val => val.name === 'Muted');
+                                const identifier = cryptoRandomString({ length: 10 });
 
                                 guild.member(user).addRole(mutedRole).then(async member => {
                                     if (member.voiceChannel !== undefined) {
                                         member.setVoiceChannel(null)
                                     }
 
-                                    var data = [user, message.author.id, reason, seconds, identifier, 0, new Date(), user /*SP arg*/];
+                                    let data = [user, message.author.id, reason, seconds, identifier, 0, new Date(), user /*SP arg*/];
                                     connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
                                     function (err, results) {
                                         if (err) {
@@ -169,9 +169,9 @@ exports.run = (client, message, args) => {
                                             }
                                         }).then(dm => {
                                             if (dm.embeds[0].type === 'rich') {
-                                                var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                                                data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
                                             } else {
-                                                var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
+                                                data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
                                             }
                                             connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                                 function (err, results) {
@@ -208,23 +208,23 @@ exports.run = (client, message, args) => {
     } else if (message.member.roles.some(role => ['Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_HELPER_MUTE')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
-                var guildUser = guild.member(user);
+                const user = functionsFile.parseUserTag(client, guild, args[0]);
+                const guildUser = guild.member(user);
 
                 if (user !== 'err' && guildUser) {
                     if (mutedFile.get(user)) {
-                        var existingMute = mutedFile.get(user);
+                        const existingMute = mutedFile.get(user);
                         message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000).toUTCString()}`);
                     } else {
                         if (parseInt(args[1])) {
                             if (args[1] <= 5) {
-                                var end = Math.floor(Date.now() / 1000) + args[1] * 60;
-                                var seconds = args[1] * 60;
+                                const end = Math.floor(Date.now() / 1000) + args[1] * 60;
+                                const seconds = args[1] * 60;
 
-                                var tail = _.rest(args, 2).join(' ');
+                                const tail = _.rest(args, 2).join(' ');
 
                                 if (tail.length > 0) {
-                                    var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
+                                    const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                     mutedFile.set(`${user}.end`, end);
                                     mutedFile.set(`${user}.actioner`,  message.author.id);
                                     mutedFile.set(`${user}.actionee`, user);
@@ -232,8 +232,8 @@ exports.run = (client, message, args) => {
                                     mutedFile.set(`${user}.isHelper`, 1);
                                     mutedFile.save();
 
-                                    var mutedRole = guild.roles.find(val => val.name === 'Muted');
-                                    var identifier = cryptoRandomString({ length: 10 });
+                                    const mutedRole = guild.roles.find(val => val.name === 'Muted');
+                                    const identifier = cryptoRandomString({ length: 10 });
 
                                     guild.member(user).addRole(mutedRole).then(member => {
                                         if (member.voiceChannel !== undefined) {
@@ -271,7 +271,7 @@ exports.run = (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        var data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
+                                        let data = [user, message.author.id, reason, seconds, identifier, 0, new Date()];
                                         connection.query('INSERT INTO log_mutes(userID, actioner, description, length, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?,?)', data,
                                         function (err, results) {
                                             if (err) {
@@ -316,9 +316,9 @@ exports.run = (client, message, args) => {
                                                 }
                                             }).then(dm => {
                                                 if (dm.embeds[0].type === 'rich') {
-                                                    var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                                                    data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
                                                 } else {
-                                                    var data = [ user, dm.content, 3, 0, identifier, new Date(), ];
+                                                    data = [ user, dm.content, 3, 0, identifier, new Date(), ];
                                                 }
                                                 connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                                 function (err, results) {

@@ -4,7 +4,7 @@ exports.run = (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) {
         if (modulesFile.get('COMMAND_QUOTE')) {
-            var answer;
+            let answer;
             request(`https://api.quotable.io/random`,
             function (error, response, body) {
                 answer = JSON.parse(body);
