@@ -23,10 +23,10 @@ exports.run = (client, message, args) => {
             }
         }
         if (args[0] && args[0].toLowerCase() === 'list') {
-            var commandsObject = (customCommands.read());
-            var numberOfCommands = 0;
-            var allCommands = '';
-            var plural = 'commands';
+            const commandsObject = (customCommands.read());
+            let numberOfCommands = 0;
+            let allCommands = '';
+            let plural = 'commands';
             for (command in commandsObject) {
                 if (allCommands.length > 1900) {
                     message.channel.send({
@@ -47,9 +47,9 @@ exports.run = (client, message, args) => {
                     allCommands = ``;
                     numberOfCommands = 0;
                 }
-                var content = commandsObject[command].content;
-                var temp = cryptoRandomString({length: 10});
-                var re = new RegExp(temp);
+                let content = commandsObject[command].content;
+                const temp = cryptoRandomString({length: 10});
+                const re = new RegExp(temp);
                 content = content.replace(/\\\\n/gi, temp);
                 content = content.replace(/\\n/gi, '\n');
                 content = content.replace(re, '\\n');
