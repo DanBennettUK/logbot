@@ -1,29 +1,30 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const functionsFile = client.functionsFile;
     const config = client.config;
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
       if (modulesFile.get('COMMAND_IDENTIFIER')) {
-        if(args[0] && args[0].length == 10){
-          var id = args[0];
+        if (args[0] && args[0].length == 10){
+          const id = args[0];
               connection.query('CALL identifier_locate(?, @where)', id,
               function (err, rows, result) {
+                let actioner;
                   if (err) {
                     connection = functionsFile.establishConnection(client);
                     connection.query('CALL identifier_locate(?, @where)', id,
                     function (err, rows, result) {
                         if (err) throw err;
                         if (rows[0].length > 0) {
-                          switch(rows[0][0].type){
+                          switch (rows[0][0].type){
                             case "warn":
                               connection.query('select * from log_warn where identifier = ?', id,
                                   function (err, rows, result) {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -53,7 +54,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -83,7 +84,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -113,7 +114,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -143,7 +144,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -173,7 +174,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -203,7 +204,7 @@ exports.run = (client, message, args) => {
                                       if (err) throw err;
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
-                                          var actioner = client.users.get(rows[0].actioner);
+                                          actioner = client.users.get(rows[0].actioner);
                                           if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
@@ -242,7 +243,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -272,7 +273,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -302,7 +303,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -332,7 +333,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -362,7 +363,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -392,7 +393,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -422,7 +423,7 @@ exports.run = (client, message, args) => {
                                   if (err) throw err;
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
-                                      var actioner = client.users.get(rows[0].actioner);
+                                      actioner = client.users.get(rows[0].actioner);
                                       if (!actioner) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
@@ -430,11 +431,11 @@ exports.run = (client, message, args) => {
                                             console.log(e);
                                         }
                                       }
-                                      var channel = guild.channels.find(chnl => chnl.id === rows[0].channel);
+                                      const channel = guild.channels.find(chnl => chnl.id === rows[0].channel);
                                       message.channel.send({
                                         embed: {
                                             color: config.color_success,
-                                            title: `Helper clear on ${u.username} (${u.id})`,
+                                            title: `Clear on ${u.username} (${u.id})`,
                                             description: `\`${rows[0].identifier}\` ${rows[0].amount} messages cleared by ${actioner} on ${rows[0].timestamp.toUTCString()} from ${channel} \n`,
                                             timestamp: new Date(),
                                             footer: {
