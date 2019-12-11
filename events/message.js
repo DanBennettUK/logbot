@@ -1,6 +1,6 @@
 module.exports = (client, message) => {
     const _ = client.underscore;
-    var connection = client.connection;
+    let connection = client.connection;
     const functionsFile = client.functionsFile;
     const badWordsFile = client.badWordsFile;
     const customCommands = client.customCommands;
@@ -11,7 +11,7 @@ module.exports = (client, message) => {
     if (_.indexOf(['dm', 'group'], message.channel.type) !== -1) return; //If the message is a DM or GroupDM, return.
 
     //Log every message that is processed; message or command.
-    var data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()];
+    const data = [message.author.id, message.id, message.content, '', message.channel.id, 1, new Date()];
     connection.query('INSERT INTO log_message (userID, messageID, newMessage, oldMessage, channel, type, timestamp) VALUES (?,?,?,?,?,?,?)', data,
         function (err, results) {
             if (err) {
@@ -30,7 +30,7 @@ module.exports = (client, message) => {
         functionsFile.inviteLinkDetection(client, message);
     }
 
-    var publicCommands = ['bugreport', 'forums', 'invite', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
+    const publicCommands = ['bugreport', 'forums', 'invite', 'official', 'report', 'roc', 'support', 'wiki', 'mobile', 'lite'];
 
     if ((!message.content.startsWith('!') || !message.content.length > 1 || !publicCommands.includes(message.content.slice(1).toLowerCase())) && //Allow usage of '!' for general commands (invite, report...)
         ((!message.content.startsWith(config.prefix) || message.content.startsWith(`${config.prefix} `)))) return; //If the message content doesn't start with our prefix, return.
@@ -41,18 +41,18 @@ module.exports = (client, message) => {
     }
 
     let args = message.content.slice(1).trim().split(/\s+/); //Result: ["<TAG>", "Bad", "person!"]
-    let command = args.shift().toLowerCase(); //Result: "ban"
+    const command = args.shift().toLowerCase(); //Result: "ban"
 
     const cmd = client.commands.get(command);
 
     if (_.keys(customCommands.read()).includes(command)) {
         if (publicCommands.includes(command) || message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
-            var obj = customCommands.get(command);
-            var content = obj.content;
-            var temp = cryptoRandomString({
+            const obj = customCommands.get(command);
+            let content = obj.content;
+            const temp = cryptoRandomString({
                 length: 10
             });
-            var re = new RegExp(temp);
+            const re = new RegExp(temp);
             content = content.replace(/\\\\n/gi, temp);
             content = content.replace(/\\n/gi, '\n');
             content = content.replace(re, '\\n');

@@ -1,6 +1,6 @@
 module.exports = (client, oldUser, newUser) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const guild = client.guilds.get(config.guildid)
     const bannedUsersFile = client.bannedUsersFile;
@@ -12,8 +12,8 @@ module.exports = (client, oldUser, newUser) => {
     if (modulesFile.get('EVENT_USER_UPDATE')) {
         //Checking for username changes for logging
         if (oldUser.username !== newUser.username) {
-            var data = [newUser.id, newUser.username, oldUser.username, new Date()];
-            connection.query('INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)', data, function (err, results) {
+            const params = [newUser.id, newUser.username, oldUser.username, new Date()];
+            connection.query('INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)', params, function (err, results) {
                     if (err) {
                         connection = functionsFile.establishConnection(client);
                         connection.query('INSERT INTO log_username (userID, new, old, timestamp) VALUES (?,?,?,?)',
@@ -62,18 +62,17 @@ module.exports = (client, oldUser, newUser) => {
                 }
             }
             if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
-                var banndUsers = bannedUsersFile.get();
-                var usernames = _.values(banndUsers);
-                var ids = _.keys(banndUsers);
-                var hits = [];
-                var identifiers = [];
-                var data = [];
-                var msg = [];
-                var description;
+                const banndUsers = bannedUsersFile.get();
+                const usernames = _.values(banndUsers);
+                const ids = _.keys(banndUsers);
+                let hits = [];
+                let identifiers = [];
+                let data = [];
+                let msg = [];
 
-                var match = stringSimilarity.findBestMatch(newUser.username, usernames);
+                const match = stringSimilarity.findBestMatch(newUser.username, usernames);
 
-                for (var a = 0; a < match['ratings'].length; a++) {
+                for (let a = 0; a < match['ratings'].length; a++) {
                     if (match['ratings'][a].rating >= 0.5) {
                         hits.push({
                             username: match['ratings'][a].target, //Username of the ban
@@ -95,8 +94,8 @@ module.exports = (client, oldUser, newUser) => {
                             function (err, rows, results) {
                                 if (err) throw err;
                                 if (rows.length == 0) return;
-                                for (var b = 0; b < rows.length; b++) {
-                                    var row = rows[b];
+                                for (let b = 0; b < rows.length; b++) {
+                                    const row = rows[b];
                                     msg.push({
                                         name: `${hits[b].username}`,
                                         value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -118,8 +117,8 @@ module.exports = (client, oldUser, newUser) => {
                                     }).catch(console.error);
                                 }
                                 msg.forEach(m => {
-                                    var identifier = cryptoRandomString({length: 10});
-                                    var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                    const identifier = cryptoRandomString({length: 10});
+                                    const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', desc, identifier, 0, new Date()],
                                     function(err, results) {
                                         if (err) {
@@ -134,8 +133,8 @@ module.exports = (client, oldUser, newUser) => {
                             });
                         } else {
                             if (rows.length == 0) return;
-                            for (var b = 0; b < rows.length; b++) {
-                                var row = rows[b];
+                            for (let b = 0; b < rows.length; b++) {
+                                const row = rows[b];
                                 msg.push({
                                     name: `${hits[b].username}`,
                                     value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -157,8 +156,8 @@ module.exports = (client, oldUser, newUser) => {
                                 }).catch(console.error);
                             }
                             msg.forEach(m => {
-                                var identifier = cryptoRandomString({length: 10});
-                                var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                const identifier = cryptoRandomString({length: 10});
+                                const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                 connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newUser.id, '001', desc, identifier, 0, new Date()],
                                 function(err, results) {
                                     if (err) {
@@ -178,7 +177,7 @@ module.exports = (client, oldUser, newUser) => {
 
         //Checking for avatar changes to update user table
         if (oldUser.avatar !== newUser.avatar) {
-            var data = [newUser.avatar, new Date(), newUser.id];
+            const data = [newUser.avatar, new Date(), newUser.id];
             connection.query('UPDATE users SET avatar = ?, updated = ? WHERE userID = ?', data,
                 function (err, results) {
                     if (err) {
