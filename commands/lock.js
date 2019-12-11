@@ -6,8 +6,9 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
-            if (args.length > 0) const dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
-            else const dsc = '';
+            let dsc;
+            if (args.length > 0) dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
+            else dsc = '';
             const everyone = guild.roles.find( role => role.name === '@everyone');
             const LFGRoomsObject = LFGRoomsFile.read();
             for (key in LFGRoomsObject) {

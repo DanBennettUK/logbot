@@ -971,8 +971,9 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                 if (msg) {
                     const messagesObject = channelsObject[mKey];
                     for (rKey in messagesObject) {
-                        if (/[0-9]+/.test(rKey)) const emoji = client.emojis.get(rKey);
-                        else const emoji = rKey;
+                        let emoji;
+                        if (/[0-9]+/.test(rKey)) emoji = client.emojis.get(rKey);
+                        else emoji = rKey;
                         if (emoji) {
                             const roleId = messagesObject[rKey];
                             const role = guild.roles.get(roleId);

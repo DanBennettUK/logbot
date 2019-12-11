@@ -149,8 +149,9 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
-                                                if (/[0-9]+/.test(emojiID)) const emoji = client.emojis.get(emojiID);
-                                                else const emoji = emojiID;
+                                                let emoji;
+                                                if (/[0-9]+/.test(emojiID)) emoji = client.emojis.get(emojiID);
+                                                else emoji = emojiID;
                                                 if (emoji) {
                                                     const emojiKeys = _.keys(reactionsFile.get(`${chnl}.${args[2]}`));
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(emo[2])) {
@@ -244,15 +245,17 @@ exports.run = async (client, message, args) => {
                             } catch (e) {}
                             if (msg) {
                                 for (rKey in msgs) {
-                                    if (/[0-9]+/.test(rKey)) const emoji = client.emojis.get(rKey);
-                                    else const emoji = rKey;
+                                    let emoji;
+                                    if (/[0-9]+/.test(rKey)) emoji = client.emojis.get(rKey);
+                                    else emoji = rKey;
                                     if (emoji) {
                                         const roleID = msgs[rKey];
                                         const role = message.guild.roles.find(r => r.id == roleID);
                                         if (role) {
                                             if (dsc.length > 1900) {
-                                                if (amount == 1) const plural = 'reaction';
-                                                else const plural = 'reactions';
+                                                let plural;
+                                                if (amount == 1) plural = 'reaction';
+                                                else plural = 'reactions';
                                                 message.channel.send({
                                                     embed: {
                                                         color: config.color_info,
@@ -302,8 +305,9 @@ exports.run = async (client, message, args) => {
                     }
                 }
                 if (dsc.length > 0) {
-                    if (amount == 1) const plural = 'reaction';
-                    else const plural = 'reactions';
+                    let plural;
+                    if (amount == 1) plural = 'reaction';
+                    else plural = 'reactions';
                     message.channel.send({
                         embed: {
                             color: config.color_info,
