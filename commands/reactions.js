@@ -21,8 +21,9 @@ exports.run = async (client, message, args) => {
                         if (msg) {
                             const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                             if (emojiID != 'err') {
-                                if (/[0-9]+/.test(emojiID)) const emoji = client.emojis.get(emojiID);
-                                const emoji = emojiID;
+                                let emoji;
+                                if (/[0-9]+/.test(emojiID)) emoji = client.emojis.get(emojiID);
+                                else emoji = emojiID;
                                 if (emoji) {
                                     const roleID = functionsFile.parseRoleTag(client, message.guild, args[4]);
                                     if (roleID != 'err') {
