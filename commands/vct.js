@@ -5,13 +5,13 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VCT')) {
             if (args.length > 0) {
-                var user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
-                var guildUser = message.guild.member(user);
-                var msg;
+                const user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+                const guildUser = message.guild.member(user);
+                let msg;
                 if (user !== 'err' && guildUser) {
-                    var vc = guildUser.voiceChannel;
+                    let vc = guildUser.voiceChannel;
                     if (vc != undefined) {
-                        var size = vc.members.size;
+                        let size = vc.members.size;
                         switch (size) {
                             case 1:
                                 await message.channel.send(`User ${guildUser} is in voice channel **${vc.name}**`).then(async m => {

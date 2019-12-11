@@ -2,13 +2,14 @@ exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const functionsFile = client.functionsFile;
     const guild = message.guild;
-    var connection = client.connection;
+    let connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
     const config = client.config;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_WARN')) {
+            let user;
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
+                user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
                 functionsFile.syntaxErr(client, message, 'warn');
                 return;
@@ -18,12 +19,12 @@ exports.run = (client, message, args) => {
                 message.channel.send('An invalid user was provided. Please try again');
             } else {
                 if (guild.member(user)) {
-                    var tail = args.slice(1);
+                    const tail = args.slice(1);
 
                     if (tail.length > 0) {
-                        var content = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
-                        var identifier = cryptoRandomString({ length: 10 });
-                        var data = [user, message.author.id, content, identifier, 0, new Date(), user /*SP arg*/];
+                        const content = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
+                        const identifier = cryptoRandomString({ length: 10 });
+                        let data = [user, message.author.id, content, identifier, 0, new Date(), user /*SP arg*/];
                         connection.query('INSERT INTO log_warn (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?); CALL user_totalRecords(?, @total)', data,
                         async function (err, results) {
                             if (err) {
@@ -82,7 +83,7 @@ exports.run = (client, message, args) => {
                                                 }
                                             }
                                         }).then(dm => {
-                                            var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
+                                            data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
                                             connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
                                                 function (err, results) {
                                                     if (err) {
@@ -151,7 +152,7 @@ exports.run = (client, message, args) => {
                                             }
                                         }
                                     }).then(dm => {
-                                        var data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
+                                        data = [user, dm.content, 1, 0, identifier, new Date(), new Date()];
                                         connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data,
                                             function (err, results) {
                                                 if (err) {

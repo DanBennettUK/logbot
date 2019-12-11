@@ -1,11 +1,11 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     const functionsFile = client.functionsFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const moment = client.moment;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_VOICELOG')) {
-            var user;
+            let user;
             if (args.length > 0) {
                 user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
             } else {
@@ -25,37 +25,37 @@ exports.run = (client, message, args) => {
                             async function (err, rows, results) {
                                 if (err) throw err;
 
-                                var times = [];
-                                var current = [];
-                                var timestamps = [];
+                                let times = [];
+                                let current = [];
+                                let timestamps = [];
                                 /*var msg = [
                                     'Channel        |                     Timestamp                     | Duration (H:M:S)',
                                     '------------------------------------------------------------------------------------------------'
                                 ];*/
-                                for (var i = rows.length - 1; i >= 0; i--) {
-                                    var row = rows[i];
+                                for (let i = rows.length - 1; i >= 0; i--) {
+                                    const row = rows[i];
 
                                     if (rows[i - 1]) {
                                         //We have a next event
-                                        var next = rows[i - 1];
+                                        const next = rows[i - 1];
 
                                         if (row.type !== 3 && [2, 3].indexOf(next.type) > -1) {
                                             //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
-                                            var time1 = row.timestamp;
-                                            var time2 = next.timestamp;
+                                            const time1 = row.timestamp;
+                                            const time2 = next.timestamp;
 
-                                            var diff = time2.getTime() - time1.getTime();
+                                            const diff = time2.getTime() - time1.getTime();
 
-                                            var msec = diff;
-                                            var hh = Math.floor(msec / 1000 / 60 / 60);
+                                            let msec = diff;
+                                            let hh = Math.floor(msec / 1000 / 60 / 60);
                                             msec -= hh * 1000 * 60 * 60;
                                             hh = hh.toString();
                                             if (hh.length == 1) hh = `0${hh}`;
-                                            var mm = Math.floor(msec / 1000 / 60);
+                                            let mm = Math.floor(msec / 1000 / 60);
                                             msec -= mm * 1000 * 60;
                                             mm = mm.toString();
                                             if (mm.length == 1) mm = `0${mm}`;
-                                            var ss = Math.floor(msec / 1000);
+                                            let ss = Math.floor(msec / 1000);
                                             msec -= ss * 1000;
                                             ss = ss.toString();
                                             if (ss.length == 1) ss = `0${ss}`;
@@ -75,25 +75,25 @@ exports.run = (client, message, args) => {
                                 current.reverse();
                                 timestamps.reverse();
 
-                                var longest = 0;
-                                for (var i = 0; i < current.length; i++) {
+                                let longest = 0;
+                                for (let i = 0; i < current.length; i++) {
                                     if (current[i].length > longest) {
                                         longest = current[i].length;
                                     }
                                 }
-                                for (var j = 0; j < current.length; j++) {
-                                    var howManyToAdd = longest - current[j].length;
+                                for (let j = 0; j < current.length; j++) {
+                                    const howManyToAdd = longest - current[j].length;
                                     current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
                                 }
 
-                                var longestTime = 0;
-                                for (var i = 0; i < timestamps.length; i++) {
+                                let longestTime = 0;
+                                for (let i = 0; i < timestamps.length; i++) {
                                     if (current[i].length > longestTime) {
                                         longestTime = timestamps[i].length;
                                     }
                                 }
-                                for (var j = 0; j < timestamps.length; j++) {
-                                    var howManyToAdd = longestTime - timestamps[j].length;
+                                for (let j = 0; j < timestamps.length; j++) {
+                                    const howManyToAdd = longestTime - timestamps[j].length;
                                     timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                                 }
 
@@ -135,37 +135,37 @@ exports.run = (client, message, args) => {
                                 }).catch(console.error);
                             });
                         } else {
-                            var times = [];
-                            var current = [];
-                            var timestamps = [];
+                            let times = [];
+                            let current = [];
+                            let timestamps = [];
                             /*var msg = [
                                 'Channel        |                     Timestamp                     | Duration (H:M:S)',
                                 '------------------------------------------------------------------------------------------------'
                             ];*/
-                            for (var i = rows.length - 1; i >= 0; i--) {
-                                var row = rows[i];
+                            for (let i = rows.length - 1; i >= 0; i--) {
+                                const row = rows[i];
 
                                 if (rows[i - 1]) {
                                     //We have a next event
-                                    var next = rows[i - 1];
+                                    const next = rows[i - 1];
 
                                     if (row.type !== 3 && [2, 3].indexOf(next.type) > -1) {
                                         //The current event IS NOT a leave event AND the next event IS a move or leave event. i.e, that's a complete wrap of one channel.
-                                        var time1 = row.timestamp;
-                                        var time2 = next.timestamp;
+                                        const time1 = row.timestamp;
+                                        const time2 = next.timestamp;
 
-                                        var diff = time2.getTime() - time1.getTime();
+                                        const diff = time2.getTime() - time1.getTime();
 
-                                        var msec = diff;
-                                        var hh = Math.floor(msec / 1000 / 60 / 60);
+                                        let msec = diff;
+                                        let hh = Math.floor(msec / 1000 / 60 / 60);
                                         msec -= hh * 1000 * 60 * 60;
                                         hh = hh.toString();
                                         if (hh.length == 1) hh = `0${hh}`;
-                                        var mm = Math.floor(msec / 1000 / 60);
+                                        let mm = Math.floor(msec / 1000 / 60);
                                         msec -= mm * 1000 * 60;
                                         mm = mm.toString();
                                         if (mm.length == 1) mm = `0${mm}`;
-                                        var ss = Math.floor(msec / 1000);
+                                        let ss = Math.floor(msec / 1000);
                                         msec -= ss * 1000;
                                         ss = ss.toString();
                                         if (ss.length == 1) ss = `0${ss}`;
@@ -185,25 +185,25 @@ exports.run = (client, message, args) => {
                             current.reverse();
                             timestamps.reverse();
 
-                            var longest = 0;
-                            for (var i = 0; i < current.length; i++) {
+                            let longest = 0;
+                            for (let i = 0; i < current.length; i++) {
                                 if (current[i].length > longest) {
                                     longest = current[i].length;
                                 }
                             }
-                            for (var j = 0; j < current.length; j++) {
-                                var howManyToAdd = longest - current[j].length;
+                            for (let j = 0; j < current.length; j++) {
+                                const howManyToAdd = longest - current[j].length;
                                 current[j] = current[j].padEnd(current[j].length + howManyToAdd + 1);
                             }
 
-                            var longestTime = 0;
-                            for (var i = 0; i < timestamps.length; i++) {
+                            let longestTime = 0;
+                            for (let i = 0; i < timestamps.length; i++) {
                                 if (current[i].length > longestTime) {
                                     longestTime = timestamps[i].length;
                                 }
                             }
-                            for (var j = 0; j < timestamps.length; j++) {
-                                var howManyToAdd = longestTime - timestamps[j].length;
+                            for (let j = 0; j < timestamps.length; j++) {
+                                const howManyToAdd = longestTime - timestamps[j].length;
                                 timestamps[j] = timestamps[j].padEnd(timestamps[j].length + howManyToAdd + 1);
                             }
 

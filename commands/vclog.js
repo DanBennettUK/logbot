@@ -1,11 +1,11 @@
 exports.run = async (client, message, args) => {
     const functionsFile = client.functionsFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const modulesFile = client.modulesFile;
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         if (modulesFile.get('COMMAND_VCLOG')) {
             if (args.length > 0) {
-                var id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
+                const id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
                 if (id == 'err') {
                     if (args.length < 3 && !/[0-9]/.test(args.slice(args.length, 1).join(' '))) {
                         switch (args[0].toLowerCase()) {
@@ -54,7 +54,7 @@ exports.run = async (client, message, args) => {
                     }
                 }
                 id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
-                var channel;
+                let channel;
                 if (id != 'err') channel = await message.guild.channels.get(id);
                 if (!channel) {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
@@ -82,12 +82,12 @@ exports.run = async (client, message, args) => {
                                     async function (err, rows, results) {
                                         if (err) throw err;
                                         if (rows && rows.length > 0) {
-                                            var users = '';
-                                            var joinTime = '';
-                                            var i = 0;
+                                            let users = '';
+                                            let joinTime = '';
+                                            let i = 0;
                                             for (row of rows) {
                                                 if (i == 30) break;
-                                                var user = client.users.get(row.userID);
+                                                let user = client.users.get(row.userID);
                                                 if (!user) {
                                                     try {
                                                         user = await client.fetchUser(row.userID);
@@ -134,12 +134,12 @@ exports.run = async (client, message, args) => {
                                     });
                             } else {
                                 if (rows && rows.length > 0) {
-                                    var users = '';
-                                    var joinTime = '';
-                                    var i = 0;
+                                    let users = '';
+                                    let joinTime = '';
+                                    let i = 0;
                                     for (row of rows) {
                                         if (i == 30) break;
-                                        var user = client.users.get(row.userID);
+                                        let user = client.users.get(row.userID);
                                         if (!user) {
                                             try {
                                                 user = await client.fetchUser(row.userID);
