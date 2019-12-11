@@ -8,7 +8,7 @@ module.exports = (client, oldChannel, newChannel) => {
                 if (!oldChannel.guild.channels.get(channelsFile.get('server_log'))) {
                     return;
                 }
-                var channelType = 'Channel'
+                let channelType = 'Channel'
                 if (oldChannel.type == `text`) {
                     channelType = `Text channel`;
                 } else if (oldChannel.type == `voice`) {

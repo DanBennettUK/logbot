@@ -1,12 +1,12 @@
 module.exports = (client, member) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const functionsFile = client.functionsFile;
     const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_LEAVE')) {
-        var data = [member.user.id, new Date()];
-        var userLeave = [0, member.user.id];
+        const data = [member.user.id, new Date()];
+        const userLeave = [0, member.user.id];
 
         connection.query('INSERT INTO log_guildleave (userID, timestamp) VALUES (?,?)', data,
             function (err, results) {
