@@ -3,7 +3,7 @@ exports.run = (client, message, args) => {
     const request = client.request;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_ANIMAL_PICTURE')) {
-            var random = Math.floor(Math.random() * Math.floor(2));
+            const random = Math.floor(Math.random() * Math.floor(2));
             switch (random) {
                 case 0:
                     message.channel.send('Fetching picture...').then(msg => {

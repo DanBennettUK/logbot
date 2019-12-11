@@ -1,6 +1,6 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_CWARN')) {
