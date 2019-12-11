@@ -10,19 +10,13 @@
 */
 const Discord = require('discord.js');
 
-var guild;
-const bfj = require('bfj');
 const mysql = require('mysql2');
-var moment = require('moment');
+const moment = require('moment');
 const client = new Discord.Client();
-const Store = require('data-store');
-var _ = require('underscore');
+const _ = require('underscore');
 const config = require('./config.json');
 const editJsonFile = require('edit-json-file');
-var modules = require('./modules.json');
-const changelog = require('./changelog.json');
-const antispam = require('discord-anti-spam');
-var stringSimilarity = require('string-similarity');
+const stringSimilarity = require('string-similarity');
 const cryptoRandomString = require('crypto-random-string');
 const enmap = require('enmap');
 const fs = require(`fs`);
@@ -30,16 +24,15 @@ const request = require('request');
 
 const functionsFile = require(`./functions.js`);
 const channelsFile = editJsonFile('./channels.json');
-var modulesFile = editJsonFile('./modules.json');
-var bannedUsers = require('./banned_users.json');
-var bannedUsersFile = editJsonFile('./banned_users.json');
-var badWordsFile = editJsonFile(`./bad_words.json`);
-var mutedFile = editJsonFile('./muted.json');
-var reminderFile = editJsonFile('./reminders.json');
-var usercardsFile = editJsonFile('./usercards.json');
-var customCommands = editJsonFile('./customCommands.json');
-var LFGRoomsFile = editJsonFile('./LFGRooms.json');
-var reactionsFile = editJsonFile('./reactions.json');
+const modulesFile = editJsonFile('./modules.json');
+const bannedUsersFile = editJsonFile('./banned_users.json');
+const badWordsFile = editJsonFile(`./bad_words.json`);
+const mutedFile = editJsonFile('./muted.json');
+const reminderFile = editJsonFile('./reminders.json');
+const usercardsFile = editJsonFile('./usercards.json');
+const customCommands = editJsonFile('./customCommands.json');
+const LFGRoomsFile = editJsonFile('./LFGRooms.json');
+const reactionsFile = editJsonFile('./reactions.json');
 
 console.log(`[${new Date().toUTCString()}] Initializing...`);
 
