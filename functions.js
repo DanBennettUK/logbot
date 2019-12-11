@@ -25,8 +25,7 @@ exports.setupTables = function setupTables(client) {
           new VARCHAR(255),
           old VARCHAR(255),
           timestamp DATETIME        NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -58,9 +57,7 @@ exports.setupTables = function setupTables(client) {
           channel VARCHAR(25),
           type int,
           timestamp DATETIME       NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (type) REFERENCES messageTypes(id)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
@@ -76,8 +73,7 @@ exports.setupTables = function setupTables(client) {
           new VARCHAR(255),
           old VARCHAR(255),
           timestamp DATETIME        NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -109,9 +105,7 @@ exports.setupTables = function setupTables(client) {
           oldChannel VARCHAR (50),
           type int,
           timestamp DATETIME       NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (type) REFERENCES voiceTypes(id)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
@@ -123,8 +117,7 @@ exports.setupTables = function setupTables(client) {
         `CREATE TABLE IF NOT EXISTS log_guildjoin
         (
           userID VARCHAR(25)       NOT NULL,
-          timestamp DATETIME,
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -136,8 +129,7 @@ exports.setupTables = function setupTables(client) {
         `CREATE TABLE IF NOT EXISTS log_guildleave
         (
           userID VARCHAR(25)       NOT NULL,
-          timestamp DATETIME,
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -156,9 +148,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (ID),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -177,9 +167,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (ID),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -198,9 +186,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME        NOT NULL,
           updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -219,9 +205,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -240,8 +224,7 @@ exports.setupTables = function setupTables(client) {
           identifier VARCHAR(10),
           timestamp DATETIME        NOT NULL,
           updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -259,9 +242,7 @@ exports.setupTables = function setupTables(client) {
           amount SMALLINT,
           identifier VARCHAR(10),
           timestamp DATETIME,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -277,8 +258,7 @@ exports.setupTables = function setupTables(client) {
           channel VARCHAR(25),
           message TEXT,
           timestamp DATETIME,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -298,9 +278,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
