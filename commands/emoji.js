@@ -32,18 +32,18 @@ exports.run = async (client, message, args) => {
                         message.channel.send(`:x: An emoji with that name already exists.`);
                     }
                 } else if (args[0].toLowerCase() === `remove` && args.length == 2) {
-                    var emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
-                    var emoji = await guild.emojis.get(emojiID);
+                    const emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
+                    const emoji = await guild.emojis.get(emojiID);
                     if (emoji) {
                         guild.deleteEmoji(emoji);
                         message.channel.send(`:white_check_mark: Emoji \`${emoji.name}\` deleted successfully.`);
                     } else message.channel.send(`:x: Emoji not found.`);
                 } else if (args[0].toLowerCase() == 'rename') {
                     if (args.length == 3) {
-                        var emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
-                        var emoji = guild.emojis.get(emojiID);
+                        const emojiID = functionsFile.parseEmojiTag(client, guild, args[1]);
+                        const emoji = guild.emojis.get(emojiID);
                         if (emoji) {
-                            var currentName = emoji.name;
+                            const currentName = emoji.name;
                             if (args[2].length > 1 && args[2].length < 33 && !args[2].includes('.')) {
                                 if ((emoji.name) != args[2]) {
                                     emoji.setName(`${args[2]}`).then(e => {
@@ -55,13 +55,13 @@ exports.run = async (client, message, args) => {
                     } else functionsFile.syntaxErr(client, message, 'emoji rename');
                 } else if (args[0].toLowerCase() === `list`) {
 
-                    var sent = false;
+                    let sent = false;
 
-                    var listOfEmojis = '';
-                    var listOfNames = '';
+                    let listOfEmojis = '';
+                    let listOfNames = '';
 
-                    var listOfAnimatedEmojis = '';
-                    var listOfAnimatedNames = '';
+                    let listOfAnimatedEmojis = '';
+                    let listOfAnimatedNames = '';
 
                     guild.emojis.forEach(e => {
                         if (e.animated) {

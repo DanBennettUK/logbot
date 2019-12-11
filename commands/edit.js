@@ -5,8 +5,8 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         if (modulesFile.get('COMMAND_EDIT')) {
             if (args.length > 2) {
-                var chID = functionsFile.parseChannelTag(client, message.guild, args[0]);
-                var chnl = message.guild.channels.get(chID);
+                const chID = functionsFile.parseChannelTag(client, message.guild, args[0]);
+                const chnl = message.guild.channels.get(chID);
                 if (chnl) {
                     chnl.fetchMessage(args[1]).then(m => {
                         if (m.author == client.user) {
