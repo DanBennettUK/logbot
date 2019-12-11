@@ -1,6 +1,6 @@
 exports.run = async (client, message, args) => {
     const functionsFile = client.functionsFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const guild = message.guild;
     const modulesFile = client.modulesFile;
@@ -8,12 +8,12 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_CLEAR')) {
             if (args.length >= 3) {
-                var amount = args[0];
-                var channelid = functionsFile.parseChannelTag(client, guild, args[1]);
-                var userid = functionsFile.parseUserTag(client, guild, args[2]);
+                const amount = args[0];
+                const channelid = functionsFile.parseChannelTag(client, guild, args[1]);
+                const userid = functionsFile.parseUserTag(client, guild, args[2]);
 
-                var channel = await guild.channels.get(channelid);
-                var user = client.users.get(userid);
+                const channel = await guild.channels.get(channelid);
+                let user = client.users.get(userid);
                 if (!user) {
                     try {
                         user = await client.fetchUser(userid);
@@ -21,13 +21,13 @@ exports.run = async (client, message, args) => {
                         console.log(e);
                     }
                 }
-                var deleted = 0;
+                let deleted = 0;
 
                 if (user && channel && guild.member(user)) {
                     channel.fetchMessages({ limit: 100 }).then(async a => {
                             await channel.bulkDelete(a.filter(b => b.author.id == user.id).first(parseInt(amount))).then(result => (deleted = result.size)).catch(console.error);
                             if (deleted > 0) {
-                                var identifier = cryptoRandomString({ length: 10 });
+                                const identifier = cryptoRandomString({ length: 10 });
                                 message.channel.send({
                                         embed: {
                                             color: config.color_success,
@@ -39,7 +39,7 @@ exports.run = async (client, message, args) => {
                                             }
                                         }
                                     }).catch(console.error);
-                                var data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
+                                const data = [user.id, message.author.id, channel.id, deleted, identifier, new Date()];
                                 connection.query('INSERT INTO log_helperclear(userID, actioner, channel, amount, identifier, timestamp) VALUES(?,?,?,?,?,?)', data,
                                 function (err, results) {
                                     if (err) {
