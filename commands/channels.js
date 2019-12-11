@@ -46,28 +46,28 @@ exports.run = (client, message, args) => {
                             });
                         } else {
                             if (args[1].toLowerCase() == 'server_log') {
-                                var channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
+                                const channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
                                 if (client.channels.get(channel)) {
                                     channelsFile.set('server_log', channel);
                                     channelsFile.save();
                                     message.channel.send(':white_check_mark: Server log successfully set');
                                 } else message.channel.send(':x: An invalid channel was provided.');
                             } else if (args[1].toLowerCase() == 'action_log') {
-                                var channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
+                                const channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
                                 if (client.channels.get(channel)) {
                                     channelsFile.set('action_log', channel);
                                     channelsFile.save();
                                     message.channel.send(':white_check_mark: Action log successfully set');
                                 } else message.channel.send(':x: An invalid channel was provided.');
                             } else if (args[1].toLowerCase() == 'voice_log') {
-                                var channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
+                                const channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
                                 if (client.channels.get(channel)) {
                                     channelsFile.set('voice_log', channel);
                                     channelsFile.save();
                                     message.channel.send(':white_check_mark: Voice log successfully set');
                                 } else message.channel.send(':x: An invalid channel was provided.');
                             } else if (args[1].toLowerCase() == 'all') {
-                                var channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
+                                const channel = functionsFile.parseChannelTag(client, message.guild, args[2]);
                                 if (client.channels.get(channel)) {
                                     channelsFile.set('server_log', channel);
                                     channelsFile.set('action_log', channel);
@@ -105,9 +105,9 @@ exports.run = (client, message, args) => {
                         } else functionsFile.syntaxErr(client, message, 'channels unset');
                     }
                 } else if (args[0] && args[0].toLowerCase() == 'list') {
-                    var channels = '';
-                    var types = '';
-                    var channelsObj = channelsFile.read();
+                    let channels = '';
+                    let types = '';
+                    const channelsObj = channelsFile.read();
                     for (type in channelsObj) {
                         types += `${type}\n`;
                         if (channelsObj[type]) {
