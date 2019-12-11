@@ -7,7 +7,7 @@ exports.run = (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_WARN')) {
-            let user;
+            let user = '';
             if (args[0]) {
                 user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {

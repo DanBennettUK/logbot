@@ -54,9 +54,9 @@ exports.run = async (client, message, args) => {
                     }
                 }
                 id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
-                let channel;
+                let channel = null;
                 if (id != 'err') channel = await message.guild.channels.get(id);
-                if (!channel) {
+                if (channel == null) {
                     message.channel.send(`I could not parse that channel. \`${args.join(' ')}\``).catch(console.error);
                     return;
                 } else if (channel.type != 'voice') {

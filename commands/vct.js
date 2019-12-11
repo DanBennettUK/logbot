@@ -7,7 +7,7 @@ exports.run = async (client, message, args) => {
             if (args.length > 0) {
                 const user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
                 const guildUser = message.guild.member(user);
-                let msg;
+                let msg = null;
                 if (user !== 'err' && guildUser) {
                     let vc = guildUser.voiceChannel;
                     if (vc != undefined) {

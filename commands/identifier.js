@@ -10,7 +10,7 @@ exports.run = (client, message, args) => {
           const id = args[0];
               connection.query('CALL identifier_locate(?, @where)', id,
               function (err, rows, result) {
-                let actioner;
+                let actioner = null;
                   if (err) {
                     connection = functionsFile.establishConnection(client);
                     connection.query('CALL identifier_locate(?, @where)', id,
@@ -25,7 +25,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -55,7 +55,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -85,7 +85,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -115,7 +115,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -145,7 +145,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -175,7 +175,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -205,7 +205,7 @@ exports.run = (client, message, args) => {
                                       if (rows) {
                                         client.fetchUser(rows[0].userID).then(async u => {
                                           actioner = client.users.get(rows[0].actioner);
-                                          if (!actioner) {
+                                          if (actioner == null) {
                                             try {
                                                 actioner = await client.fetchUser(rows[0].actioner);
                                             } catch (e) {
@@ -244,7 +244,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -274,7 +274,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -304,7 +304,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -334,7 +334,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -364,7 +364,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -394,7 +394,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {
@@ -424,7 +424,7 @@ exports.run = (client, message, args) => {
                                   if (rows) {
                                     client.fetchUser(rows[0].userID).then(async u => {
                                       actioner = client.users.get(rows[0].actioner);
-                                      if (!actioner) {
+                                      if (actioner == null) {
                                         try {
                                             actioner = await client.fetchUser(rows[0].actioner);
                                         } catch (e) {

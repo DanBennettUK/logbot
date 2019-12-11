@@ -14,8 +14,8 @@ exports.run = (client, message, args) => {
             }
         });
         const db_PING = connection.ping();
-        let client_STATUS;
-        let db_STATUS;
+        let client_STATUS = '';
+        let db_STATUS = '';
 
         if (client_PING >= 1 && client_PING <= 500) {
             client_STATUS = 'OK';

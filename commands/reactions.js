@@ -14,16 +14,15 @@ exports.run = async (client, message, args) => {
                 if (chnl != 'err') {
                     const channl = client.channels.get(chnl);
                     if (channl) {
-                        let msg;
+                        let msg = null;
                         try {
                             msg = await channl.fetchMessage(args[2]);
                         } catch (e) {}
-                        if (msg) {
+                        if (msg && msg != null) {
                             const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                             if (emojiID != 'err') {
-                                let emoji;
+                                let emoji = emojiID;
                                 if (/[0-9]+/.test(emojiID)) emoji = client.emojis.get(emojiID);
-                                else emoji = emojiID;
                                 if (emoji) {
                                     const roleID = functionsFile.parseRoleTag(client, message.guild, args[4]);
                                     if (roleID != 'err') {
@@ -111,11 +110,11 @@ exports.run = async (client, message, args) => {
                                     }
                                 }).catch(console.error);
                             } else {
-                                let msg;
+                                let msg = null;
                                 try {
                                     msg = chnl.fetchMessage(args[2]);
                                 } catch (e) {}
-                                if (msg) {
+                                if (msg && msg != null) {
                                     const msgKeys = _.keys(reactionsFile.get(`${chnl}`));
                                     if (msgKeys.length > 0 && msgKeys.includes(args[2])) {
                                         if (!args[3]) {
@@ -150,9 +149,8 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             const emojiID = functionsFile.parseEmojiTag(client, message.guild, args[3]);
                                             if (emojiID != 'err') {
-                                                let emoji;
+                                                let emoji = emojiID;
                                                 if (/[0-9]+/.test(emojiID)) emoji = client.emojis.get(emojiID);
-                                                else emoji = emojiID;
                                                 if (emoji) {
                                                     const emojiKeys = _.keys(reactionsFile.get(`${chnl}.${args[2]}`));
                                                     if (emojiKeys.length > 0 && emojiKeys.includes(emo[2])) {
@@ -240,23 +238,21 @@ exports.run = async (client, message, args) => {
                     if (chnl) {
                         for (mKey in chnls) {
                             const msgs = chnls[mKey];
-                            let msg;
+                            let msg = null;
                             try {
                                 msg = await chnl.fetchMessage(mKey);
                             } catch (e) {}
-                            if (msg) {
+                            if (msg && msg != null) {
                                 for (rKey in msgs) {
-                                    let emoji;
+                                    let emoji = rKey;
                                     if (/[0-9]+/.test(rKey)) emoji = client.emojis.get(rKey);
-                                    else emoji = rKey;
                                     if (emoji) {
                                         const roleID = msgs[rKey];
                                         const role = message.guild.roles.find(r => r.id == roleID);
                                         if (role) {
                                             if (dsc.length > 1900) {
-                                                let plural;
+                                                let plural = 'reactions';
                                                 if (amount == 1) plural = 'reaction';
-                                                else plural = 'reactions';
                                                 message.channel.send({
                                                     embed: {
                                                         color: config.color_info,
@@ -306,9 +302,8 @@ exports.run = async (client, message, args) => {
                     }
                 }
                 if (dsc.length > 0) {
-                    let plural;
+                    let plural = 'reactions';
                     if (amount == 1) plural = 'reaction';
-                    else plural = 'reactions';
                     message.channel.send({
                         embed: {
                             color: config.color_info,

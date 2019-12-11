@@ -4,10 +4,9 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_ASK')) {
             const query = args.join('+');
-            let answer;
             request(`https://api.duckduckgo.com/?q=${query}&format=json`,
                 function (error, response, body) {
-                    answer = JSON.parse(body);
+                    let answer = JSON.parse(body);
                     if (answer.Abstract == '') {
                         if (answer.RelatedTopics.length > 0) {
                             if (answer.RelatedTopics[0].text != '') {

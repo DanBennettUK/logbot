@@ -5,7 +5,7 @@ exports.run = (client, message, args) => {
     const moment = client.moment;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_VOICELOG')) {
-            let user;
+            let user = '';
             if (args.length > 0) {
                 user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
             } else {

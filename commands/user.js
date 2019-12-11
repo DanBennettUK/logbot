@@ -7,7 +7,7 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
-            let userID;
+            let userID = '';
             const tag = args.join(' ');
             if (args.length > 0) userID = functionsFile.parseUserTag(client, guild, tag);
             else {
@@ -44,30 +44,24 @@ exports.run = async (client, message, args) => {
             const userObject = guild.member(globalUser);
 
             if (userObject && userObject != null) {
-                let nickname;
-                let voiceChannel;
-                let app;
-                let joined;
+                let nickname = 'No nickname';
+                let voiceChannel = 'Not in a voice channel';
+                let app = 'None';
+                let joined = 'UNKNOWN';
 
                 if (userObject.nickname) {
                     nickname = userObject.nickname;
-                } else {
-                    nickname = 'No nickname';
                 }
                 if (userObject.voiceChannel) {
                     voiceChannel = userObject.voiceChannel.name;
-                } else {
-                    voiceChannel = 'Not in a voice channel';
                 }
                 if (userObject.user.presence.game) {
                     app = userObject.user.presence.game.name;
                     if (app == 'Custom Status') app += `:\n${userObject.user.presence.game.state}`;
-                } else {
-                    app = 'None';
                 }
                 if (userObject.joinedAt) {
                     joined = userObject.joinedAt.toUTCString();
-                } else joined = 'UNKNOWN';
+                }
 
                 message.channel.send({
                     embed: {
@@ -133,7 +127,7 @@ exports.run = async (client, message, args) => {
                                             if (err) throw err;
                                             let events = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -197,7 +191,7 @@ exports.run = async (client, message, args) => {
                                     } else {
                                         let events = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -276,7 +270,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let events = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -341,7 +335,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let events = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -419,7 +413,7 @@ exports.run = async (client, message, args) => {
                                             let notes = [];
 
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -477,7 +471,7 @@ exports.run = async (client, message, args) => {
                                     } else {
                                         let notes = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -545,7 +539,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let notes = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -595,7 +589,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let notes = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -711,7 +705,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let names = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -769,7 +763,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let names = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -836,7 +830,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let history = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -893,7 +887,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let history = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -1013,7 +1007,7 @@ exports.run = async (client, message, args) => {
                                             if (err) throw err;
                                             let events = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -1078,7 +1072,7 @@ exports.run = async (client, message, args) => {
                                     } else {
                                         let events = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1158,7 +1152,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let events = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1223,7 +1217,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let events = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1300,7 +1294,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let notes = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1358,7 +1352,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let notes = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1425,7 +1419,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let notes = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1475,7 +1469,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let notes = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1536,7 +1530,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let names = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -1594,7 +1588,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let names = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -1693,7 +1687,7 @@ exports.run = async (client, message, args) => {
                                         if (err) throw err;
                                         let history = [];
                                         let max = 5;
-                                        let extra;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -1751,7 +1745,7 @@ exports.run = async (client, message, args) => {
                                 } else {
                                     let history = [];
                                     let max = 5;
-                                    let extra;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -1878,7 +1872,7 @@ exports.run = async (client, message, args) => {
                                                         if (err) throw err;
                                                         let events = [];
                                                         let max = 5;
-                                                        let extra;
+                                                        let extra = 0;
 
                                                         if (rows.length <= max) {
                                                             max = rows.length;
@@ -1942,7 +1936,7 @@ exports.run = async (client, message, args) => {
                                                 } else {
                                                     let events = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2021,7 +2015,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let events = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2086,7 +2080,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let events = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2163,7 +2157,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let notes = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2221,7 +2215,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let notes = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2288,7 +2282,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let notes = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2338,7 +2332,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let notes = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2399,7 +2393,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let names = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
@@ -2456,7 +2450,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let names = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -2539,7 +2533,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let history = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
@@ -2596,7 +2590,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let history = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -2716,7 +2710,7 @@ exports.run = async (client, message, args) => {
                                                     if (err) throw err;
                                                     let events = [];
                                                     let max = 5;
-                                                    let extra;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2780,7 +2774,7 @@ exports.run = async (client, message, args) => {
                                             } else {
                                                 let events = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2859,7 +2853,7 @@ exports.run = async (client, message, args) => {
                                                 if (err) throw err;
                                                 let events = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2924,7 +2918,7 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             let events = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -3001,7 +2995,7 @@ exports.run = async (client, message, args) => {
                                                 if (err) throw err;
                                                 let notes = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -3059,7 +3053,7 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             let notes = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -3126,7 +3120,7 @@ exports.run = async (client, message, args) => {
                                                 if (err) throw err;
                                                 let notes = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -3176,7 +3170,7 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             let notes = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -3237,7 +3231,7 @@ exports.run = async (client, message, args) => {
                                                 if (err) throw err;
                                                 let names = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -3294,7 +3288,7 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             let names = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= 5) {
                                                 max = rows.length;
@@ -3377,7 +3371,7 @@ exports.run = async (client, message, args) => {
                                                 if (err) throw err;
                                                 let history = [];
                                                 let max = 5;
-                                                let extra;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -3434,7 +3428,7 @@ exports.run = async (client, message, args) => {
                                         } else {
                                             let history = [];
                                             let max = 5;
-                                            let extra;
+                                            let extra = 0;
 
                                             if (rows.length <= 5) {
                                                 max = rows.length;

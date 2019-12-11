@@ -18,8 +18,8 @@ exports.run = (client, message, args) => {
                         const existingMute = mutedFile.get(user);
                         message.channel.send(`${client.users.get(user)} already has an active mute. This will end at ${new Date(existingMute.end * 1000).toUTCString()}`);
                     } else {
-                        let end;
-                        let seconds;
+                        let end = 0;
+                        let seconds = 0;
                         const int = args[1].replace(/[a-zA-Z]$/g, '');
 
                         if (parseInt(int)) {

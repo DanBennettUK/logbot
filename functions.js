@@ -810,16 +810,13 @@ exports.importMutes = function importMutes(client) {
             const userID = mutes[i].DiscordId.$numberLong;
             for (let a = 0; a < mutes[i].Records.length; a++) {
                 if (mutes[i].Records[a]._t[1] == 'MuteRecord') {
-                    let split;
+                    let split = mutes[i].Records[a].Duration.split(':');
                     let seconds = 0;
-                    split = mutes[i].Records[a].Duration.split(':');
 
                     for (var b = 0; b < 3; b++) {
-                        let int;
+                        let int = parseInt(split[b]);
                         if (split[b] == '00') {
                             int = 0;
-                        } else {
-                            int = parseInt(split[b]);
                         }
                         if (b == 0) {
                             seconds += int * 60 * 60;
@@ -956,7 +953,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
     const reactionsFile = client.reactionsFile;
     const reactionsObject = reactionsFile.read();
     const channelsFile = client.channelsFile;
-    let actnChnl;
+    let actnChnl = null;
     if (channelsFile.get('action-log')) {
         actnChnl = guild.channels.get(channelsFile.get('action-log'));
     }
@@ -965,29 +962,31 @@ exports.setReactionRoles = async function setReactionRoles (client) {
         if (chnl) {
             const channelsObject = reactionsObject[cKey];
             for (mKey in channelsObject) {
+                let msg = null;
                 try {
-                    const msg = await chnl.fetchMessage(mKey);
-                } catch (e) {}
-                if (msg) {
+                    msg = await chnl.fetchMessage(mKey);
+                } catch (e) {
+                    console.log(e);
+                }
+                if (msg && msg != null) {
                     const messagesObject = channelsObject[mKey];
                     for (rKey in messagesObject) {
-                        let emoji;
+                        let emoji = rKey;
                         if (/[0-9]+/.test(rKey)) emoji = client.emojis.get(rKey);
-                        else emoji = rKey;
                         if (emoji) {
                             const roleId = messagesObject[rKey];
                             const role = guild.roles.get(roleId);
                             if (role) {
                                 await msg.react(emoji).catch(console.error);
                             } else {
-                                if (actnChnl) {
+                                if (actnChnl && actnChnl != null) {
                                     actnChnl.send(`:x: Unable to set ${emoji} reaction for **INVALID ROLE** (${roleId}) set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
                                 }
                                 //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                 //reactionsFile.save();
                             }
                         } else {
-                            if (actnChnl) {
+                            if (actnChnl && actnChnl != null) {
                                 actnChnl.send(`:x: Unable to set **INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
                             }
                             //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
@@ -995,7 +994,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                         }
                     }
                 } else {
-                    if (actnChnl) {
+                    if (actnChnl && actnChnl != null) {
                         actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}`).catch(console.error);
                     }
                     //reactionsFile.unset(`${cKey}.${mKey}`);
@@ -1003,7 +1002,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                 }
             }
         } else {
-            if (actnChnl) {
+            if (actnChnl && actnChnl != null) {
                 actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})`).catch(console.error);
             }
             //reactionsFile.unset(`${cKey}`);

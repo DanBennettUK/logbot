@@ -7,8 +7,8 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_REMINDME')) {
             const user = message.author.id;
-            let end;
-            let ms;
+            let end = 0;
+            let ms = 0;
             if (args[0]) {
                 const int = args[0].replace(/[a-zA-Z]$/g, '');
                 if (parseInt(int)) {
