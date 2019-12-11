@@ -6,12 +6,12 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_LOCK/UNLOCK')) {
-            if (args.length > 0) var dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
-            else var dsc = '';
-            var everyone = guild.roles.find( role => role.name === '@everyone');
-            var LFGRoomsObject = LFGRoomsFile.read();
+            if (args.length > 0) const dsc = `${args.join(' ').charAt(0).toUpperCase()}${args.join(' ').slice(1)}`
+            else const dsc = '';
+            const everyone = guild.roles.find( role => role.name === '@everyone');
+            const LFGRoomsObject = LFGRoomsFile.read();
             for (key in LFGRoomsObject) {
-                var channelObj = guild.channels.get(key);
+                const channelObj = guild.channels.get(key);
                 if (channelObj) {
                     if (channelObj.permissionsFor(everyone).has('SEND_MESSAGES')) {
                         await channelObj.overwritePermissions(everyone, {
