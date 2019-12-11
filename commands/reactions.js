@@ -251,9 +251,8 @@ exports.run = async (client, message, args) => {
                                         const role = message.guild.roles.find(r => r.id == roleID);
                                         if (role) {
                                             if (dsc.length > 1900) {
-                                                if (amount == 1) {
-                                                    const plural = 'reaction';
-                                                } else const plural = 'reactions';
+                                                if (amount == 1) const plural = 'reaction';
+                                                else const plural = 'reactions';
                                                 message.channel.send({
                                                     embed: {
                                                         color: config.color_info,
@@ -303,9 +302,8 @@ exports.run = async (client, message, args) => {
                     }
                 }
                 if (dsc.length > 0) {
-                    if (amount == 1) {
-                        const plural = 'reaction';
-                    } else const plural = 'reactions';
+                    if (amount == 1) const plural = 'reaction';
+                    else const plural = 'reactions';
                     message.channel.send({
                         embed: {
                             color: config.color_info,
