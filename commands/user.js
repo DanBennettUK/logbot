@@ -7,7 +7,8 @@ exports.run = async (client, message, args) => {
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
-            if (args.length > 0) const userID = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+            let userID;
+            if (args.length > 0) userID = functionsFile.parseUserTag(client, message.guild, args.join(' '));
             else {
                 functionsFile.syntaxErr(client, message, 'user');
                 return;
