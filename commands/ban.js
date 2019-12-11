@@ -4,24 +4,24 @@ exports.run = async (client, message, args) => {
     const cryptoRandomString = client.cryptoRandomString;
     const config = client.config;
     const guild = message.guild;
-    var connection = client.connection;
+    let connection = client.connection;
     const bannedUsersFile = client.bannedUsersFile;
     if (message.member.roles.some(role=>['Moderators'].includes(role.name))) {
-        if(modulesFile.get('COMMAND_BAN')) {
-            if(args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
+        if (modulesFile.get('COMMAND_BAN')) {
+            if (args[0]) {
+                const user = functionsFile.parseUserTag(client, guild, args[0]);
 
                 if (user == 'err') { //Check if the user parameter is valid
                 message.channel.send('An invalid user was provided. Please try again');
                 } else {
                     if (guild.member(user)) { //Check if the user exists in the guild
                         if (message.member.highestRole.comparePositionTo(guild.member(user).highestRole) > 0) {
-                            var tail = args.slice(1);
-                            var reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
+                            const tail = args.slice(1);
+                            const reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
 
                             if (tail.length > 0) {
-                                var identifier = cryptoRandomString({length: 10});
-                                var chnl = await client.users.get(user).createDM();
+                                const identifier = cryptoRandomString({length: 10});
+                                const chnl = await client.users.get(user).createDM();
                                 try {
                                     await chnl.send({
                                         embed: {
@@ -49,7 +49,7 @@ exports.run = async (client, message, args) => {
                                             }
                                         }
                                     }).then(dm => {
-                                        var data = [user, `Title: ${dm.embeds[0].title}`, 2, 0, identifier, new Date(), new Date()];
+                                        const data = [user, `Title: ${dm.embeds[0].title}`, 2, 0, identifier, new Date(), new Date()];
                                         connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data,
                                         function(err, results) {
                                             if(err) {
@@ -102,7 +102,7 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }).catch(console.error);
 
-                                            var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                                            const data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                             connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                                             function(err, results) {
                                                 if(err) {
@@ -164,7 +164,7 @@ exports.run = async (client, message, args) => {
                                         message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.').catch(console.error);
 
 
-                                        var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                                        const data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                         connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                                         function(err, results) {
                                             if(err) {
@@ -199,11 +199,11 @@ exports.run = async (client, message, args) => {
                                     collector.on('collect', async react => {
                                         if (react.emoji.name == '✅') {
                                             await msg.delete();
-                                            var tail = args.slice(1);
-                                            var reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
+                                            const tail = args.slice(1);
+                                            const reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
 
                                             if (tail.length > 0) {
-                                                var identifier = cryptoRandomString({length: 10});
+                                                const identifier = cryptoRandomString({length: 10});
                                                 guild.ban(user, { days: 1, reason: reason }).then(async result => {
                                                     await message.channel.send({
                                                         embed: {
@@ -244,7 +244,7 @@ exports.run = async (client, message, args) => {
                                                             }
                                                         }
                                                     });
-                                                    var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                                                    const data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                                     connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                                                     function(err, results) {
                                                         if(err) {
