@@ -30,7 +30,13 @@ exports.run = async (client, message, args) => {
                                             fields: [
                                                 {
                                                     name: 'Reason',
-                                                    value: `${reason}`
+                                                    value: `${reason}`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Identifier',
+                                                    value: `${identifier}`,
+                                                    inline: true
                                                 },
                                                 {
                                                     name: 'Want to dispute?',
