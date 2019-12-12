@@ -14,6 +14,13 @@ exports.run = async (client, message, args) => {
 
                 var channel = await guild.channels.get(channelid);
                 var user = client.users.get(userid);
+                if (!user) {
+                    try {
+                        user = await client.fetchUser(userid);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
                 var deleted = 0;
 
                 if (user && channel && guild.member(user)) {

@@ -16,7 +16,7 @@ module.exports = async (client, oldMember, newMember) => {
                 function (err, results) {
                     if (err) {
                         connection = functionsFile.establishConnection(client);
-                        connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)', 
+                        connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)',
                         [newMember.user.id, newMember.displayName, oldMember.displayName, new Date()],
                         function (err, results) {
                             if (err) throw err
@@ -70,9 +70,9 @@ module.exports = async (client, oldMember, newMember) => {
                 var data = [];
                 var msg = [];
                 var description;
-        
+
                 var match = stringSimilarity.findBestMatch(newMember.displayName, usernames);
-        
+
                 for (var a = 0; a < match['ratings'].length; a++) {
                     if (match['ratings'][a].rating >= 0.5) {
                         hits.push({
@@ -83,10 +83,10 @@ module.exports = async (client, oldMember, newMember) => {
                         identifiers.push(ids[a]);
                     }
                 }
-        
+
                 if (identifiers.length > 0) {
                     data.push(identifiers); //If this work - ew.....you motherfucker, it did.
-        
+
                     connection.query('SELECT * FROM log_guildbans WHERE identifier IN (?) AND actioner <> \'001\'', data,
                     function (err, rows, results) {
                         if (err) {
@@ -97,7 +97,10 @@ module.exports = async (client, oldMember, newMember) => {
                                 if (rows.length == 0) return;
                                 for (var b = 0; b < rows.length; b++) {
                                     var row = rows[b];
-                                    msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                                    msg.push({
+                                        name: `**${hits[b].username}**`,
+                                        value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                                    });
                                 }
                                 if (channelsFile.get('action_log')) {
                                     if (!oldMember.guild.channels.get(channelsFile.get('action_log'))) {
@@ -107,7 +110,7 @@ module.exports = async (client, oldMember, newMember) => {
                                         embed: {
                                             color: config.color_warning,
                                             title: `❗ ${newMember.user.username}#${newMember.user.discriminator} (${newMember.displayName}) matches one or more previous ban record(s)`,
-                                            description: msg.join(' '),
+                                            fields: msg,
                                             timestamp: new Date(),
                                             footer: {
                                                 text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -115,23 +118,29 @@ module.exports = async (client, oldMember, newMember) => {
                                         }
                                     }).catch(console.error);
                                 }
-                                var identifier = cryptoRandomString({length: 10});
-                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                                function(err, results) {
-                                    if (err) {
-                                        connection = functionsFile.establishConnection(client);
-                                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                                        function(err, results) {
-                                            if (err) throw err;
-                                        });
-                                    }
+                                msg.forEach(m => {
+                                    var identifier = cryptoRandomString({length: 10});
+                                    var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
+                                    function(err, results) {
+                                        if (err) {
+                                            connection = functionsFile.establishConnection(client);
+                                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
+                                            function(err, results) {
+                                                if (err) throw err;
+                                            });
+                                        }
+                                    });
                                 });
                             });
                         } else {
                             if (rows.length == 0) return;
                             for (var b = 0; b < rows.length; b++) {
                                 var row = rows[b];
-                                msg.push(`\`(${hits[b].rating.toString().substring(0, 5)})\` \`${hits[b].identifier}\` \`${hits[b].username}\` was banned on: \`${row.timestamp.toUTCString()}\` for: \`${row.description}\` \n\n`);
+                                msg.push({
+                                    name: `**${hits[b].username}**`,
+                                    value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
+                                });
                             }
                             if (channelsFile.get('action_log')) {
                                 if (!oldMember.guild.channels.get(channelsFile.get('action_log'))) {
@@ -141,7 +150,7 @@ module.exports = async (client, oldMember, newMember) => {
                                     embed: {
                                         color: config.color_warning,
                                         title: `❗ ${newMember.user.username}#${newMember.user.discriminator} (${newMember.displayName}) matches one or more previous ban record(s)`,
-                                        description: msg.join(' '),
+                                        fields: msg,
                                         timestamp: new Date(),
                                         footer: {
                                             text: `Marvin's Little Brother | Current version: ${config.version}`
@@ -149,16 +158,19 @@ module.exports = async (client, oldMember, newMember) => {
                                     }
                                 }).catch(console.error);
                             }
-                            var identifier = cryptoRandomString({length: 10});
-                            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                            function(err, results) {
-                                if (err) {
-                                    connection = functionsFile.establishConnection(client);
-                                    connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', msg.join(' ').replace(/`/g, ''), identifier, 0, new Date()],
-                                    function(err, results) {
-                                        if (err) throw err;
-                                    });
-                                }
+                            msg.forEach(m => {
+                                var identifier = cryptoRandomString({length: 10});
+                                var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
+                                function(err, results) {
+                                    if (err) {
+                                        connection = functionsFile.establishConnection(client);
+                                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
+                                        function(err, results) {
+                                            if (err) throw err;
+                                        });
+                                    }
+                                });
                             });
                         }
                     });

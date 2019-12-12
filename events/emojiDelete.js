@@ -2,7 +2,7 @@ module.exports = (client, emoji) => {
     const modulesFile = client.modulesFile;
     const channelsFile = client.channelsFile;
     const guild = emoji.guild;
-  
+
     if (modulesFile.get('EVENT_EMOJI_DELETE')) {
       if (channelsFile.get('server_log')) {
         if (guild.channels.get(channelsFile.get('server_log'))) {

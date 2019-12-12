@@ -30,7 +30,13 @@ exports.run = async (client, message, args) => {
                                             fields: [
                                                 {
                                                     name: 'Reason',
-                                                    value: `${reason}`
+                                                    value: `${reason}`,
+                                                    inline: true
+                                                },
+                                                {
+                                                    name: 'Identifier',
+                                                    value: `${identifier}`,
+                                                    inline: true
                                                 },
                                                 {
                                                     name: 'Want to dispute?',
@@ -54,7 +60,7 @@ exports.run = async (client, message, args) => {
                                                 });
                                             }
                                         });
-    
+
                                         guild.ban(user, { days: 1, reason: reason }).then(async result => {
                                             await message.channel.send({
                                                 embed: {
@@ -95,7 +101,7 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-    
+
                                             var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                                             connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                                             function(err, results) {
@@ -107,7 +113,7 @@ exports.run = async (client, message, args) => {
                                                     });
                                                 }
                                             });
-    
+
                                             //Adding the user to our banned users JSON
                                             bannedUsersFile.set(identifier, result.username);
                                             bannedUsersFile.save();
@@ -155,7 +161,7 @@ exports.run = async (client, message, args) => {
                                             }
                                         }).catch(console.error);
 
-                                        message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.');
+                                        message.channel.send(':x: I could not reach that user via DM. They may have DMs turned off or have me blocked.').catch(console.error);
 
 
                                         var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
@@ -175,7 +181,6 @@ exports.run = async (client, message, args) => {
                                         bannedUsersFile.save();
                                     }).catch(console.error);
                                 }
-                                
                             }
                             else {
                                 message.channel.send('Please provide a reason for the ban');
@@ -255,7 +260,7 @@ exports.run = async (client, message, args) => {
                                                     bannedUsersFile.set(identifier, result.username);
                                                     bannedUsersFile.save();
                                                 }).catch(console.error);
-                                            }
+                                            } else message.channel.send(':x: Please provide a reason for the ban.').catch(console.error);
                                         }
                                         if (react.emoji.name == '❌') {
                                             await msg.delete();

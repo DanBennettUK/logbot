@@ -56,7 +56,7 @@ exports.run = async (client, message, args) => {
                 } else if (args[0].toLowerCase() === `list`) {
 
                     var sent = false;
-    
+
                     var listOfEmojis = '';
                     var listOfNames = '';
 

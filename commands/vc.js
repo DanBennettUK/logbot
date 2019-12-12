@@ -17,7 +17,7 @@ exports.run = (client, message, args) => {
                                 message.channel.send(`User ${guildUser} is in voice channel **${vc.name}** with ${vc.members.size - 1} other users`);
                         }
                     } else message.channel.send(`User ${guildUser} is not in a voice channel`);
-                } else message.channel.send('Thes user provided was not found');
+                } else message.channel.send('The user provided was not found').catch(console.error);
             } else functionsFile.syntaxErr(client, message, 'vc');
         }
     }

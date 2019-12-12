@@ -697,12 +697,12 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
 
         if (mutes[key].end < Math.floor(Date.now() / 1000)) {
             if (actionee) {
-                actionee.removeRole(mutedRole).then(async member => {
+                actionee.removeRole(mutedRole).then(member => {
                     if (channelsFile.get('action_log')) {
                         if (!guild.channels.get(channelsFile.get('action_log'))) {
                             return;
                         }
-                        await guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
+                        guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
                     }
                     mutedFile.unset(key);
                     mutedFile.save();
@@ -719,7 +719,7 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                         member.setVoiceChannel(null);
                         var identifier = cryptoRandomString({length: 10});
                         var data = [member.id, '001', 'Muted role removed prior to expiration. User may have attempted to mute evade.', identifier, 0, new Date()]
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data, 
+                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                         function(err, results) {
                             if (err) throw err;
                         });
@@ -788,7 +788,7 @@ exports.checkReminders = async function checkReminders(client) {
             reminderFile.unset(key);
             await reminderFile.save();
         }
-    }   
+    }
 }
 
 exports.importWarnings = function importWarnings(client) {
@@ -1081,7 +1081,7 @@ exports.parseRoleTag = (client, guild, tag) => {
             if (role) return role.id;
             else return 'err';
         }
-    } 
+    }
 }
 
 exports.inviteLinkDetection = (client, message) => {
@@ -1225,7 +1225,7 @@ exports.checkLive = (client) => {
     request(options, (error, response, body) => {
         if (!error) {
             var channel = JSON.parse(body);
-            if (channel.data.length > 0) {
+            if (channel && channel.data && channel.data.length > 0) {
                 if (client.live == false) {
                     if (channelsFile.get('action_log')) {
                         var chnl = guild.channels.get(channelsFile.get('action_log'))

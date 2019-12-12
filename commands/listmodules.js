@@ -83,6 +83,5 @@ exports.run = (client, message, args) => {
                 }).catch(console.error);
             }
         });
-        
     } //End of permission checking statement
 }
