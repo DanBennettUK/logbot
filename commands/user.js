@@ -42,7 +42,7 @@ exports.run = async (client, message, args) => {
                 }
             }
             const userObject = guild.member(globalUser);
-
+            let autoClose = null;
             if (userObject && userObject != null) {
                 let nickname = 'No nickname';
                 let voiceChannel = 'Not in a voice channel';
@@ -110,9 +110,39 @@ exports.run = async (client, message, args) => {
                     const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
+                    autoClose = setTimeout(() => {
+                        collector.stop();
+                        message.channel.send({
+                            embed: {
+                                color: config.color_info,
+                                title: 'Usercard closed',
+                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                    }, 300000);
+
                     collector.on('collect', async r => {
                         if (r.emoji.name == '👮') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
                                 SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -256,6 +286,21 @@ exports.run = async (client, message, args) => {
                             );
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                             SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
@@ -399,10 +444,27 @@ exports.run = async (client, message, args) => {
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
+                            clearTimeout(autoClose);
+                            collector.stop();
                             msg.delete();
                             message.delete();
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                 async function (err, rows, results) {
                                     if (err) {
@@ -530,6 +592,21 @@ exports.run = async (client, message, args) => {
                             );
                         } else if (r.emoji.name == '🖥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -639,6 +716,21 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             if (userObject.voiceChannel) {
                                 voiceChannel = userObject.voiceChannel.name;
                             } else {
@@ -694,6 +786,21 @@ exports.run = async (client, message, args) => {
                             }).catch(console.error);
                         } else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
@@ -821,6 +928,21 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) {
@@ -942,8 +1064,6 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             });
-                        } else {
-                            return;
                         }
                     });
                     await msg.react('👥');
@@ -954,6 +1074,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
+
                 }).catch(console.error);
             } else if (globalUser) {
                 message.channel.send({
@@ -990,9 +1111,40 @@ exports.run = async (client, message, args) => {
                     const filter = (reaction, user) => !user.bot;
                     const collector = msg.createReactionCollector(filter);
 
+                    autoClose = setTimeout(() => {
+                        collector.stop();
+                        message.channel.send({
+                            embed: {
+                                color: config.color_info,
+                                title: 'Usercard closed',
+                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                    }, 300000);
+
                     collector.on('collect', async r => {
                         if (r.emoji.name == '👮') {
                             await r.remove(r.users.last());
+
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
                                 SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -1139,6 +1291,22 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
 
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
+
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                             SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                             gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -1281,10 +1449,27 @@ exports.run = async (client, message, args) => {
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
+                            clearTimeout(autoClose);
+                            collector.stop();
                             msg.delete();
                             message.delete();
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -1410,6 +1595,21 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '🖥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -1519,6 +1719,21 @@ exports.run = async (client, message, args) => {
                             });
                         }  else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
@@ -1646,6 +1861,21 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             msg.edit({
                                 embed: {
                                     color: config.color_caution,
@@ -1678,6 +1908,21 @@ exports.run = async (client, message, args) => {
                             }).catch(console.error);
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) {
@@ -1855,9 +2100,40 @@ exports.run = async (client, message, args) => {
                                 const filter = (reaction, user) => !user.bot;
                                 const collector = msg.createReactionCollector(filter);
 
+                                autoClose = setTimeout(() => {
+                                    collector.stop();
+                                    message.channel.send({
+                                        embed: {
+                                            color: config.color_info,
+                                            title: 'Usercard closed',
+                                            description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                }, 300000);
+
                                 collector.on('collect', async r => {
                                     if (r.emoji.name == '👮') {
                                         await r.remove(r.users.last());
+
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
 
                                         connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                             SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -2002,6 +2278,22 @@ exports.run = async (client, message, args) => {
                                     } else if (r.emoji.name == '🔈') {
                                         await r.remove(r.users.last());
 
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
+
                                         connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                         SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                         gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2144,10 +2436,27 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     } else if (r.emoji.name == '❌') {
+                                        clearTimeout(autoClose);
+                                        collector.stop();
                                         msg.delete();
                                         message.delete();
                                     } else if (r.emoji.name == '✍') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
                                         connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results ) {
                                             if (err) {
@@ -2273,6 +2582,21 @@ exports.run = async (client, message, args) => {
                                         });
                                     } else if (r.emoji.name == '🖥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
                                         connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results) {
                                             if (err) {
@@ -2382,6 +2706,21 @@ exports.run = async (client, message, args) => {
                                         });
                                     }  else if (r.emoji.name == '📛') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
                                         connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                                         SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                         [userID, userID], async function (err, rows, results) {
@@ -2507,6 +2846,21 @@ exports.run = async (client, message, args) => {
                                         });
                                     }  else if (r.emoji.name == '👥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
                                         await msg.edit({
                                             embed: {
                                                 color: config.color_caution,
@@ -2524,6 +2878,21 @@ exports.run = async (client, message, args) => {
                                         }).catch(console.error);
                                     } else if (r.emoji.name == '📥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            message.channel.send({
+                                                embed: {
+                                                    color: config.color_info,
+                                                    title: 'Usercard closed',
+                                                    description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                        }, 300000);
                                         connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                         [userID, userID], async function (err, rows, results) {
                                             if (err) {
@@ -2693,9 +3062,40 @@ exports.run = async (client, message, args) => {
                             const filter = (reaction, user) => !user.bot;
                             const collector = msg.createReactionCollector(filter);
 
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                message.channel.send({
+                                    embed: {
+                                        color: config.color_info,
+                                        title: 'Usercard closed',
+                                        description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                            }, 300000);
+
                             collector.on('collect', async r => {
                                 if (r.emoji.name == '👮') {
                                     await r.remove(r.users.last());
+
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
 
                                     connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                         SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -2840,6 +3240,22 @@ exports.run = async (client, message, args) => {
                                 } else if (r.emoji.name == '🔈') {
                                     await r.remove(r.users.last());
 
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
+
                                     connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                     SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                     gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2982,10 +3398,27 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else if (r.emoji.name == '❌') {
+                                    clearTimeout(autoClose);
+                                    collector.stor();
                                     msg.delete();
                                     message.delete();
                                 } else if (r.emoji.name == '✍') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
                                     connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results ) {
                                         if (err) {
@@ -3111,6 +3544,21 @@ exports.run = async (client, message, args) => {
                                     });
                                 } else if (r.emoji.name == '🖥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
                                     connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results) {
                                         if (err) {
@@ -3220,6 +3668,21 @@ exports.run = async (client, message, args) => {
                                     });
                                 }  else if (r.emoji.name == '📛') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
                                     connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                                     SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
@@ -3345,6 +3808,21 @@ exports.run = async (client, message, args) => {
                                     });
                                 }  else if (r.emoji.name == '👥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
                                     await msg.edit({
                                         embed: {
                                             color: config.color_caution,
@@ -3362,6 +3840,21 @@ exports.run = async (client, message, args) => {
                                     }).catch(console.error);
                                 } else if (r.emoji.name == '📥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        message.channel.send({
+                                            embed: {
+                                                color: config.color_info,
+                                                title: 'Usercard closed',
+                                                description: `[Usercard](${msg.url}) is no longer receiving reactions.\nTo open it again, run \`${client.config.prefix}user ${userID}\``,
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                    }, 300000);
                                     connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) {
