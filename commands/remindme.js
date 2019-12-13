@@ -31,7 +31,7 @@ exports.run = async (client, message, args) => {
                             break;
                     }
 
-                    const reminder = _.rest(args, 1).join(' ');
+                    let reminder = _.rest(args, 1).join(' ');
 
                     if (reminder.length > 1000) {
                         message.channel.send(':x: Please keep the reminder message under 1000 characters.');
