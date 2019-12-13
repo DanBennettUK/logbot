@@ -116,7 +116,7 @@ exports.run = (client, message, args) => {
                                     }
                                     var joinedMessage = msg.join('\n');
                                     message.channel.send(`🎙 Viewing the voice logs of ${u} \`\`\`${joinedMessage}\`\`\``);*/
-                                    msg.edit({
+                                    await msg.edit({
                                         embed: {
                                             author: {
                                                 name: `${u.username}#${u.discriminator}`,
@@ -231,7 +231,7 @@ exports.run = (client, message, args) => {
                                     timestamps.push('No results found');
                                     times.push('No results found');
                                 }
-                                msg.edit({
+                                await msg.edit({
                                     embed: {
                                         author: {
                                             name: `${u.username}#${u.discriminator}`,
