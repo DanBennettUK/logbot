@@ -5,7 +5,7 @@ exports.run = async (client, message, args) => {
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         if (modulesFile.get('COMMAND_VCLOG')) {
             if (args.length > 0) {
-                const id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
+                let id = functionsFile.parseChannelTag(client, message.guild, args.join(' '));
                 if (id == 'err') {
                     if (args.length < 3 && !/[0-9]/.test(args.slice(args.length, 1).join(' '))) {
                         switch (args[0].toLowerCase()) {
