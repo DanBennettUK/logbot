@@ -6,7 +6,7 @@ exports.run = (client, message, args) => {
             const query = args.join('+');
             request(`https://api.duckduckgo.com/?q=${query}&format=json`,
                 function (error, response, body) {
-                    let answer = JSON.parse(body);
+                    const answer = JSON.parse(body);
                     if (answer.Abstract == '') {
                         if (answer.RelatedTopics.length > 0) {
                             if (answer.RelatedTopics[0].text != '') {

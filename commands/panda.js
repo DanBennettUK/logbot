@@ -9,7 +9,7 @@ exports.run = (client, message, args) => {
                     message.channel.send('Fetching picture...').then(msg => {
                         request(`https://some-random-api.ml/img/panda`,
                         function (error, response, body) {
-                            answer = JSON.parse(body);
+                            const answer = JSON.parse(body);
                             const attachment = new client.Discord.Attachment(answer['link']);
                             message.channel.send(attachment).then(() => {
                                 msg.delete().catch(console.error);
@@ -21,7 +21,7 @@ exports.run = (client, message, args) => {
                     message.channel.send('Fetching picture...').then(msg => {
                         request(`https://some-random-api.ml/img/red_panda`,
                         function (error, response, body) {
-                            answer = JSON.parse(body);
+                            const answer = JSON.parse(body);
                             const attachment = new client.Discord.Attachment(answer['link']);
                             message.channel.send(attachment).then(() => {
                                 msg.delete().catch(console.error);

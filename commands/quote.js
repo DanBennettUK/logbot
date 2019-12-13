@@ -6,7 +6,7 @@ exports.run = (client, message, args) => {
         if (modulesFile.get('COMMAND_QUOTE')) {
             request(`https://api.quotable.io/random`,
             function (error, response, body) {
-                let answer = JSON.parse(body);
+                const answer = JSON.parse(body);
                 if (answer.content.length > 0) {
                     message.channel.send({
                         embed: {
