@@ -1,7 +1,7 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     if (modulesFile.get('COMMAND_ROLL')) {
-        var outcome = 0;
+        let outcome = 0;
         while (outcome == 0) {
             outcome = Math.floor(Math.random() * Math.floor(101));
         }

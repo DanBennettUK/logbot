@@ -4,10 +4,10 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(role => role.name === 'Moderators')) {
         if (modulesFile.get('COMMAND_VC')) {
             if (args.length > 0) {
-                var user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
-                var guildUser = message.guild.member(user);
+                const user = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+                const guildUser = message.guild.member(user);
                 if (user !== 'err' && guildUser) {
-                    var vc = guildUser.voiceChannel;
+                    const vc = guildUser.voiceChannel;
                     if (vc != undefined) {
                         switch (vc.members.size) {
                             case 1:

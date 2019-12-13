@@ -6,8 +6,9 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
         if (modulesFile.get('COMMAND_NOTE')) {
+            let id = '';
             if (args[0]) {
-                var id = functionsFile.parseUserTag(client, message.guild, args[0]);
+                id = functionsFile.parseUserTag(client, message.guild, args[0]);
             } else {
                 message.channel.send(`Format: \`${config.prefix}note [User ID] [Note content]\``);
                 return;
@@ -16,7 +17,7 @@ exports.run = async (client, message, args) => {
             if (id == 'err') {
                 message.channel.send(':x: An invalid user was provided. Please try again').catch(console.error);
             } else {
-                var user = client.users.get(id);
+                let user = client.users.get(id);
                 if (!user) {
                     try {
                         user = await client.fetchUser(id);
@@ -28,12 +29,12 @@ exports.run = async (client, message, args) => {
                     message.channel.send(':x: An invalid user was provided. Please try again').catch(console.error);
                     return;
                 }
-                var tail = args.slice(1);
-                var note = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
+                const tail = args.slice(1);
+                const note = `${tail.join(' ').trim().charAt(0).toUpperCase()}${tail.join(' ').trim().slice(1)}`;
 
                 if (tail.length > 0) {
-                    var identifier = cryptoRandomString({ length: 10 });
-                    var data = [id, message.author.id, note, identifier, 0, new Date(), id];
+                    const identifier = cryptoRandomString({ length: 10 });
+                    const data = [id, message.author.id, note, identifier, 0, new Date(), id];
                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                     function (err, results) {
                         if (err) {

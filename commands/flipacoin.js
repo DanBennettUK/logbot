@@ -1,7 +1,7 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
     if (modulesFile.get('COMMAND_FLIPACOIN')) {
-        var outcome = Math.floor(Math.random() * Math.floor(2));
+        const outcome = Math.floor(Math.random() * Math.floor(2));
 
         switch (outcome) {
             case 0:

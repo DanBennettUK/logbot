@@ -1,9 +1,9 @@
 exports.run = (client, message, args) => {
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const functionsFile = client.functionsFile;
     if (message.member.roles.some(role => ['Moderators', 'Support'].includes(role.name))) {
-        var client_PING = Math.floor(client.ping);
+        const client_PING = Math.floor(client.ping);
         connection.on('error', (err) => {
             console.log(err);
             if (err.code == 'PROTOCOL_CONNECTION_LOST') {
@@ -13,9 +13,9 @@ exports.run = (client, message, args) => {
                 }, 5000);
             }
         });
-        var db_PING = connection.ping();
-        var client_STATUS;
-        var db_STATUS;
+        const db_PING = connection.ping();
+        let client_STATUS = '';
+        let db_STATUS = '';
 
         if (client_PING >= 1 && client_PING <= 500) {
             client_STATUS = 'OK';

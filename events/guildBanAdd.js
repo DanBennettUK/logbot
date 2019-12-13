@@ -1,16 +1,16 @@
 module.exports = (client, guild, user) => {
     const cryptoRandomString = client.cryptoRandomString;
     const bannedUsersFile = client.bannedUsersFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const functionsFile = client.functionsFile;
     const config = client.config;
     const modulesFile = client.modulesFile;
     const channelsFile = client.channelsFile;
-    var identifier = cryptoRandomString({ length: 10 });
+    const identifier = cryptoRandomString({ length: 10 });
     bannedUsersFile.set(identifier, user.username);
     bannedUsersFile.save();
 
-    var data = [user.id, '001', 'SYSTEM BAN', identifier, 0, new Date()];
+    const data = [user.id, '001', 'SYSTEM BAN', identifier, 0, new Date()];
     connection.query('INSERT INTO log_guildbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
         function (err, results) {
             if (err) {

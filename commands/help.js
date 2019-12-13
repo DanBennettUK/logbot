@@ -1,7 +1,7 @@
 exports.run = (client, message, args) => {
     const config = client.config;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-        var staffHelpCommands =
+        const staffHelpCommands =
         `[Commands in detail](https://github.com/FMWK/logbot/wiki/Commands-in-detail)
 
         **Fun commands:**
@@ -11,6 +11,7 @@ exports.run = (client, message, args) => {
         ${config.prefix}birb
         ${config.prefix}cat
         ${config.prefix}dog
+        ${config.prefix}panda
 
         **Utility commands:**
         ${config.prefix}module <module> <0/1>
@@ -78,7 +79,7 @@ exports.run = (client, message, args) => {
         return;
     }
     if (message.member.roles.some(role => ['Support'].includes(role.name))) {
-        var helperCommands =
+        const helperCommands =
             `**Fun commands:**
         **${config.prefix}flipacoin:** This command will flip a coin and return the result.
         **${config.prefix}roll:** This command will return a random number between 1 and 100.
@@ -86,6 +87,7 @@ exports.run = (client, message, args) => {
         **${config.prefix}birb:** This command will return a random bird picture.
         **${config.prefix}cat:** This command will return a random cat picture.
         **${config.prefix}dog:** This command will return a random dog picture.
+        **${config.prefix}dog:** This command will return a random pands picture.
 
         **Utility commands:**
         **${config.prefix}note <user> <note_content>:** This command is used to add notes to a user. When a note is added to a user, they are not notified.
@@ -118,7 +120,7 @@ exports.run = (client, message, args) => {
         return;
     }
 
-    var helpCommands =
+    const helpCommands =
     `${config.prefix}invite
     ${config.prefix}bugreport
     ${config.prefix}forums

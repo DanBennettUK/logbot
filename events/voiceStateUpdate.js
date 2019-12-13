@@ -4,7 +4,7 @@ module.exports = (client, oldMember, newMember) => {
     const channelsFile = client.channelsFile;
     const functionsFile = client.functionsFile;
     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES')) {
-        var data = [];
+        let data = [];
         if (oldMember.voiceChannel) {
             if (newMember.voiceChannel) {
                 if (oldMember.voiceChannel.id !== newMember.voiceChannel.id) {
@@ -12,7 +12,7 @@ module.exports = (client, oldMember, newMember) => {
                     if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
                         if (channelsFile.get('voice_log')) {
                             if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {
-                                var voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
+                                const voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
                                 if (voiceLogChannel.members.has(newMember.id)) {
                                         voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>**, moving from **<#${data[3]}>** | ${data[6].toUTCString()}`);
                                     } else {
@@ -31,7 +31,7 @@ module.exports = (client, oldMember, newMember) => {
                 if (modulesFile.get('EVENT_GUILD_VOICE_UPDATES_LOG')) {
                     if (channelsFile.get('voice_log')) {
                         if (oldMember.guild.channels.get(channelsFile.get('voice_log'))) {
-                            var voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
+                            const voiceLogChannel = newMember.guild.channels.get(channelsFile.get('voice_log'));
                             if (voiceLogChannel.members.has(newMember.id)) {
                                 voiceLogChannel.send(`${newMember.user.username}#${newMember.user.discriminator} has joined **<#${data[1]}>** | ${data[6].toUTCString()}`);
                             } else {

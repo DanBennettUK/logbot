@@ -6,29 +6,29 @@ exports.run = (client, message, args) => {
     const config = client.config;
     const _ = client.underscore;
     const cryptoRandomString = client.cryptoRandomString;
-    var connection = client.connection;
+    let connection = client.connection;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNMUTE')) {
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
-                var guildUser = guild.member(user);
+                const user = functionsFile.parseUserTag(client, guild, args[0]);
+                const guildUser = guild.member(user);
 
                 if (user !== 'err' && guildUser) {
                     if ((mutedFile.get(user)) || (guild.members.get(user).roles.some(r => r.name === 'Muted'))) {
-                        var tail = _.rest(args, 1).join(' ');
+                        const tail = _.rest(args, 1).join(' ');
 
                         if (tail.length > 0) {
 
-                            var reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
+                            const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
 
                             mutedFile.unset(`${user}`);
                             mutedFile.save();
 
-                            var mutedRole = guild.roles.find(val => val.name === 'Muted');
-                            var identifier = cryptoRandomString({ length: 10 });
+                            const mutedRole = guild.roles.find(val => val.name === 'Muted');
+                            const identifier = cryptoRandomString({ length: 10 });
 
                             guild.member(user).removeRole(mutedRole).then(member => {
-                                var data = [user, message.author.id, reason, identifier, 0, new Date(), user /*SP arg*/];
+                                let data = [user, message.author.id, reason, identifier, 0, new Date(), user /*SP arg*/];
                                 connection.query('INSERT INTO log_unmutes(userID, actioner, description, identifier, isDeleted, timestamp) VALUES(?,?,?,?,?,?);',
                                 data, function (err, results) {
                                     if (err) {
@@ -119,14 +119,14 @@ exports.run = (client, message, args) => {
                                         }
                                     }).then(dm => {
                                         if (dm.embeds[0].type === 'rich') {
-                                            var data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
+                                            data = [user, dm.embeds[0].title, 3, 0, identifier, new Date(), new Date()];
                                         } else {
-                                            var data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
+                                            data = [user, dm.content, 3, 0, identifier, new Date(), new Date()];
                                         }
-                                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
+                                        connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function (err, results) {
                                             if (err) {
                                                 connection = functionsFile.establishConnection(client);
-                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)',data, function (err, results) {
+                                                connection.query('INSERT INTO log_outgoingdm(userid, content, type, isDeleted, identifier, timestamp, updated) VALUES(?,?,?,?,?,?,?)', data, function (err, results) {
                                                     if (err) throw err;
                                                 });
                                             }

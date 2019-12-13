@@ -4,12 +4,13 @@ exports.run = (client, message, args) => {
     const cryptoRandomString = client.cryptoRandomString;
     const guild = message.guild;
     const functionsFile = client.functionsFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const bannedUsersFile = client.bannedUsersFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNBAN')) {
+            let user = '';
             if (args[0]) {
-                var user = functionsFile.parseUserTag(client, guild, args[0]);
+                user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
                 message.channel.send(`Unban who?\n Format:\`${config.prefix}unban <UserTag> <Reason>\``);
                 return;
@@ -20,12 +21,12 @@ exports.run = (client, message, args) => {
                 message.channel.send(':thinking: An invalid user was provided. Please try again');
             } else {
                 if (client.fetchUser(user)) {
-                    var tail = args.slice(1);
-                    var reason = tail.join(' ').trim();
+                    const tail = args.slice(1);
+                    const reason = tail.join(' ').trim();
 
                     if (tail.length > 0) {
                         guild.unban(user, reason).then(result => {
-                            var identifier = cryptoRandomString({ length: 10 });
+                            const identifier = cryptoRandomString({ length: 10 });
                             message.channel.send({
                                 embed: {
                                     color: config.color_success,
@@ -66,7 +67,7 @@ exports.run = (client, message, args) => {
                                 }
                             }).catch(console.error);
 
-                            var data = [result.id, message.author.id, reason, identifier, 0, new Date()];
+                            const data = [result.id, message.author.id, reason, identifier, 0, new Date()];
                             connection.query('INSERT INTO log_guildunbans (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                             function (err, results) {
                                 if (err) {
@@ -94,16 +95,16 @@ exports.run = (client, message, args) => {
                             });
                         }).catch(err => {
                             if (err.message === 'Unknown Ban') {
-                                message.channel.send('That user doesn\'t appear to be banned');
+                                message.channel.send('That user doesn\'t appear to be banned').catch(console.error);
                             } else {
                                 console.log(err);
                             }
                         });
                     } else {
-                        message.channel.send('Please provide a reason for the unban');
+                        message.channel.send('Please provide a reason for the unban').catch(console.error);
                     }
                 } else {
-                    message.channel.send('Could not find a Discord user with that tag/ID');
+                    message.channel.send('Could not find a Discord user with that tag/ID').catch(console.error);
                 }
             }
         } else {

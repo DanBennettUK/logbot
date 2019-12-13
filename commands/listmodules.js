@@ -3,13 +3,13 @@ exports.run = (client, message, args) => {
     const config = client.config;
     const _ = client.underscore;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-        var file = modulesFile.get();
-        var moduleNames = _.keys(file);
-        var moduleValues = _.values(file);
+        const file = modulesFile.get();
+        const moduleNames = _.keys(file);
+        const moduleValues = _.values(file);
 
-        var joinedNames = '';
-        var joinedValues = '';
-        var amount = 0;
+        let joinedNames = '';
+        let joinedValues = '';
+        let amount = 0;
 
         moduleNames.forEach((name, index) => {
             if (joinedNames.length > 900) {

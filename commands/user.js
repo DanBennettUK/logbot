@@ -2,23 +2,22 @@ exports.run = async (client, message, args) => {
     const modulesFile = client.modulesFile;
     const functionsFile = client.functionsFile;
     const config = client.config;
-    var connection = client.connection;
+    let connection = client.connection;
     const _ = client.underscore;
     const guild = message.guild;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
-            if (args.length > 0) var userID = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+            let userID = '';
+            const tag = args.join(' ');
+            if (args.length > 0) userID = functionsFile.parseUserTag(client, guild, tag);
             else {
                 functionsFile.syntaxErr(client, message, 'user');
                 return;
             }
-            var globalUser = client.users.get(userID);
-            if (!globalUser) {
-                try {
-                    globalUser = await client.fetchUser(userID);
-                } catch (e) {
-                    console.log(e);
-                }
+            if (userID == 'err') {
+                const IDArray = await functionsFile.parseBannedUserTag(client, guild, tag);
+                if (IDArray.length > 0) userID = IDArray[0];
+                if (IDArray.length > 1) message.channel.send(`Multiple matching users have been found. The first will be displayed. All IDs of matching users are displayed below:\n${IDArray.join(' ')}`).catch(console.error);
             }
             if (userID == 'err') {
                 message.channel.send({
@@ -34,33 +33,35 @@ exports.run = async (client, message, args) => {
                 }).catch(console.error);
                 return;
             }
-            var userObject = guild.member(globalUser);
+            let globalUser = client.users.get(userID);
+            if (!globalUser) {
+                try {
+                    globalUser = await client.fetchUser(userID);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+            const userObject = guild.member(globalUser);
 
             if (userObject && userObject != null) {
-                var nickname;
-                var voiceChannel;
-                var app;
-                var joined;
+                let nickname = 'No nickname';
+                let voiceChannel = 'Not in a voice channel';
+                let app = 'None';
+                let joined = 'UNKNOWN';
 
                 if (userObject.nickname) {
                     nickname = userObject.nickname;
-                } else {
-                    nickname = 'No nickname';
                 }
                 if (userObject.voiceChannel) {
                     voiceChannel = userObject.voiceChannel.name;
-                } else {
-                    voiceChannel = 'Not in a voice channel';
                 }
                 if (userObject.user.presence.game) {
                     app = userObject.user.presence.game.name;
                     if (app == 'Custom Status') app += `:\n${userObject.user.presence.game.state}`;
-                } else {
-                    app = 'None';
                 }
                 if (userObject.joinedAt) {
                     joined = userObject.joinedAt.toUTCString();
-                } else joined = 'UNKNOWN';
+                }
 
                 message.channel.send({
                     embed: {
@@ -124,9 +125,9 @@ exports.run = async (client, message, args) => {
                                         SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
                                         async function (err, rows, results) {
                                             if (err) throw err;
-                                            var events = [];
-                                            var max = 5;
-                                            var extra;
+                                            let events = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -134,9 +135,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
-                                                var actioner = client.users.get(row.actioner);
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
+                                                let actioner = client.users.get(row.actioner);
                                                 if (!actioner) {
                                                     try {
                                                         actioner = await client.fetchUser(row.actioner);
@@ -188,9 +189,9 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     } else {
-                                        var events = [];
-                                        var max = 5;
-                                        var extra;
+                                        let events = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -198,9 +199,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -267,9 +268,9 @@ exports.run = async (client, message, args) => {
                                     gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                                     async function (err, rows, results) {
                                         if (err) throw err;
-                                        var events = [];
-                                        var max = 5;
-                                        var extra;
+                                        let events = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -277,9 +278,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -287,7 +288,7 @@ exports.run = async (client, message, args) => {
                                                     console.log(e);
                                                 }
                                             }
-                                            switch(row.type) {
+                                            switch (row.type) {
                                                 case 'mute':
                                                     await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                     break;
@@ -332,9 +333,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var events = [];
-                                    var max = 5;
-                                    var extra;
+                                    let events = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -342,9 +343,9 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        var actioner = client.users.get(row.actioner);
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
+                                        let actioner = client.users.get(row.actioner);
                                         if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(row.actioner);
@@ -352,7 +353,7 @@ exports.run = async (client, message, args) => {
                                                 console.log(e);
                                             }
                                         }
-                                        switch(row.type) {
+                                        switch (row.type) {
                                             case 'mute':
                                                 await events.push(`\`${row.identifier}\` 🔇 Mute by ${actioner} on ${row.timestamp.toUTCString()} for ${row.length}s \n \`\`\`${row.description}\`\`\`\n\n`);
                                                 break;
@@ -409,10 +410,10 @@ exports.run = async (client, message, args) => {
                                         connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results) {
                                             if (err) throw err;
-                                            var notes = [];
+                                            let notes = [];
 
-                                            var max = 5;
-                                            var extra;
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -420,9 +421,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
-                                                var actioner = client.users.get(row.actioner);
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
+                                                let actioner = client.users.get(row.actioner);
                                                 if (!actioner) {
                                                     try {
                                                         actioner = await client.fetchUser(row.actioner);
@@ -468,10 +469,9 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     } else {
-                                        var notes = [];
-
-                                        var max = 5;
-                                        var extra;
+                                        let notes = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -479,9 +479,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -537,10 +537,9 @@ exports.run = async (client, message, args) => {
                                     connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results) {
                                         if (err) throw err;
-                                        var notes = [];
-
-                                        var max = 5;
-                                        var extra;
+                                        let notes = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -549,7 +548,7 @@ exports.run = async (client, message, args) => {
                                         }
 
                                         for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
+                                            const row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                             if (i == max - 1 && extra > 0) {
                                                 notes.push(`...${extra} more`);
@@ -588,10 +587,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var notes = [];
-
-                                    var max = 5;
-                                    var extra;
+                                    let notes = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -600,7 +598,7 @@ exports.run = async (client, message, args) => {
                                     }
 
                                     for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
+                                        const row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                         if (i == max - 1 && extra > 0) {
                                             notes.push(`...${extra} more`);
@@ -705,9 +703,9 @@ exports.run = async (client, message, args) => {
                                     SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) throw err;
-                                        var names = [];
-                                        var max = 0;
-                                        var extra;
+                                        let names = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -715,9 +713,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            switch(row.type) {
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            switch (row.type) {
                                                 case 'user':
                                                     names.push(`📛${userObject.user.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                     break;
@@ -763,9 +761,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var names = [];
-                                    var max = 0;
-                                    var extra;
+                                    let names = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -773,9 +771,9 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        switch(row.type) {
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
+                                        switch (row.type) {
                                             case 'user':
                                                 names.push(`📛${userObject.user.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
@@ -830,9 +828,9 @@ exports.run = async (client, message, args) => {
                                     connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) throw err;
-                                        var history = [];
-                                        var max = 5;
-                                        var extra;
+                                        let history = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -840,8 +838,8 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
                                             switch (row.Status) {
                                                 case 'join':
                                                     history.push(`📥 ${userObject.user.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -887,9 +885,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var history = [];
-                                    var max = 5;
-                                    var extra;
+                                    let history = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -897,8 +895,8 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
                                         switch (row.Status) {
                                             case 'join':
                                                 history.push(`📥 ${userObject.user.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -965,6 +963,9 @@ exports.run = async (client, message, args) => {
                             name: globalUser.username,
                             icon_url: globalUser.displayAvatarURL
                         },
+                        thumbnail: {
+                            url: globalUser.displayAvatarURL
+                        },
                         title: `${globalUser.username}#${globalUser.discriminator}`,
                         description: `The user you provided is not currently camping in this guild.`,
                         fields: [
@@ -1004,9 +1005,9 @@ exports.run = async (client, message, args) => {
                                         SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
                                         async function (err, rows, results) {
                                             if (err) throw err;
-                                            var events = [];
-                                            var max = 5;
-                                            var extra;
+                                            let events = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -1014,9 +1015,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
-                                                var actioner = client.users.get(row.actioner);
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
+                                                let actioner = client.users.get(row.actioner);
                                                 if (!actioner) {
                                                     try {
                                                         actioner = await client.fetchUser(row.actioner);
@@ -1069,9 +1070,9 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     } else {
-                                        var events = [];
-                                        var max = 5;
-                                        var extra;
+                                        let events = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1079,9 +1080,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -1149,9 +1150,9 @@ exports.run = async (client, message, args) => {
                                     gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                                     async function (err, rows, results) {
                                         if (err) throw err;
-                                        var events = [];
-                                        var max = 5;
-                                        var extra;
+                                        let events = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1159,9 +1160,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -1214,9 +1215,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var events = [];
-                                    var max = 5;
-                                    var extra;
+                                    let events = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1224,9 +1225,9 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        var actioner = client.users.get(row.actioner);
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
+                                        let actioner = client.users.get(row.actioner);
                                         if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(row.actioner);
@@ -1291,10 +1292,9 @@ exports.run = async (client, message, args) => {
                                     connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results) {
                                         if (err) throw err;
-                                        var notes = [];
-
-                                        var max = 5;
-                                        var extra;
+                                        let notes = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1302,9 +1302,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            var actioner = client.users.get(row.actioner);
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            let actioner = client.users.get(row.actioner);
                                             if (!actioner) {
                                                 try {
                                                     actioner = await client.fetchUser(row.actioner);
@@ -1350,10 +1350,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var notes = [];
-
-                                    var max = 5;
-                                    var extra;
+                                    let notes = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1361,9 +1360,9 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        var actioner = client.users.get(row.actioner);
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
+                                        let actioner = client.users.get(row.actioner);
                                         if (!actioner) {
                                             try {
                                                 actioner = await client.fetchUser(row.actioner);
@@ -1418,9 +1417,9 @@ exports.run = async (client, message, args) => {
                                     connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results) {
                                         if (err) throw err;
-                                        var notes = [];
-                                        var max = 5;
-                                        var extra;
+                                        let notes = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= max) {
                                             max = rows.length;
@@ -1428,8 +1427,8 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
                                             if (i == max - 1 && extra > 0) {
                                                 notes.push(`...${extra} more`);
@@ -1468,9 +1467,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var notes = [];
-                                    var max = 5;
-                                    var extra;
+                                    let notes = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= max) {
                                         max = rows.length;
@@ -1478,8 +1477,8 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`\n${row.description.replace(/`/g, '')}\n\`\`\`\n\n`);
                                         if (i == max - 1 && extra > 0) {
                                             notes.push(`...${extra} more`);
@@ -1529,9 +1528,9 @@ exports.run = async (client, message, args) => {
                                     SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) throw err;
-                                        var names = [];
-                                        var max = 0;
-                                        var extra;
+                                        let names = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -1539,9 +1538,9 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
-                                            switch(row.type) {
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
+                                            switch (row.type) {
                                                 case 'user':
                                                     names.push(`📛${globalUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                     break;
@@ -1587,9 +1586,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var names = [];
-                                    var max = 0;
-                                    var extra;
+                                    let names = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -1597,9 +1596,9 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
-                                        switch(row.type) {
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
+                                        switch (row.type) {
                                             case 'user':
                                                 names.push(`📛${globalUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                 break;
@@ -1654,6 +1653,9 @@ exports.run = async (client, message, args) => {
                                         name: globalUser.username,
                                         icon_url: globalUser.displayAvatarURL
                                     },
+                                    thumbnail: {
+                                        url: globalUser.displayAvatarURL
+                                    },
                                     title: `${globalUser.username}#${globalUser.discriminator}`,
                                     description: `The user you provided is not currently camping in this guild.`,
                                     fields: [
@@ -1683,9 +1685,9 @@ exports.run = async (client, message, args) => {
                                     connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) throw err;
-                                        var history = [];
-                                        var max = 5;
-                                        var extra;
+                                        let history = [];
+                                        let max = 5;
+                                        let extra = 0;
 
                                         if (rows.length <= 5) {
                                             max = rows.length;
@@ -1693,8 +1695,8 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
-                                            var row = rows[i];
+                                        for (let i = 0; i < max; i++) {
+                                            const row = rows[i];
                                             switch (row.Status) {
                                                 case 'join':
                                                     history.push(`📥 ${globalUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -1741,9 +1743,9 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else {
-                                    var history = [];
-                                    var max = 5;
-                                    var extra;
+                                    let history = [];
+                                    let max = 5;
+                                    let extra = 0;
 
                                     if (rows.length <= 5) {
                                         max = rows.length;
@@ -1751,8 +1753,8 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
-                                        var row = rows[i];
+                                    for (let i = 0; i < max; i++) {
+                                        const row = rows[i];
                                         switch (row.Status) {
                                             case 'join':
                                                 history.push(`📥 ${globalUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -1833,7 +1835,7 @@ exports.run = async (client, message, args) => {
                                 }).catch(console.error);
                                 return;
                             }
-                            var cardUser = rows[0];
+                            const cardUser = rows[0];
                             message.channel.send({
                                 embed: {
                                     color: config.color_caution,
@@ -1868,9 +1870,9 @@ exports.run = async (client, message, args) => {
                                                     SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
                                                     async function (err, rows, results) {
                                                         if (err) throw err;
-                                                        var events = [];
-                                                        var max = 5;
-                                                        var extra;
+                                                        let events = [];
+                                                        let max = 5;
+                                                        let extra = 0;
 
                                                         if (rows.length <= max) {
                                                             max = rows.length;
@@ -1878,9 +1880,9 @@ exports.run = async (client, message, args) => {
                                                             extra = rows.length - max;
                                                         }
 
-                                                        for (var i = 0; i < max; i++) {
-                                                            var row = rows[i];
-                                                            var actioner = client.users.get(row.actioner);
+                                                        for (let i = 0; i < max; i++) {
+                                                            const row = rows[i];
+                                                            let actioner = client.users.get(row.actioner);
                                                             if (!actioner) {
                                                                 try {
                                                                     actioner = await client.fetchUser(row.actioner);
@@ -1932,9 +1934,9 @@ exports.run = async (client, message, args) => {
                                                         }
                                                     });
                                                 } else {
-                                                    var events = [];
-                                                    var max = 5;
-                                                    var extra;
+                                                    let events = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -1942,9 +1944,9 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
-                                                        var actioner = client.users.get(row.actioner);
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
+                                                        let actioner = client.users.get(row.actioner);
                                                         if (!actioner) {
                                                             try {
                                                                 actioner = await client.fetchUser(row.actioner);
@@ -2011,9 +2013,9 @@ exports.run = async (client, message, args) => {
                                                 gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                                                 async function (err, rows, results) {
                                                     if (err) throw err;
-                                                    var events = [];
-                                                    var max = 5;
-                                                    var extra;
+                                                    let events = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2021,10 +2023,9 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
-                                                        var row = rows[i];
-                                                        var actioner = client.users.get(row.actioner);
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
+                                                        let actioner = client.users.get(row.actioner);
                                                         if (!actioner) {
                                                             try {
                                                                 actioner = await client.fetchUser(row.actioner);
@@ -2077,9 +2078,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var events = [];
-                                                var max = 5;
-                                                var extra;
+                                                let events = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2087,9 +2088,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
-                                                    var actioner = client.users.get(row.actioner);
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
+                                                    let actioner = client.users.get(row.actioner);
                                                     if (!actioner) {
                                                         try {
                                                             actioner = await client.fetchUser(row.actioner);
@@ -2154,10 +2155,9 @@ exports.run = async (client, message, args) => {
                                                 connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                                 async function (err, rows, results ) {
                                                     if (err) throw err;
-                                                    var notes = [];
-
-                                                    var max = 5;
-                                                    var extra;
+                                                    let notes = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2165,9 +2165,9 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for ( var i = 0; i < max; i++ ) {
-                                                        var row = rows[i];
-                                                        var actioner = client.users.get(row.actioner);
+                                                    for (let i = 0; i < max; i++ ) {
+                                                        const row = rows[i];
+                                                        let actioner = client.users.get(row.actioner);
                                                         if (!actioner) {
                                                             try {
                                                                 actioner = await client.fetchUser(row.actioner);
@@ -2213,10 +2213,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var notes = [];
-
-                                                var max = 5;
-                                                var extra;
+                                                let notes = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2224,9 +2223,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for ( var i = 0; i < max; i++ ) {
-                                                    var row = rows[i];
-                                                    var actioner = client.users.get(row.actioner);
+                                                for (let i = 0; i < max; i++ ) {
+                                                    const row = rows[i];
+                                                    let actioner = client.users.get(row.actioner);
                                                     if (!actioner) {
                                                         try {
                                                             actioner = await client.fetchUser(row.actioner);
@@ -2281,10 +2280,9 @@ exports.run = async (client, message, args) => {
                                                 connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                                 async function (err, rows, results) {
                                                     if (err) throw err;
-                                                    var notes = [];
-
-                                                    var max = 5;
-                                                    var extra;
+                                                    let notes = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2292,8 +2290,8 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
                                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                                         if (i == max - 1 && extra > 0) {
                                                             notes.push(`...${extra} more`);
@@ -2332,10 +2330,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var notes = [];
-
-                                                var max = 5;
-                                                var extra;
+                                                let notes = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2343,8 +2340,8 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                                     if (i == max - 1 && extra > 0) {
                                                         notes.push(`...${extra} more`);
@@ -2394,9 +2391,9 @@ exports.run = async (client, message, args) => {
                                                 SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                                 [userID, userID], async function (err, rows, results) {
                                                     if (err) throw err;
-                                                    var names = [];
-                                                    var max = 0;
-                                                    var extra;
+                                                    let names = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
@@ -2404,9 +2401,9 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
-                                                        switch(row.type) {
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
+                                                        switch (row.type) {
                                                             case 'user':
                                                                 names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                                 break;
@@ -2451,9 +2448,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var names = [];
-                                                var max = 0;
-                                                var extra;
+                                                let names = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -2461,9 +2458,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
-                                                    switch(row.type) {
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
+                                                    switch (row.type) {
                                                         case 'user':
                                                             names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                             break;
@@ -2534,9 +2531,9 @@ exports.run = async (client, message, args) => {
                                                 connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                                 [userID, userID], async function (err, rows, results) {
                                                     if (err) throw err;
-                                                    var history = [];
-                                                    var max = 5;
-                                                    var extra;
+                                                    let history = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= 5) {
                                                         max = rows.length;
@@ -2544,8 +2541,8 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
                                                         switch (row.Status) {
                                                             case 'join':
                                                                 history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -2591,9 +2588,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var history = [];
-                                                var max = 5;
-                                                var extra;
+                                                let history = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -2601,8 +2598,8 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
                                                     switch (row.Status) {
                                                         case 'join':
                                                             history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -2676,7 +2673,7 @@ exports.run = async (client, message, args) => {
                             }).catch(console.error);
                             return;
                         }
-                        var cardUser = rows[0];
+                        const cardUser = rows[0];
                         message.channel.send({
                             embed: {
                                 color: config.color_caution,
@@ -2711,9 +2708,9 @@ exports.run = async (client, message, args) => {
                                                 SELECT 'warn' AS \`type\`, w.* FROM log_warn w WHERE w.userid = ${connection.escape(userID)} AND w.isDeleted = 0) ORDER BY timestamp DESC`,
                                                 async function (err, rows, results) {
                                                     if (err) throw err;
-                                                    var events = [];
-                                                    var max = 5;
-                                                    var extra;
+                                                    let events = [];
+                                                    let max = 5;
+                                                    let extra = 0;
 
                                                     if (rows.length <= max) {
                                                         max = rows.length;
@@ -2721,9 +2718,9 @@ exports.run = async (client, message, args) => {
                                                         extra = rows.length - max;
                                                     }
 
-                                                    for (var i = 0; i < max; i++) {
-                                                        var row = rows[i];
-                                                        var actioner = client.users.get(row.actioner);
+                                                    for (let i = 0; i < max; i++) {
+                                                        const row = rows[i];
+                                                        let actioner = client.users.get(row.actioner);
                                                         if (!actioner) {
                                                             try {
                                                                 actioner = await client.fetchUser(row.actioner);
@@ -2775,9 +2772,9 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 });
                                             } else {
-                                                var events = [];
-                                                var max = 5;
-                                                var extra;
+                                                let events = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2785,9 +2782,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
-                                                    var actioner = client.users.get(row.actioner);
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
+                                                    let actioner = client.users.get(row.actioner);
                                                     if (!actioner) {
                                                         try {
                                                             actioner = await client.fetchUser(row.actioner);
@@ -2854,9 +2851,9 @@ exports.run = async (client, message, args) => {
                                             gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
                                             async function (err, rows, results) {
                                                 if (err) throw err;
-                                                var events = [];
-                                                var max = 5;
-                                                var extra;
+                                                let events = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -2864,8 +2861,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
+                                                    let actioner = client.users.get(row.actioner);
                                                     if (!actioner) {
                                                         try {
                                                             actioner = await client.fetchUser(row.actioner);
@@ -2918,9 +2916,9 @@ exports.run = async (client, message, args) => {
                                                 }
                                             });
                                         } else {
-                                            var events = [];
-                                            var max = 5;
-                                            var extra;
+                                            let events = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -2928,8 +2926,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
+                                                let actioner = client.users.get(row.actioner);
                                                 if (!actioner) {
                                                     try {
                                                         actioner = await client.fetchUser(row.actioner);
@@ -2994,10 +2993,9 @@ exports.run = async (client, message, args) => {
                                             connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                             async function (err, rows, results ) {
                                                 if (err) throw err;
-                                                var notes = [];
-
-                                                var max = 5;
-                                                var extra;
+                                                let notes = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -3005,8 +3003,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for ( var i = 0; i < max; i++ ) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++ ) {
+                                                    const row = rows[i];
+                                                    let actioner = client.users.get(row.actioner);
                                                     if (!actioner) {
                                                         try {
                                                             actioner = await client.fetchUser(row.actioner);
@@ -3052,10 +3051,9 @@ exports.run = async (client, message, args) => {
                                                 }
                                             });
                                         } else {
-                                            var notes = [];
-
-                                            var max = 5;
-                                            var extra;
+                                            let notes = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -3063,8 +3061,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for ( var i = 0; i < max; i++ ) {
-                                                var row = rows[i];
+                                            for (let i = 0; i < max; i++ ) {
+                                                const row = rows[i];
+                                                let actioner = client.users.get(row.actioner);
                                                 if (!actioner) {
                                                     try {
                                                         actioner = await client.fetchUser(row.actioner);
@@ -3119,10 +3118,9 @@ exports.run = async (client, message, args) => {
                                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                             async function (err, rows, results) {
                                                 if (err) throw err;
-                                                var notes = [];
-
-                                                var max = 5;
-                                                var extra;
+                                                let notes = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= max) {
                                                     max = rows.length;
@@ -3130,8 +3128,8 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
                                                     await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                                     if (i == max - 1 && extra > 0) {
                                                         notes.push(`...${extra} more`);
@@ -3170,10 +3168,9 @@ exports.run = async (client, message, args) => {
                                                 }
                                             });
                                         } else {
-                                            var notes = [];
-
-                                            var max = 5;
-                                            var extra;
+                                            let notes = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= max) {
                                                 max = rows.length;
@@ -3181,8 +3178,8 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
                                                 await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                                 if (i == max - 1 && extra > 0) {
                                                     notes.push(`...${extra} more`);
@@ -3232,9 +3229,9 @@ exports.run = async (client, message, args) => {
                                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                             [userID, userID], async function (err, rows, results) {
                                                 if (err) throw err;
-                                                var names = [];
-                                                var max = 0;
-                                                var extra;
+                                                let names = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -3242,9 +3239,9 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
-                                                    switch(row.type) {
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
+                                                    switch (row.type) {
                                                         case 'user':
                                                             names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                             break;
@@ -3289,9 +3286,9 @@ exports.run = async (client, message, args) => {
                                                 }
                                             });
                                         } else {
-                                            var names = [];
-                                            var max = 0;
-                                            var extra;
+                                            let names = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= 5) {
                                                 max = rows.length;
@@ -3299,9 +3296,9 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
-                                                switch(row.type) {
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
+                                                switch (row.type) {
                                                     case 'user':
                                                         names.push(`📛${cardUser.username} changed username from \`${row.old}\` to \`${row.new}\` on \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
                                                         break;
@@ -3372,9 +3369,9 @@ exports.run = async (client, message, args) => {
                                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                             [userID, userID], async function (err, rows, results) {
                                                 if (err) throw err;
-                                                var history = [];
-                                                var max = 5;
-                                                var extra;
+                                                let history = [];
+                                                let max = 5;
+                                                let extra = 0;
 
                                                 if (rows.length <= 5) {
                                                     max = rows.length;
@@ -3382,8 +3379,8 @@ exports.run = async (client, message, args) => {
                                                     extra = rows.length - max;
                                                 }
 
-                                                for (var i = 0; i < max; i++) {
-                                                    var row = rows[i];
+                                                for (let i = 0; i < max; i++) {
+                                                    const row = rows[i];
                                                     switch (row.Status) {
                                                         case 'join':
                                                             history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);
@@ -3429,9 +3426,9 @@ exports.run = async (client, message, args) => {
                                                 }
                                             });
                                         } else {
-                                            var history = [];
-                                            var max = 5;
-                                            var extra;
+                                            let history = [];
+                                            let max = 5;
+                                            let extra = 0;
 
                                             if (rows.length <= 5) {
                                                 max = rows.length;
@@ -3439,8 +3436,8 @@ exports.run = async (client, message, args) => {
                                                 extra = rows.length - max;
                                             }
 
-                                            for (var i = 0; i < max; i++) {
-                                                var row = rows[i];
+                                            for (let i = 0; i < max; i++) {
+                                                const row = rows[i];
                                                 switch (row.Status) {
                                                     case 'join':
                                                         history.push(`📥 ${cardUser.username} joined at \`${new Date(row.timestamp).toUTCString()}\`\n\n`);

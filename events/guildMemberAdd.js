@@ -1,6 +1,6 @@
 module.exports = (client, member) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const bannedUsersFile = client.bannedUsersFile;
     const stringSimilarity = client.stringSimilarity;
@@ -9,7 +9,7 @@ module.exports = (client, member) => {
     const cryptoRandomString = client.cryptoRandomString;
     const channelsFile = client.channelsFile;
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
-        var params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
+        const params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
         UPDATE users SET exist = 1 WHERE userID = ?;
         INSERT INTO log_guildjoin (userID, timestamp) VALUES (?,?);`, params,
@@ -52,18 +52,17 @@ module.exports = (client, member) => {
     }
 
     if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
-        var banndUsers = bannedUsersFile.get();
-        var usernames = _.values(banndUsers);
-        var ids = _.keys(banndUsers);
-        var hits = [];
-        var identifiers = [];
-        var data = [];
-        var msg = [];
-        var description;
+        const banndUsers = bannedUsersFile.get();
+        const usernames = _.values(banndUsers);
+        const ids = _.keys(banndUsers);
+        let hits = [];
+        let identifiers = [];
+        let data = [];
+        let msg = [];
 
-        var match = stringSimilarity.findBestMatch(member.user.username, usernames);
+        const match = stringSimilarity.findBestMatch(member.user.username, usernames);
 
-        for (var a = 0; a < match['ratings'].length; a++) {
+        for (let a = 0; a < match['ratings'].length; a++) {
             if (match['ratings'][a].rating >= 0.5) {
                 hits.push({
                     username: match['ratings'][a].target, //Username of the ban
@@ -85,8 +84,8 @@ module.exports = (client, member) => {
                     function (err, rows, results) {
                         if (err) throw err;
                         if (rows.length == 0) return;
-                        for (var b = 0; b < rows.length; b++) {
-                            var row = rows[b];
+                        for (let b = 0; b < rows.length; b++) {
+                            const row = rows[b];
                             msg.push({
                                 name: `${hits[b].username}`,
                                 value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -109,8 +108,8 @@ module.exports = (client, member) => {
                             }).catch(console.error);
                         }
                         msg.forEach(m => {
-                            var identifier = cryptoRandomString({length: 10});
-                            var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                            const identifier = cryptoRandomString({length: 10});
+                            const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                             connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
                             function(err, results) {
                                 if (err) {
@@ -125,8 +124,8 @@ module.exports = (client, member) => {
                     });
                 } else {
                     if (rows.length == 0) return;
-                    for (var b = 0; b < rows.length; b++) {
-                        var row = rows[b];
+                    for (let b = 0; b < rows.length; b++) {
+                        const row = rows[b];
                         msg.push({
                             name: `${hits[b].username}`,
                             value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -149,8 +148,8 @@ module.exports = (client, member) => {
                         }).catch(console.error);
                     }
                     msg.forEach(m => {
-                        var identifier = cryptoRandomString({length: 10});
-                        var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                        const identifier = cryptoRandomString({length: 10});
+                        const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                         connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', desc, identifier, 0, new Date()],
                         function(err, results) {
                             if (err) {
@@ -168,10 +167,10 @@ module.exports = (client, member) => {
     }
     if (modulesFile.get('EVENT_NEWACC_DETEC')) {
         if (member.user.createdTimestamp > (Date.now() - 1000 * 60 * 60 * 24 * 7)) {
-            var s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
-            var d = 0;
-            var h = 0;
-            var m = 0;
+            let s = Math.floor((member.joinedTimestamp - member.user.createdTimestamp) / 1000);
+            let d = 0;
+            let h = 0;
+            let m = 0;
             while (s >= 60) {
                 while (m >= 60) {
                     while (h >= 24) {
@@ -184,7 +183,7 @@ module.exports = (client, member) => {
                 s -= 60;
                 m++;
             }
-            var time = '';
+            let time = '';
             switch (d) {
                 case 0:
                     switch (h) {
@@ -238,8 +237,8 @@ module.exports = (client, member) => {
                     }
                 }).catch(console.error);
             }
-            var message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
-            var identifier = cryptoRandomString({length: 10});
+            const message = `Account created on ${member.user.createdAt.toUTCString()}, joined the guild ${time} after creation.`
+            const identifier = cryptoRandomString({length: 10});
             connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [member.id, '001', message, identifier, 0, new Date()],
             function(err, results) {
                 if (err) {

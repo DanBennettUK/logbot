@@ -1,6 +1,6 @@
 exports.run = (client, message, args) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const functionsFile = client.functionsFile;
     if (args[0] && args[0].toLowerCase() == 'count') {

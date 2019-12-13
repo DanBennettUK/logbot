@@ -4,16 +4,16 @@ exports.run = (client, message, args) => {
     if (args[0] && args[0].toLowerCase() === 'add') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (args[1]) {
-                var newWords = args.splice(1);
-                for (var i = 0; i < newWords.length; i++) {
-                    for (var j = 0; j < newWords.length; j++) {
+                const newWords = args.splice(1);
+                for (let i = 0; i < newWords.length; i++) {
+                    for (let j = 0; j < newWords.length; j++) {
                         if (i != j && newWords[i] == newWords[j]) {
                             message.channel.send(`:x: The argument contains duplicates.`);
                             return;
                         }
                     }
                 }
-                var currentWords = badWordsFile.get(`badWords`);
+                let currentWords = badWordsFile.get(`badWords`);
                 if (currentWords.length > 0) {
                     if (currentWords.some(word => newWords.includes(word))) {
                         message.channel.send(`:x: One or more words are already on the list.`);
@@ -37,19 +37,19 @@ exports.run = (client, message, args) => {
     if (args[0] && args[0].toLowerCase() === 'remove') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
             if (args[1]) {
-                var newWords = args.splice(1);
-                for (var i = 0; i < newWords.length; i++) {
-                    for (var j = 0; j < newWords.length; j++) {
+                const newWords = args.splice(1);
+                for (let i = 0; i < newWords.length; i++) {
+                    for (let j = 0; j < newWords.length; j++) {
                         if (i != j && newWords[i] == newWords[j]) {
                             message.channel.send(`:x: The argument contains duplicates.`);
                             return;
                         }
                     }
                 }
-                var currentWords = badWordsFile.get(`badWords`);
-                var numberOfElements = 0;
-                for (var i = 0; i < newWords.length; i++) {
-                    for (var j = 0; j < currentWords.length; j++) {
+                let currentWords = badWordsFile.get(`badWords`);
+                let numberOfElements = 0;
+                for (let i = 0; i < newWords.length; i++) {
+                    for (let j = 0; j < currentWords.length; j++) {
                         if (newWords[i] === currentWords[j]) {
                             numberOfElements++;
                         }
@@ -59,8 +59,8 @@ exports.run = (client, message, args) => {
                     message.channel.send(`:x: One or more words are not on the list.`);
                     return;
                 }
-                for (var i = 0; i < currentWords.length; i++) {
-                    for (var j = 0; j < newWords.length; j++) {
+                for (let i = 0; i < currentWords.length; i++) {
+                    for (let j = 0; j < newWords.length; j++) {
                         if (currentWords[i] === newWords[j]) {
                             currentWords = currentWords.splice(i, 1);
                         }
@@ -90,8 +90,8 @@ exports.run = (client, message, args) => {
     }
     if (args[0] && args[0].toLowerCase() === 'list') {
         if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
-            var currentWords = '';
-            var currentWordsArray = badWordsFile.get(`badWords`);
+            let currentWords = '';
+            const currentWordsArray = badWordsFile.get(`badWords`);
             if (currentWordsArray.length > 0) {
                 currentWordsArray.forEach((word, i) => {
                     if (currentWords.length > 1900) {
@@ -132,7 +132,7 @@ exports.run = (client, message, args) => {
                             }).catch(console.error);
                         }
                     }
-                })
+                });
             } else {
                 message.channel.send({
                     embed: {

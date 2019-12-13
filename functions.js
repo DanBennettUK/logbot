@@ -1,5 +1,5 @@
 exports.setupTables = function setupTables(client) {
-    var connection = client.connection;
+    const connection = client.connection;
     connection.query(
         `CREATE TABLE IF NOT EXISTS users
         (
@@ -25,8 +25,7 @@ exports.setupTables = function setupTables(client) {
           new VARCHAR(255),
           old VARCHAR(255),
           timestamp DATETIME        NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -58,9 +57,7 @@ exports.setupTables = function setupTables(client) {
           channel VARCHAR(25),
           type int,
           timestamp DATETIME       NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (type) REFERENCES messageTypes(id)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
@@ -76,8 +73,7 @@ exports.setupTables = function setupTables(client) {
           new VARCHAR(255),
           old VARCHAR(255),
           timestamp DATETIME        NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -109,9 +105,7 @@ exports.setupTables = function setupTables(client) {
           oldChannel VARCHAR (50),
           type int,
           timestamp DATETIME       NOT NULL,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (type) REFERENCES voiceTypes(id)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_general_ci';`,
@@ -123,8 +117,7 @@ exports.setupTables = function setupTables(client) {
         `CREATE TABLE IF NOT EXISTS log_guildjoin
         (
           userID VARCHAR(25)       NOT NULL,
-          timestamp DATETIME,
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -136,8 +129,7 @@ exports.setupTables = function setupTables(client) {
         `CREATE TABLE IF NOT EXISTS log_guildleave
         (
           userID VARCHAR(25)       NOT NULL,
-          timestamp DATETIME,
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -156,9 +148,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (ID),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -177,9 +167,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (ID),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -198,9 +186,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME        NOT NULL,
           updated DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -219,9 +205,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -240,8 +224,7 @@ exports.setupTables = function setupTables(client) {
           identifier VARCHAR(10),
           timestamp DATETIME        NOT NULL,
           updated timestamp         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -259,9 +242,7 @@ exports.setupTables = function setupTables(client) {
           amount SMALLINT,
           identifier VARCHAR(10),
           timestamp DATETIME,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -277,8 +258,7 @@ exports.setupTables = function setupTables(client) {
           channel VARCHAR(25),
           message TEXT,
           timestamp DATETIME,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -298,9 +278,7 @@ exports.setupTables = function setupTables(client) {
           isDeleted BIT,
           timestamp DATETIME,
           updated DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          PRIMARY KEY (id),
-          FOREIGN KEY (userID) REFERENCES users(userID),
-          FOREIGN KEY (actioner) REFERENCES users(userID)
+          PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
         COLLATE 'utf8mb4_0900_ai_ci';`,
@@ -348,16 +326,16 @@ exports.parseUserTag = function parseUserTag(client, guild, tag) {
 
     returns @id <int>
     */
-    var trimMe = tag.trim();
+    let trimMe = tag.trim();
 
     if (/(<@(!)*)+\w+(>)/.test(tag)) {
         return trimMe.replace(/[^0-9.]/gi, '');
     } else if (/.+(#\d\d\d\d)+$/.test(tag)) {
-        var split = tag.split('#');
-        var disc = split[split.length - 1];
+        let split = tag.split('#');
+        const disc = split[split.length - 1];
         split.pop();
         split = split.join('#');
-        var usernameResolve = client.users.find(obj => (obj.username === split) && (obj.discriminator == disc));
+        let usernameResolve = client.users.find(obj => (obj.username === split) && (obj.discriminator == disc));
 
         if (usernameResolve == null) {
             usernameResolve = client.users.find(obj => (obj.username.toLowerCase() === split.toLowerCase()) && (obj.discriminator == disc));
@@ -394,7 +372,7 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
 
     returns @id <int>
     */
-    var trimMe = tag.trim();
+    let trimMe = tag.trim();
 
     if (/(<#(!)*)+\w+(>)/.test(tag)) {
         return trimMe.replace(/[^0-9.]/gi, '');
@@ -402,7 +380,7 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
         return trimMe;
     } else if (/#.+/.test(tag)) {
         trimMe.replace('#', '');
-        var chnl = guild.channels.find(c => c.name === trimMe);
+        let chnl = guild.channels.find(c => c.name === trimMe);
         if (chnl == null) {
             chnl = guild.channels.find(c => c.name.toLowerCase() === trimMe);
             if (chnl == null) {
@@ -414,7 +392,7 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
             return chnl.id;
         }
     } else if (/.+/.test(tag)) {
-        var chnl = guild.channels.find(c => c.name === trimMe);
+        let chnl = guild.channels.find(c => c.name === trimMe);
         if (chnl == null) {
             chnl = guild.channels.find(c => c.name.toLowerCase() === trimMe);
             if (chnl == null) {
@@ -432,9 +410,9 @@ exports.parseChannelTag = function parseChannelTag(client, guild, tag) {
 
 exports.updateUserTable = function updateUserTable(client, invoker, channel) {
     const config = client.config;
-    var connection = client.connection;
-    var memberArray = [];
-    var guild = client.guilds.get(config.guildid);
+    const connection = client.connection;
+    let memberArray = [];
+    const guild = client.guilds.get(config.guildid);
 
     guild.fetchMembers().then(r => {
         r.members.array().forEach(r => {
@@ -488,9 +466,9 @@ exports.updateUserTable = function updateUserTable(client, invoker, channel) {
 
 exports.updateGuildBansTable = function updateGuildBansTable(client, invoker, channel) {
     const config = client.config;
-    var connection = client.connection;
-    var banArray = [];
-    var guild = client.guilds.get(config.guildid);
+    const connection = client.connection;
+    let banArray = [];
+    const guild = client.guilds.get(config.guildid);
 
     guild.fetchBans().then(bans => {
         bans.array().forEach(ban => {
@@ -563,12 +541,12 @@ exports.isNull = function isNull(value, def) {
 
 exports.checkMessageContent = function checkMessageContent(client, message) {
     const badWordsFile = client.badWordsFile;
-    var connection = client.connection;
+    const connection = client.connection;
     const channelsFile = client.channelsFile;
     if (message.author.bot) return;
     if (message.member && message.member != null && message.member.roles.some(role => ['Moderators'].includes(role.name))) return;
-    var wholeMessage = message.content.split(' ');
-    var badWordList = badWordsFile.get(`badWords`);
+    const wholeMessage = message.content.split(' ');
+    const badWordList = badWordsFile.get(`badWords`);
     if (badWordList == undefined) {
         badWordsFile.set(`badWords`, []);
         badWordsFile.save();
@@ -584,7 +562,7 @@ exports.checkMessageContent = function checkMessageContent(client, message) {
                             }, 5000);
                         }).catch(console.error);
 
-                    var data = [message.author.id, message.channel.id, message.content, new Date()];
+                    const data = [message.author.id, message.channel.id, message.content, new Date()];
                     connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                         function (err, results) {
                             if (err) throw err;
@@ -688,9 +666,9 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
     const channelsFile = client.channelsFile;
-    var connection = client.connection;
+    const connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
-    var mutes = mutedFile.read();
+    const mutes = mutedFile.read();
     for (key in mutes) {
         var actionee = guild.member(key);
         var mutedRole = guild.roles.find(val => val.name === 'Muted');
@@ -717,8 +695,8 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                 if (!actionee.roles.some(r => r == mutedRole)) {
                     actionee.addRole(mutedRole).then(async member => {
                         member.setVoiceChannel(null);
-                        var identifier = cryptoRandomString({length: 10});
-                        var data = [member.id, '001', 'Muted role removed prior to expiration. User may have attempted to mute evade.', identifier, 0, new Date()]
+                        const identifier = cryptoRandomString({length: 10});
+                        const data = [member.id, '001', 'Muted role removed prior to expiration. User may have attempted to mute evade.', identifier, 0, new Date()]
                         connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
                         function(err, results) {
                             if (err) throw err;
@@ -739,15 +717,15 @@ exports.checkReminders = async function checkReminders(client) {
     const config = client.config;
     const reminderFile = client.reminderFile;
     const _ = client.underscore;
-    var guild = client.guilds.get(config.guildid);
-    var reminders = reminderFile.read();
+    const guild = client.guilds.get(config.guildid);
+    const reminders = reminderFile.read();
 
     for (key in reminders) {
-        var current = reminders[key];
+        const current = reminders[key];
         if (current.end < Math.floor(Date.now() / 1000)) {
-            var member = guild.member(current.who);
-            var time = current.length;
-            var unit = time.replace(/[0-9]+/g, ``);
+            const member = guild.member(current.who);
+            let time = current.length;
+            let unit = time.replace(/[0-9]+/g, ``);
             time = time.replace(/[a-z]$/i, ``);
             switch (unit) {
                 case `m`:
@@ -792,16 +770,16 @@ exports.checkReminders = async function checkReminders(client) {
 }
 
 exports.importWarnings = function importWarnings(client) {
-    var connection = client.connection;
+    const connection = client.connection;
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    var warnings = usercardsFile.get();
-    var insert = [];
+    const warnings = usercardsFile.get();
+    let insert = [];
 
-    for (var i = 0; i < warnings.length; i++) {
+    for (let i = 0; i < warnings.length; i++) {
         if (warnings[i].Records.length > 0) {
-            var userID = warnings[i].DiscordId.$numberLong;
-            for (var a = 0; a < warnings[i].Records.length; a++) {
+            const userID = warnings[i].DiscordId.$numberLong;
+            for (let a = 0; a < warnings[i].Records.length; a++) {
                 if (warnings[i].Records[a]._t[1] == 'WarnRecord') {
                     insert.push([userID, warnings[i].Records[a].AddedByUserId.$numberLong, warnings[i].Records[a].Reason,
                     cryptoRandomString({ length: 10 }), 0, warnings[i].Records[a].ActionTaken.$date, new Date()]);
@@ -822,26 +800,23 @@ exports.importWarnings = function importWarnings(client) {
 
 exports.importMutes = function importMutes(client) {
     const usercardsFile = client.usercardsFile;
-    var connection = client.connection;
+    const connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
-    var mutes = usercardsFile.get();
-    var insert = [];
+    const mutes = usercardsFile.get();
+    let insert = [];
 
-    for (var i = 0; i < mutes.length; i++) {
+    for (let i = 0; i < mutes.length; i++) {
         if (mutes[i].Records.length > 0) {
-            var userID = mutes[i].DiscordId.$numberLong;
-            for (var a = 0; a < mutes[i].Records.length; a++) {
+            const userID = mutes[i].DiscordId.$numberLong;
+            for (let a = 0; a < mutes[i].Records.length; a++) {
                 if (mutes[i].Records[a]._t[1] == 'MuteRecord') {
-                    var split;
-                    var seconds = 0;
-                    split = mutes[i].Records[a].Duration.split(':');
+                    let split = mutes[i].Records[a].Duration.split(':');
+                    let seconds = 0;
 
                     for (var b = 0; b < 3; b++) {
-                        let int;
+                        let int = parseInt(split[b]);
                         if (split[b] == '00') {
                             int = 0;
-                        } else {
-                            int = parseInt(split[b]);
                         }
                         if (b == 0) {
                             seconds += int * 60 * 60;
@@ -873,14 +848,14 @@ exports.importMutes = function importMutes(client) {
 exports.importNotes = function importNotes(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    var connection = client.connection;
-    var notes = usercardsFile.get();
-    var insert = [];
+    const connection = client.connection;
+    const notes = usercardsFile.get();
+    let insert = [];
 
-    for (var i = 0; i < notes.length; i++) {
+    for (let i = 0; i < notes.length; i++) {
         if (notes[i].Notes.length > 0) {
-            var userID = notes[i].DiscordId.$numberLong;
-            for (var a = 0; a < notes[i].Notes.length; a++) {
+            const userID = notes[i].DiscordId.$numberLong;
+            for (let a = 0; a < notes[i].Notes.length; a++) {
                 insert.push([userID, notes[i].Notes[a].AddedByUserId.$numberLong, notes[i].Notes[a].Message,
                 cryptoRandomString({ length: 10 }), 0, notes[i].Notes[a].ActionTaken.$date, new Date()]);
             }
@@ -900,14 +875,14 @@ exports.importNotes = function importNotes(client) {
 exports.importBans = function importBans(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    var connection = client.connection;
-    var bans = usercardsFile.get();
-    var insert = [];
+    const connection = client.connection;
+    const bans = usercardsFile.get();
+    let insert = [];
 
-    for (var i = 0; i < bans.length; i++) {
+    for (let i = 0; i < bans.length; i++) {
         if (bans[i].Records.length > 0) {
-            var userID = bans[i].DiscordId.$numberLong;
-            for (var a = 0; a < bans[i].Records.length; a++) {
+            const userID = bans[i].DiscordId.$numberLong;
+            for (let a = 0; a < bans[i].Records.length; a++) {
                 if (bans[i].Records[a]._t[1] == 'BanRecord') {
                     insert.push([userID, bans[i].Records[a].AddedByUserId.$numberLong, bans[i].Records[a].Reason,
                     cryptoRandomString({ length: 10 }), 0, bans[i].Records[a].ActionTaken.$date, new Date()]);
@@ -929,14 +904,14 @@ exports.importBans = function importBans(client) {
 exports.importUnbans = function importUnbans(client) {
     const usercardsFile = client.usercardsFile;
     const cryptoRandomString = client.cryptoRandomString;
-    var connection = client.connection;
-    var unbans = usercardsFile.get();
-    var insert = [];
+    const connection = client.connection;
+    const unbans = usercardsFile.get();
+    let insert = [];
 
-    for (var i = 0; i < unbans.length; i++) {
+    for (let i = 0; i < unbans.length; i++) {
         if (unbans[i].Records.length > 0) {
-            var userID = unbans[i].DiscordId.$numberLong;
-            for (var a = 0; a < unbans[i].Records.length; a++) {
+            const userID = unbans[i].DiscordId.$numberLong;
+            for (let a = 0; a < unbans[i].Records.length; a++) {
                 if (unbans[i].Records[a]._t[1] == 'UnbanRecord') {
                     insert.push([userID, unbans[i].Records[a].AddedByUserId.$numberLong, unbans[i].Records[a].Reason,
                     cryptoRandomString({ length: 10 }), 0, unbans[i].Records[a].ActionTaken.$date, new Date()]);
@@ -957,10 +932,10 @@ exports.importUnbans = function importUnbans(client) {
 
 exports.checkStreamers = function checkStreamers(client) {
     const guild = client.guilds.get(client.config.guildid);
-    var streamerRole = guild.roles.find(r => r.name == 'Streamers');
-    var spotlightRole = guild.roles.find(r => r.name == 'Streamer Spotlight');
-    var streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
-    var spotlighters = guild.members.filter(m => m.roles.has(spotlightRole.id));
+    const streamerRole = guild.roles.find(r => r.name == 'Streamers');
+    const spotlightRole = guild.roles.find(r => r.name == 'Streamer Spotlight');
+    const streamers = guild.members.filter(m => m.roles.has(streamerRole.id) && !m.roles.has(spotlightRole.id));
+    const spotlighters = guild.members.filter(m => m.roles.has(spotlightRole.id));
     streamers.forEach(s => {
         if (s.user.presence.status != 'offline' && s.user.presence.game && /.*twitch\.tv.*/.test(s.user.presence.game.url) && s.user.presence.game.state == 'PLAYERUNKNOWN\'S BATTLEGROUNDS') {
             s.addRole(spotlightRole);
@@ -978,37 +953,40 @@ exports.setReactionRoles = async function setReactionRoles (client) {
     const reactionsFile = client.reactionsFile;
     const reactionsObject = reactionsFile.read();
     const channelsFile = client.channelsFile;
-    var actnChnl;
+    let actnChnl = null;
     if (channelsFile.get('action-log')) {
         actnChnl = guild.channels.get(channelsFile.get('action-log'));
     }
     for (cKey in reactionsObject) {
-        var chnl = guild.channels.get(cKey);
+        const chnl = guild.channels.get(cKey);
         if (chnl) {
             const channelsObject = reactionsObject[cKey];
             for (mKey in channelsObject) {
+                let msg = null;
                 try {
-                    var msg = await chnl.fetchMessage(mKey);
-                } catch (e) {}
-                if (msg) {
+                    msg = await chnl.fetchMessage(mKey);
+                } catch (e) {
+                    console.log(e);
+                }
+                if (msg && msg != null) {
                     const messagesObject = channelsObject[mKey];
                     for (rKey in messagesObject) {
-                        if (/[0-9]+/.test(rKey)) var emoji = client.emojis.get(rKey);
-                        else var emoji = rKey;
+                        let emoji = rKey;
+                        if (/[0-9]+/.test(rKey)) emoji = client.emojis.get(rKey);
                         if (emoji) {
                             const roleId = messagesObject[rKey];
-                            var role = guild.roles.get(roleId);
+                            const role = guild.roles.get(roleId);
                             if (role) {
                                 await msg.react(emoji).catch(console.error);
                             } else {
-                                if (actnChnl) {
+                                if (actnChnl && actnChnl != null) {
                                     actnChnl.send(`:x: Unable to set ${emoji} reaction for **INVALID ROLE** (${roleId}) set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
                                 }
                                 //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
                                 //reactionsFile.save();
                             }
                         } else {
-                            if (actnChnl) {
+                            if (actnChnl && actnChnl != null) {
                                 actnChnl.send(`:x: Unable to set **INVALID EMOJI** (${rKey}) reaction for **UNKNOWN ROLE** set on [this message](${msg.url}) in ${chnl}`).catch(console.error);
                             }
                             //reactionsFile.unset(`${cKey}.${mKey}.${rKey}`);
@@ -1016,7 +994,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                         }
                     }
                 } else {
-                    if (actnChnl) {
+                    if (actnChnl && actnChnl != null) {
                         actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **INVALID MESSAGE** (${mKey}) in ${chnl}`).catch(console.error);
                     }
                     //reactionsFile.unset(`${cKey}.${mKey}`);
@@ -1024,7 +1002,7 @@ exports.setReactionRoles = async function setReactionRoles (client) {
                 }
             }
         } else {
-            if (actnChnl) {
+            if (actnChnl && actnChnl != null) {
                 actnChnl.send(`:x: Unable to set **UNKNOWN EMOJI** reaction for **UNKNOWN ROLE** set on **UNKNOWN MESSAGE** in **INVALID CHANNEL** (${cKey})`).catch(console.error);
             }
             //reactionsFile.unset(`${cKey}`);
@@ -1035,13 +1013,13 @@ exports.setReactionRoles = async function setReactionRoles (client) {
 
 exports.parseEmojiTag = (client, guild, tag) => {
     if (/^<a?:[^\.]+:[0-9]+>$/i.test(tag)) {
-        var emo = tag.replace(/<|>/g, '');
+        let emo = tag.replace(/<|>/g, '');
         emo = emo.split(':');
-        var emoji = guild.emojis.find(e => e.id == emo[2]);
+        const emoji = guild.emojis.find(e => e.id == emo[2]);
         if (emoji) return emoji.id;
         else return 'err';
     } else if (/[0-9]+/.test(tag)) {
-        var emoji = guild.emojis.get(tag);
+        let emoji = guild.emojis.get(tag);
         if (emoji) return emoji.id;
         else {
             emoji = guild.emojis.find(e => e.name == tag);
@@ -1049,7 +1027,7 @@ exports.parseEmojiTag = (client, guild, tag) => {
             else return 'err';
         }
     } else if (/[^\.]+/i.test(tag)) {
-        var emoji = guild.emojis.find(e => e.name == tag);
+        let emoji = guild.emojis.find(e => e.name == tag);
         if (emoji) return emoji.id;
         else {
             emoji = guild.emojis.find(e => e.name.toLowerCase() == tag.toLowerCase());
@@ -1061,12 +1039,12 @@ exports.parseEmojiTag = (client, guild, tag) => {
 
 exports.parseRoleTag = (client, guild, tag) => {
     if (/^<@&[a-z0-9]+>$/i.test(tag)) {
-        var roleID = tag.replace(/<|@|&|>/g, '');
-        var role = guild.roles.get(roleID);
+        const roleID = tag.replace(/<|@|&|>/g, '');
+        const role = guild.roles.get(roleID);
         if (role) return role.id;
         else return 'err';
     } else if (/[0-9]+/.test(tag)) {
-        var role = guild.roles.get(tag);
+        let role = guild.roles.get(tag);
         if (role) return role.id;
         else {
             role = guild.roles.find(r => r.name == tag);
@@ -1074,7 +1052,7 @@ exports.parseRoleTag = (client, guild, tag) => {
             else return 'err';
         }
     } else if (/[a-z0-9]+/i.test(tag)) {
-        var role = guild.roles.find(r => r.name == tag);
+        let role = guild.roles.find(r => r.name == tag);
         if (role) return role.id;
         else {
             role = guild.roles.find(r => r.name.toLowerCase() == tag.toLowerCase());
@@ -1086,7 +1064,7 @@ exports.parseRoleTag = (client, guild, tag) => {
 
 exports.inviteLinkDetection = (client, message) => {
     const channelsFile = client.channelsFile;
-    var connection = client.connection;
+    const connection = client.connection;
     if (message.author.bot) return;
     if (message.member && message.member != null && message.member.roles.some(r => ['Moderators', 'Support'].includes(r.name))) return;
     if (/.*discordapp\.com\/invite\/.+/.test(message.content) || /.*discord\.gg\/.+/.test(message.content)) {
@@ -1096,7 +1074,7 @@ exports.inviteLinkDetection = (client, message) => {
                         await msg.delete();
                     }, 5000);
                 }).catch(console.error);
-            var data = [message.author.id, message.channel.id, message.content, new Date()];
+            const data = [message.author.id, message.channel.id, message.content, new Date()];
             connection.query('INSERT INTO log_messageremovals (userID, channel, message, timestamp) VALUES (?,?,?,?)', data,
                 function (err, results) {
                     if (err) throw err;
@@ -1152,7 +1130,7 @@ exports.inviteLinkDetection = (client, message) => {
                                         text: `Marvin's Little Brother | Current version: ${client.config.version}`
                                     }
                                 }
-                            }).catch(console.error); 
+                            }).catch(console.error);
                         } else {
                             message.guild.channels.get(channelsFile.get('action_log')).send({
                                 embed: {
@@ -1215,7 +1193,7 @@ exports.checkLive = (client) => {
     const channelsFile = client.channelsFile;
     const guild = client.guilds.get(client.config.guildid);
     const request = client.request;
-    var options = {
+    const options = {
         url: `https://api.twitch.tv/helix/streams/?user_login=${client.config.streamer}`,
         headers: {
             'Client-ID': client.config.clientId
@@ -1224,11 +1202,11 @@ exports.checkLive = (client) => {
 
     request(options, (error, response, body) => {
         if (!error) {
-            var channel = JSON.parse(body);
+            const channel = JSON.parse(body);
             if (channel && channel.data && channel.data.length > 0) {
                 if (client.live == false) {
                     if (channelsFile.get('action_log')) {
-                        var chnl = guild.channels.get(channelsFile.get('action_log'))
+                        const chnl = guild.channels.get(channelsFile.get('action_log'))
                         if (chnl) {
                             chnl.send({
                                 embed: {
@@ -1259,4 +1237,21 @@ exports.checkLive = (client) => {
             } else client.live = false;
         } else console.log(error);
     });
+}
+
+exports.parseBannedUserTag = async function(client, guild, tag) {
+    let bans = await guild.fetchBans()
+    if (/.+(#\d\d\d\d)+$/.test(tag)) {
+        let split = tag.split('#');
+        const disc = split[split.length - 1];
+        split.pop();
+        split = split.join('#');
+        bans = bans.filter(u => (u.username == split || u.username.toLowerCase() == split.toLowerCase()) && u.discriminator == disc);
+        if (bans.size > 0) return bans.keyArray();
+        else return [];
+    } else {
+        bans = bans.filter(u => u.username == tag || u.username.toLowerCase() == tag.toLowerCase());
+        if (bans.size > 0) return bans.keyArray();
+        else return [];
+    }
 }

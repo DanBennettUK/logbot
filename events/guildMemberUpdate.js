@@ -1,6 +1,6 @@
 module.exports = async (client, oldMember, newMember) => {
     const modulesFile = client.modulesFile;
-    var connection = client.connection;
+    let connection = client.connection;
     const config = client.config;
     const bannedUsersFile = client.bannedUsersFile;
     const stringSimilarity = client.stringSimilarity;
@@ -11,8 +11,8 @@ module.exports = async (client, oldMember, newMember) => {
     if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE')) {
         //Checking for nickname changes for logging
         if (oldMember.displayName !== newMember.displayName) {
-            var data = [newMember.user.id, newMember.displayName, oldMember.displayName, new Date()];
-            connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)', data,
+            const params = [newMember.user.id, newMember.displayName, oldMember.displayName, new Date()];
+            connection.query('INSERT INTO log_nickname (userID, new, old, timestamp) VALUES (?,?,?,?)', params,
                 function (err, results) {
                     if (err) {
                         connection = functionsFile.establishConnection(client);
@@ -62,18 +62,17 @@ module.exports = async (client, oldMember, newMember) => {
                 }
             }
             if (modulesFile.get('EVENT_BANNDUSER_DETEC')) {
-                var banndUsers = bannedUsersFile.get();
-                var usernames = _.values(banndUsers);
-                var ids = _.keys(banndUsers);
-                var hits = [];
-                var identifiers = [];
-                var data = [];
-                var msg = [];
-                var description;
+                let banndUsers = bannedUsersFile.get();
+                let usernames = _.values(banndUsers);
+                let ids = _.keys(banndUsers);
+                let hits = [];
+                let identifiers = [];
+                let data = [];
+                let msg = [];
 
-                var match = stringSimilarity.findBestMatch(newMember.displayName, usernames);
+                const match = stringSimilarity.findBestMatch(newMember.displayName, usernames);
 
-                for (var a = 0; a < match['ratings'].length; a++) {
+                for (let a = 0; a < match['ratings'].length; a++) {
                     if (match['ratings'][a].rating >= 0.5) {
                         hits.push({
                             username: match['ratings'][a].target, //Username of the ban
@@ -95,8 +94,8 @@ module.exports = async (client, oldMember, newMember) => {
                             function (err, rows, results) {
                                 if (err) throw err;
                                 if (rows.length == 0) return;
-                                for (var b = 0; b < rows.length; b++) {
-                                    var row = rows[b];
+                                for (let b = 0; b < rows.length; b++) {
+                                    const row = rows[b];
                                     msg.push({
                                         name: `**${hits[b].username}**`,
                                         value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -119,8 +118,8 @@ module.exports = async (client, oldMember, newMember) => {
                                     }).catch(console.error);
                                 }
                                 msg.forEach(m => {
-                                    var identifier = cryptoRandomString({length: 10});
-                                    var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                    const identifier = cryptoRandomString({length: 10});
+                                    const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                     connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
                                     function(err, results) {
                                         if (err) {
@@ -135,8 +134,8 @@ module.exports = async (client, oldMember, newMember) => {
                             });
                         } else {
                             if (rows.length == 0) return;
-                            for (var b = 0; b < rows.length; b++) {
-                                var row = rows[b];
+                            for (let b = 0; b < rows.length; b++) {
+                                const row = rows[b];
                                 msg.push({
                                     name: `**${hits[b].username}**`,
                                     value: `\`Match:\` ${Math.round(hits[b].rating.toString().substring(0, 5) * 100 * 10) / 10}%\n\`Identifier:\` ${hits[b].identifier}\n\`Date banned:\` ${row.timestamp.toUTCString()}\n\`Reason:\` ${row.description}`
@@ -159,8 +158,8 @@ module.exports = async (client, oldMember, newMember) => {
                                 }).catch(console.error);
                             }
                             msg.forEach(m => {
-                                var identifier = cryptoRandomString({length: 10});
-                                var desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
+                                const identifier = cryptoRandomString({length: 10});
+                                const desc = `BANNED USER DETECTION\nUsername: ${m.name.replace(/\*/g, '')}\n${m.value.replace(/`/g, '')}`;
                                 connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', [newMember.id, '001', desc, identifier, 0, new Date()],
                                 function(err, results) {
                                     if (err) {
@@ -183,12 +182,12 @@ module.exports = async (client, oldMember, newMember) => {
             }
             if (modulesFile.get('EVENT_GUILD_MEMBER_UPDATE_ROLES_LOG')) {
                 if (oldMember.roles.size > newMember.roles.size) {
-                    var role = oldMember.roles.filter(r => !newMember.roles.has(r.id)).first();
+                    const role = oldMember.roles.filter(r => !newMember.roles.has(r.id)).first();
                     await oldMember.guild.fetchAuditLogs({
                         type: 'MEMBER_ROLE_UPDATE'
                     }).then(audit => {
-                        var description = `Role ${role} removed from user ${oldMember.user} (${oldMember.user.username}#${oldMember.user.discriminator} ${oldMember.user.id})`;
-                        for (var i = 0; i < audit.entries.array().length; i++) {
+                        let description = `Role ${role} removed from user ${oldMember.user} (${oldMember.user.username}#${oldMember.user.discriminator} ${oldMember.user.id})`;
+                        for (let i = 0; i < audit.entries.array().length; i++) {
                             if (audit.entries.array()[i].target == oldMember.user) {
                                 description += ` by ${audit.entries.array()[i].executor}`;
                                 break;
@@ -212,12 +211,12 @@ module.exports = async (client, oldMember, newMember) => {
                     }).catch(console.error);
                 }
                 if (newMember.roles.size > oldMember.roles.size) {
-                    var role = newMember.roles.filter(r => !oldMember.roles.has(r.id)).first();
+                    const role = newMember.roles.filter(r => !oldMember.roles.has(r.id)).first();
                     await newMember.guild.fetchAuditLogs({
                         type: 'MEMBER_ROLE_UPDATE'
                     }).then(audit => {
-                        var description = `Role ${role} added to user ${newMember.user} (${newMember.user.username}#${newMember.user.discriminator} ${newMember.user.id})`;
-                        for (var i = 0; i < audit.entries.array().length; i++) {
+                        let description = `Role ${role} added to user ${newMember.user} (${newMember.user.username}#${newMember.user.discriminator} ${newMember.user.id})`;
+                        for (let i = 0; i < audit.entries.array().length; i++) {
                             if (audit.entries.array()[i].target == newMember.user) {
                                 description += ` by ${audit.entries.array()[i].executor}`;
                                 break;

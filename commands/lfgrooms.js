@@ -8,18 +8,18 @@ exports.run = (client, message, args) => {
             message.channel.send('Please provide a channel to add.');
             return;
         }
-        var chnlID = functionsFile.parseChannelTag(client, message.guild, args[1].toLowerCase());
-        var chnl = message.guild.channels.get(chnlID);
+        const chnlID = functionsFile.parseChannelTag(client, message.guild, args[1].toLowerCase());
+        const chnl = message.guild.channels.get(chnlID);
         if (chnl) {
             LFGRoomsFile.set(chnlID, 1);
             LFGRoomsFile.save();
-            message.channel.send(`Added ${chnl}`);   
+            message.channel.send(`Added ${chnl}`);
         } else message.channel.send('Channel not found.');
     }
     if (args[0] && args[0].toLowerCase() === 'remove') {
         if (args[1]) {
-            var chnlID = functionsFile.parseChannelTag(client, message.guild, args[1].toLowerCase());
-            var chnl = message.guild.channels.get(chnlID);
+            const chnlID = functionsFile.parseChannelTag(client, message.guild, args[1].toLowerCase());
+            const chnl = message.guild.channels.get(chnlID);
             if (chnl) {
                 if (_.keys(LFGRoomsFile.read()).length > 0 && _.keys(LFGRoomsFile.read()).includes(chnlID)) {
                     LFGRoomsFile.unset(chnlID);
@@ -54,10 +54,10 @@ exports.run = (client, message, args) => {
 
     if (args[0] && args[0].toLowerCase() == 'list') {
         if (message.member.roles.some(r => r.name == 'Moderators')) {
-            var dsc = '';
-            var LFGRoomsObject = LFGRoomsFile.read();
+            let dsc = '';
+            const LFGRoomsObject = LFGRoomsFile.read();
             for (key in LFGRoomsObject) {
-                var chnl = message.guild.channels.get(key);
+                const chnl = message.guild.channels.get(key);
                 if (chnl) {
                     dsc += `${chnl} (${key})\n`;
                 } else {
