@@ -78,30 +78,32 @@ exports.run = (client, message, args) => {
                             } else functionsFile.syntaxErr(client, message, 'channels set');
                         }
                     } else if (args[0].toLowerCase() == 'unset') {
-                        if (args[1].toLowerCase() == 'server_log') {
-                            if (channelsFile.get('server_log')) {
-                            channelsFile.set('server_log', '');
-                            channelsFile.save();
-                            message.channel.send(':white_check_mark: Server log successfully unset');
-                            } else message.channel.send(':x: Server log is not set')
-                        } else if (args[1].toLowerCase() == 'action_log') {
-                            if (channelsFile.get('action_log')) {
-                                channelsFile.set('action_log', '');
+                        if (args[1]) {
+                            if (args[1].toLowerCase() == 'server_log') {
+                                if (channelsFile.get('server_log')) {
+                                channelsFile.set('server_log', '');
                                 channelsFile.save();
-                                message.channel.send(':white_check_mark: Action log successfully unset');
-                                } else message.channel.send(':x: Action log is not set');
-                        } else if (args[1].toLowerCase() == 'voice_log') {
-                            if (channelsFile.get('voice_log')) {
+                                message.channel.send(':white_check_mark: Server log successfully unset');
+                                } else message.channel.send(':x: Server log is not set')
+                            } else if (args[1].toLowerCase() == 'action_log') {
+                                if (channelsFile.get('action_log')) {
+                                    channelsFile.set('action_log', '');
+                                    channelsFile.save();
+                                    message.channel.send(':white_check_mark: Action log successfully unset');
+                                    } else message.channel.send(':x: Action log is not set');
+                            } else if (args[1].toLowerCase() == 'voice_log') {
+                                if (channelsFile.get('voice_log')) {
+                                    channelsFile.set('voice_log', '');
+                                    channelsFile.save();
+                                    message.channel.send(':white_check_mark: Voice log successfully unset');
+                                } else message.channel.send(':x: Voice log is not set');
+                            } else if (args[1].toLowerCase() == 'all') {
+                                channelsFile.set('server_log', '');
+                                channelsFile.set('action_log', '');
                                 channelsFile.set('voice_log', '');
                                 channelsFile.save();
-                                message.channel.send(':white_check_mark: Voice log successfully unset');
-                            } else message.channel.send(':x: Voice log is not set');
-                        } else if (args[1].toLowerCase() == 'all') {
-                            channelsFile.set('server_log', '');
-                            channelsFile.set('action_log', '');
-                            channelsFile.set('voice_log', '');
-                            channelsFile.save();
-                            message.channel.send(':white_check_mark: All logs successfully unset');
+                                message.channel.send(':white_check_mark: All logs successfully unset');
+                            } else functionsFile.syntaxErr(client, message, 'channels unset');
                         } else functionsFile.syntaxErr(client, message, 'channels unset');
                     }
                 } else if (args[0] && args[0].toLowerCase() == 'list') {
