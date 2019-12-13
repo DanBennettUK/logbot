@@ -8,8 +8,9 @@ exports.run = (client, message, args) => {
     const bannedUsersFile = client.bannedUsersFile;
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_UNBAN')) {
+            let user = '';
             if (args[0]) {
-                const user = functionsFile.parseUserTag(client, guild, args[0]);
+                user = functionsFile.parseUserTag(client, guild, args[0]);
             } else {
                 message.channel.send(`Unban who?\n Format:\`${config.prefix}unban <UserTag> <Reason>\``);
                 return;
