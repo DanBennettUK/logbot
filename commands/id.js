@@ -14,22 +14,23 @@ exports.run = async (client, message, args) => {
                         } catch (e) {
                             message.channel.send(':x: The provided ID appears to be invalid.').catch(console.error);
                         }
-                        return;
                     }
                 }
-                const id = functionsFile.parseUserTag(client, message.guild, args.join(' '));
-                if (id != 'err') {
-                    let user = client.users.get(id);
-                    if (user) message.channel.send(`The user ID of user ${user} is ${id}.`).catch(console.error);
-                    else {
-                        try {
-                            user = await client.fetchUser(id);
-                            message.channel.send(`The user ID of user ${user} is ${id}.`).catch(console.error);
-                        } catch (e) {
-                            message.channel.send(':x: I could not find that user.').catch(console.error);
+                else {
+                    const id = functionsFile.parseUserTag(client, message.guild, args.join(' '));
+                    if (id != 'err') {
+                        let user = client.users.get(id);
+                        if (user) message.channel.send(`The user ID of user ${user} is ${id}.`).catch(console.error);
+                        else {
+                            try {
+                                user = await client.fetchUser(id);
+                                message.channel.send(`The user ID of user ${user} is ${id}.`).catch(console.error);
+                            } catch (e) {
+                                message.channel.send(':x: I could not find that user.').catch(console.error);
+                            }
                         }
-                    }
-                } else message.channel.send(':x: I could not find that user.').catch(console.error);
+                    } else message.channel.send(':x: I could not find that user.').catch(console.error);
+                }
             } else functionsFile.syntaxErr(client, message, 'id');
         }
     }
