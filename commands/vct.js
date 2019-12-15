@@ -9,9 +9,10 @@ exports.run = async (client, message, args) => {
                 const guildUser = message.guild.member(user);
                 let msg = null;
                 if (user !== 'err' && guildUser) {
+                    let size = 0;
                     let vc = guildUser.voiceChannel;
                     if (vc != undefined) {
-                        let size = vc.members.size;
+                        size = vc.members.size;
                         switch (size) {
                             case 1:
                                 await message.channel.send(`User ${guildUser} is in voice channel **${vc.name}**`).then(async m => {
