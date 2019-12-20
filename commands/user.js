@@ -161,7 +161,13 @@ exports.run = async (client, message, args) => {
                                 }
                             }
                         }).catch(console.error);
-                        collector, filter, msg, guild, userObject, globalUser, connection = null;
+                        userObject = null;
+                        globalUser = null;
+                        collector = null;
+                        filter = null;
+                        msg = null;
+                        guild = null;
+                        connection = null;
                     }, 300000);
 
                     collector.on('collect', async r => {
@@ -218,7 +224,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                userObject = null;
+                                globalUser = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
@@ -414,7 +426,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
@@ -561,9 +579,15 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '❌') {
                             clearTimeout(autoClose);
                             collector.stop();
-                            msg.delete();
-                            message.delete();
-                            collector, filter, msg, guild, userObject, globalUser, connection = null;
+                            msg.delete().catch(console.error);
+                            message.delete().catch(console.error);
+                            collector = null;
+                            filter = null;
+                            msg = null;
+                            guild = null;
+                            userObject = null;
+                            globalUser = null;
+                            connection = null;
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
                             clearTimeout(autoClose);
@@ -617,7 +641,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
@@ -798,7 +828,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
@@ -961,7 +997,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             if (userObject.voiceChannel) {
@@ -1070,7 +1112,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
@@ -1251,7 +1299,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -1459,7 +1513,13 @@ exports.run = async (client, message, args) => {
                                 }
                             }
                         }).catch(console.error);
-                        collector, filter, msg, guild, userObject, globalUser, connection = null;
+                        collector = null;
+                        filter = null;
+                        msg = null;
+                        guild = null;
+                        userObject = null;
+                        globalUser = null;
+                        connection = null;
                     }, 300000);
 
                     collector.on('collect', async r => {
@@ -1504,7 +1564,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
@@ -1690,7 +1756,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
@@ -1837,9 +1909,15 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '❌') {
                             clearTimeout(autoClose);
                             collector.stop();
-                            msg.delete();
-                            message.delete();
-                            collector, filter, msg, guild, userObject, globalUser, connection = null;
+                            msg.delete().catch(console.error);
+                            message.delete().catch(console.error);
+                            collector = null;
+                            filter = null;
+                            msg = null;
+                            guild = null;
+                            userObject = null;
+                            globalUser = null;
+                            connection = null;
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
                             clearTimeout(autoClose);
@@ -1880,7 +1958,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
@@ -2046,7 +2130,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
@@ -2196,7 +2286,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
@@ -2364,7 +2460,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             msg.edit({
@@ -2437,7 +2539,13 @@ exports.run = async (client, message, args) => {
                                         }
                                     }
                                 }).catch(console.error);
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -2641,7 +2749,14 @@ exports.run = async (client, message, args) => {
                                             }
                                         }
                                     }).catch(console.error);
-                                    cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                    cardUser = null;
+                                    collector = null;
+                                    filter = null;
+                                    msg = null;
+                                    guild = null;
+                                    userObject = null;
+                                    globalUser = null;
+                                    connection = null;
                                 }, 300000);
 
                                 collector.on('collect', async r => {
@@ -2673,7 +2788,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
@@ -2844,7 +2966,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
@@ -2991,9 +3120,16 @@ exports.run = async (client, message, args) => {
                                     } else if (r.emoji.name == '❌') {
                                         clearTimeout(autoClose);
                                         collector.stop();
-                                        msg.delete();
-                                        message.delete();
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        msg.delete().catch(console.error);
+                                        message.delete().catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     } else if (r.emoji.name == '✍') {
                                         await r.remove(r.users.last());
                                         clearTimeout(autoClose);
@@ -3021,9 +3157,15 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
-
                                         connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results ) {
                                             if (err) {
@@ -3174,7 +3316,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
@@ -3311,7 +3460,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
@@ -3464,7 +3620,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         await msg.edit({
@@ -3509,7 +3672,14 @@ exports.run = async (client, message, args) => {
                                                     }
                                                 }
                                             }).catch(console.error);
-                                            cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
                                         }, 300000);
 
                                         connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
@@ -3706,8 +3876,13 @@ exports.run = async (client, message, args) => {
                                     }
                                 }).catch(console.error);
                                 cardUser = null;
-                                collector, filter, msg, guild, userObject, globalUser, connection = null;
-
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
                             }, 300000);
 
                             collector.on('collect', async r => {
@@ -3739,7 +3914,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
@@ -3910,7 +4092,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
@@ -4057,8 +4246,8 @@ exports.run = async (client, message, args) => {
                                 } else if (r.emoji.name == '❌') {
                                     clearTimeout(autoClose);
                                     collector.stor();
-                                    msg.delete();
-                                    message.delete();
+                                    msg.delete().catch(console.error);
+                                    message.delete().catch(console.error);
                                     cardUser = null;
                                     collector = null;
                                     filter = null;
@@ -4094,7 +4283,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
@@ -4247,7 +4443,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
@@ -4384,7 +4587,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
@@ -4537,8 +4747,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
-
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     await msg.edit({
@@ -4583,7 +4799,14 @@ exports.run = async (client, message, args) => {
                                                 }
                                             }
                                         }).catch(console.error);
-                                        cardUser, collector, filter, msg, guild, userObject, globalUser, connection = null;
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     }, 300000);
 
                                     connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
