@@ -13,26 +13,16 @@ exports.run = (client, message, args) => {
                         function (err, results, rows) {
                             if (err) throw err;
                             if (results.affectedRows == 1) {
-                                message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`);
+                                message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`).catch(console.error);
                             } else {
-                                message.channel.send(`A note with that ID could not be found`).then(msg => {
-                                    setTimeout(async () => {
-                                        await msg.delete();
-                                        await message.delete();
-                                    }, 6000);
-                                }).catch(console.error);
+                                message.channel.send(`:x: A note with that ID could not be found`).catch(console.error);
                             }
                         });
                     } else {
                         if (results.affectedRows == 1) {
-                            message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`);
+                            message.channel.send(`☑ Note with id \`${args[0].trim()}\` was successfully cleared.`).catch(console.error);
                         } else {
-                            message.channel.send(`A note with that ID could not be found`).then(msg => {
-                                setTimeout(async () => {
-                                    await msg.delete();
-                                    await message.delete();
-                                }, 6000);
-                            }).catch(console.error);
+                            message.channel.send(`:x: A note with that ID could not be found`).catch(console.error);
                         }
                     }
                 });
