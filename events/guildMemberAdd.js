@@ -254,6 +254,7 @@ module.exports = (client, member) => {
     }
     const muted = Object.keys(mutes);
     if (muted.includes(member.id)) {
+        let mutedRole = member.guild.roles.find(r => r.name == 'Muted');
         member.addRole(mutedRole).then(async member => {
             member.setVoiceChannel(null);
             const identifier = cryptoRandomString({length: 10});
@@ -263,8 +264,8 @@ module.exports = (client, member) => {
                 if (err) throw err;
             });
             if (channelsFile.get('action_log')) {
-                if (guild.channels.get(channelsFile.get('action_log'))) {
-                    guild.channels.get(channelsFile.get('action_log')).send(`${member} has left and rejoined the guild while muted. Muted role has been re-added.`).catch(console.error);
+                if (member.guild.channels.get(channelsFile.get('action_log'))) {
+                    member.guild.channels.get(channelsFile.get('action_log')).send(`${member} has left and rejoined the guild while muted. ${mutedRole} has been re-added.`).catch(console.error);
                 }
             }
         }).catch(console.error);
