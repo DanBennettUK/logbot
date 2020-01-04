@@ -198,7 +198,7 @@ exports.run = (client, message, args) => {
                                 message.channel.send('Please provide a reason for the mute.');
                             }
                         } else {
-                            message.channel.send( `Hm, that length doesn't seem right? ${int}`);
+                            message.channel.send( `:x: That length could not be parsed. \`${args[1]}\``).catch(console.error);
                             return;
                         }
                     }
