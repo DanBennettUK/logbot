@@ -192,9 +192,18 @@ exports.run = async (client, message, args) => {
                                     const filter = (reaction, user) => user == message.member.user;
                                     const collector = msg.createReactionCollector(filter);
 
+                                    const autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.delete();
+                                        msg = null;
+                                        message.channel.send('Action automatically cancelled after 5m.').catch(console.error);
+                                    }, 300000);
+
                                     collector.on('collect', async react => {
                                         if (react.emoji.name == '✅') {
-                                            await msg.delete();
+                                            clearTimeout(autoClose);
+                                            collector.stop();
+                                            msg.delete();
                                             const tail = args.slice(1);
                                             const reason = `${tail.join(" ").trim().charAt(0).toUpperCase()}${tail.join(" ").trim().slice(1)}`;
 
@@ -256,13 +265,15 @@ exports.run = async (client, message, args) => {
                                                     bannedUsersFile.set(identifier, result.username);
                                                     bannedUsersFile.save();
                                                 }).catch(console.error);
+                                                msg = null;
                                             } else message.channel.send(':x: Please provide a reason for the ban.').catch(console.error);
                                         }
                                         if (react.emoji.name == '❌') {
-                                            await msg.delete();
-                                            message.channel.send('Action cancelled').then(msg2 => {
-                                                setTimeout(function() {msg2.delete();}, 5000);
-                                            }).catch(console.error);
+                                            clearTimeout(autoClose);
+                                            collector.stop();
+                                            msg.delete();
+                                            msg = null;
+                                            message.channel.send('Action cancelled').catch(console.error);
                                         }
                                     });
                                 });
