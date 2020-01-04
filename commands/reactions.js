@@ -81,7 +81,7 @@ exports.run = async (client, message, args) => {
             } else if (args[0].toLowerCase() == 'remove') {
                 const chnlKeys = _.keys(reactionsFile.read());
                 if (args[1]) {
-                    let chnl = parseChannelTag(args[1]);
+                    let chnl = funstionsFile.parseChannelTag(args[1]);
                     const channl = client.channels.get(chnl);
                     if (!channl) chnl = 'err';
                     if (chnl != 'err') {
