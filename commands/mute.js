@@ -20,10 +20,10 @@ exports.run = (client, message, args) => {
                     } else {
                         let end = 0;
                         let seconds = 0;
-                        const int = args[1].replace(/[a-zA-Z]$/g, '');
+                        const int = args[1].slice(0, args[1].length - 1);
                         let duration = '';
 
-                        if (parseInt(int)) {
+                        if (/^[0-9]+$/.test(int)) {
                             switch (args[1] && args[1].toLowerCase().charAt(args[1].length - 1)) {
                                 case 'd':
                                     end = Math.floor(Date.now() / 1000) + int * 24 * 60 * 60;
