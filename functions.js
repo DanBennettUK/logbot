@@ -669,7 +669,7 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const connection = client.connection;
     const cryptoRandomString = client.cryptoRandomString;
     const mutes = mutedFile.read();
-    for (key in mutes) {
+    for (let key in mutes) {
         var actionee = guild.member(key);
         var mutedRole = guild.roles.find(val => val.name === 'Muted');
 
@@ -680,13 +680,18 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                         if (!guild.channels.get(channelsFile.get('action_log'))) {
                             return;
                         }
-                        guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
+                        guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`).catch(console.error);
                     }
                     mutedFile.unset(key);
                     mutedFile.save();
                 }).catch(console.error);
             } else {
-                console.log(`Actionee could not be found ${key}`);
+                if (channelsFile.get('action_log')) {
+                    if (!guild.channels.get(channelsFile.get('action_log'))) {
+                        return;
+                    }
+                    guild.channels.get(channelsFile.get('action_log')).send(`<@${key}>'s mute has expired, but they could not be found.`).catch(console.error);
+                }
                 mutedFile.unset(key);
                 mutedFile.save();
             }
@@ -720,7 +725,7 @@ exports.checkReminders = async function checkReminders(client) {
     const guild = client.guilds.get(config.guildid);
     const reminders = reminderFile.read();
 
-    for (key in reminders) {
+    for (let key in reminders) {
         const current = reminders[key];
         if (current.end < Math.floor(Date.now() / 1000)) {
             const member = guild.member(current.who);

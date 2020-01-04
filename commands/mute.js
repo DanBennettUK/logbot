@@ -37,24 +37,22 @@ exports.run = (client, message, args) => {
                                     seconds = int * 60;
                                     break;
                                 default:
-                                    end = Math.floor(Date.now() / 1000) + int * 60 * 60;
-                                    seconds = int * 60 * 60;
-                                    break;
+                                    message.channel.send(':x: That duration is invalid.').catch(console.error);
+                                    return;
                             }
 
                             const tail = _.rest(args, 2).join(' ');
 
                             if (tail.length > 0) {
+                                const identifier = cryptoRandomString({ length: 10 });
                                 const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                 mutedFile.set(`${user}.end`, end);
                                 mutedFile.set(`${user}.actioner`,message.author.id);
-                                mutedFile.set(`${user}.actionee`, user);
                                 mutedFile.set(`${user}.reason`, reason);
-                                mutedFile.set(`${user}.isHelper`, 0);
+                                mutedFile.set(`${user}.identifier`, identifier);
                                 mutedFile.save();
 
                                 const mutedRole = guild.roles.find(val => val.name === 'Muted');
-                                const identifier = cryptoRandomString({ length: 10 });
 
                                 guild.member(user).addRole(mutedRole).then(async member => {
                                     if (member.voiceChannel !== undefined) {
