@@ -666,8 +666,6 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
     const channelsFile = client.channelsFile;
-    const connection = client.connection;
-    const cryptoRandomString = client.cryptoRandomString;
     const mutes = mutedFile.read();
     for (let key in mutes) {
         var actionee = guild.member(key);
@@ -694,25 +692,6 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                 }
                 mutedFile.unset(key);
                 mutedFile.save();
-            }
-        } else {
-            if (actionee) {
-                if (!actionee.roles.some(r => r == mutedRole)) {
-                    actionee.addRole(mutedRole).then(async member => {
-                        member.setVoiceChannel(null);
-                        const identifier = cryptoRandomString({length: 10});
-                        const data = [member.id, '001', 'Muted role removed prior to expiration. User may have attempted to mute evade.', identifier, 0, new Date()]
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                        function(err, results) {
-                            if (err) throw err;
-                        });
-                        if (channelsFile.get('action_log')) {
-                            if (guild.channels.get(channelsFile.get('action_log'))) {
-                                guild.channels.get(channelsFile.get('action_log')).send(`${mutedRole} has been re-added to ${member}. The role has been removed prior to mute expiration.`);
-                            }
-                        }
-                    }).catch(console.error);
-                }
             }
         }
     }

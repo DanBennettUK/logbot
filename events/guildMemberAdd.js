@@ -8,6 +8,7 @@ module.exports = (client, member) => {
     const functionsFile = client.functionsFile;
     const cryptoRandomString = client.cryptoRandomString;
     const channelsFile = client.channelsFile;
+    const mutes = client.mutedFile.read();
     if (modulesFile.get('EVENT_GUILD_MEMBER_ADD')) {
         const params = [member.user.id, member.user.username,member.user.avatar, 1, new Date(), member.user.id, member.user.id, new Date()];
         connection.query(`INSERT IGNORE INTO users (userID, username, avatar, exist, timestamp) VALUES (?,?,?,?,?);
@@ -250,5 +251,22 @@ module.exports = (client, member) => {
                 }
             });
         }
+    }
+    const muted = Object.keys(mutes);
+    if (muted.includes(member.id)) {
+        member.addRole(mutedRole).then(async member => {
+            member.setVoiceChannel(null);
+            const identifier = cryptoRandomString({length: 10});
+            const data = [member.id, '001', 'User left and rejoined the guild while muted.', identifier, 0, new Date()]
+            connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
+            function(err, results) {
+                if (err) throw err;
+            });
+            if (channelsFile.get('action_log')) {
+                if (guild.channels.get(channelsFile.get('action_log'))) {
+                    guild.channels.get(channelsFile.get('action_log')).send(`${member} has left and rejoined the guild while muted. Muted role has been re-added.`).catch(console.error);
+                }
+            }
+        }).catch(console.error);
     }
 }
