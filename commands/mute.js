@@ -21,20 +21,24 @@ exports.run = (client, message, args) => {
                         let end = 0;
                         let seconds = 0;
                         const int = args[1].replace(/[a-zA-Z]$/g, '');
+                        let duration = '';
 
                         if (parseInt(int)) {
                             switch (args[1] && args[1].toLowerCase().charAt(args[1].length - 1)) {
                                 case 'd':
                                     end = Math.floor(Date.now() / 1000) + int * 24 * 60 * 60;
                                     seconds = int * 24 * 60 * 60;
+                                    duration = `${int} days`;
                                     break;
                                 case 'h':
                                     end = Math.floor(Date.now() / 1000) + int * 60 * 60;
                                     seconds = int * 60 * 60;
+                                    duration = `${int} hours`;
                                     break;
                                 case 'm':
                                     end = Math.floor(Date.now() / 1000) + int * 60;
                                     seconds = int * 60;
+                                    duration = `${int} seconds`;
                                     break;
                                 default:
                                     message.channel.send(':x: That duration is invalid.').catch(console.error);
@@ -47,6 +51,8 @@ exports.run = (client, message, args) => {
                                 const identifier = cryptoRandomString({ length: 10 });
                                 const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                 mutedFile.set(`${user}.end`, end);
+                                mutedFile.set(`${user}.start`, Date.now() / 1000);
+                                mutedFile.set(`${user}.duration`, duration);
                                 mutedFile.set(`${user}.actioner`,message.author.id);
                                 mutedFile.set(`${user}.reason`, reason);
                                 mutedFile.set(`${user}.identifier`, identifier);
