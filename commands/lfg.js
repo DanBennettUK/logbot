@@ -5,8 +5,8 @@ exports.run = (client, message, args) => {
             message.delete().then(() => {
                 message.channel.fetchMessages({limit: 1}).then(msgs => {
                     msgs.first().delete().then(m => {
-                        message.channel.send(`${m.author}, please use the appropriate channel for LFG requests, not ${m.channel} `).then(msg => {
-                            setTimeout(() => msg.delete(), 7000);
+                        message.channel.send(`${m.author}, please use the appropriate channel for LFG requests, not ${m.channel}.`).then(msg => {
+                            setTimeout(() => msg.delete(), 30000);
                         }).catch(console.error);
                     }).catch(console.error);
                 }).catch(console.error);
