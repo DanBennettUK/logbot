@@ -9,9 +9,10 @@ exports.run = async (client, message, args) => {
                 const guildUser = message.guild.member(user);
                 let msg = null;
                 if (user !== 'err' && guildUser) {
+                    let size = 0;
                     let vc = guildUser.voiceChannel;
                     if (vc != undefined) {
-                        let size = vc.members.size;
+                        size = vc.members.size;
                         switch (size) {
                             case 1:
                                 await message.channel.send(`User ${guildUser} is in voice channel **${vc.name}**`).then(async m => {
@@ -47,8 +48,10 @@ exports.run = async (client, message, args) => {
                     const autoStop = setTimeout(()=> {
                         clearInterval(checkVC);
                         msg.clearReactions();
-                        if (vc) msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct <user>\` User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
-                        else msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct <user>\` User ${guildUser} was **not in a voice channel**.`).catch(console.error);
+                        collector.stop();
+                        msg = null;
+                        if (vc) msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct ${user}\` User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
+                        else msg.edit(`Tracking automatically stopped after 5m. To start again, use \`${config.prefix}vct ${user}\` User ${guildUser} was **not in a voice channel**.`).catch(console.error);
                     }, 300000);
                     const filter = (reaction, user) => !user.bot
                     const collector = msg.createReactionCollector(filter);
@@ -57,6 +60,8 @@ exports.run = async (client, message, args) => {
                             clearTimeout(autoStop);
                             clearInterval(checkVC);
                             msg.clearReactions();
+                            collector.stop();
+                            msg = null;
                             if (vc) msg.edit(`Tracking stopped. User ${guildUser} was last seen in **${vc.name}**.`).catch(console.error);
                             else msg.edit(`Tracking stopped. User ${guildUser} was **not in a voice channel**.`).catch(console.error);                        }
                     });

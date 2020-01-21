@@ -666,10 +666,8 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
     const guild = client.guilds.get(config.guildid);
     const _ = client.underscore;
     const channelsFile = client.channelsFile;
-    const connection = client.connection;
-    const cryptoRandomString = client.cryptoRandomString;
     const mutes = mutedFile.read();
-    for (key in mutes) {
+    for (let key in mutes) {
         var actionee = guild.member(key);
         var mutedRole = guild.roles.find(val => val.name === 'Muted');
 
@@ -680,34 +678,20 @@ exports.checkExpiredMutes = async function checkExpiredMutes(client) {
                         if (!guild.channels.get(channelsFile.get('action_log'))) {
                             return;
                         }
-                        guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`);
+                        guild.channels.get(channelsFile.get('action_log')).send(`${member} has been unmuted`).catch(console.error);
                     }
                     mutedFile.unset(key);
                     mutedFile.save();
                 }).catch(console.error);
             } else {
-                console.log(`Actionee could not be found ${key}`);
+                if (channelsFile.get('action_log')) {
+                    if (!guild.channels.get(channelsFile.get('action_log'))) {
+                        return;
+                    }
+                    guild.channels.get(channelsFile.get('action_log')).send(`<@${key}>'s mute has expired, but they could not be found.`).catch(console.error);
+                }
                 mutedFile.unset(key);
                 mutedFile.save();
-            }
-        } else {
-            if (actionee) {
-                if (!actionee.roles.some(r => r == mutedRole)) {
-                    actionee.addRole(mutedRole).then(async member => {
-                        member.setVoiceChannel(null);
-                        const identifier = cryptoRandomString({length: 10});
-                        const data = [member.id, '001', 'Muted role removed prior to expiration. User may have attempted to mute evade.', identifier, 0, new Date()]
-                        connection.query('INSERT INTO log_note (userID, actioner, description, identifier, isDeleted, timestamp) VALUES (?,?,?,?,?,?)', data,
-                        function(err, results) {
-                            if (err) throw err;
-                        });
-                        if (channelsFile.get('action_log')) {
-                            if (guild.channels.get(channelsFile.get('action_log'))) {
-                                guild.channels.get(channelsFile.get('action_log')).send(`${mutedRole} has been re-added to ${member}. The role has been removed prior to mute expiration.`);
-                            }
-                        }
-                    }).catch(console.error);
-                }
             }
         }
     }
@@ -720,7 +704,7 @@ exports.checkReminders = async function checkReminders(client) {
     const guild = client.guilds.get(config.guildid);
     const reminders = reminderFile.read();
 
-    for (key in reminders) {
+    for (let key in reminders) {
         const current = reminders[key];
         if (current.end < Math.floor(Date.now() / 1000)) {
             const member = guild.member(current.who);

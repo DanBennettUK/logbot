@@ -4,7 +4,8 @@ exports.run = async (client, message, args) => {
     const config = client.config;
     let connection = client.connection;
     const _ = client.underscore;
-    const guild = message.guild;
+    let guild = message.guild;
+
     if (message.member.roles.some(role => ['Moderators'].includes(role.name))) {
         if (modulesFile.get('COMMAND_USER')) {
             let userID = '';
@@ -41,8 +42,8 @@ exports.run = async (client, message, args) => {
                     console.log(e);
                 }
             }
-            const userObject = guild.member(globalUser);
-
+            let userObject = guild.member(globalUser);
+            let autoClose = null;
             if (userObject && userObject != null) {
                 let nickname = 'No nickname';
                 let voiceChannel = 'Not in a voice channel';
@@ -107,12 +108,130 @@ exports.run = async (client, message, args) => {
                     }
                 }).then(async msg => {
 
-                    const filter = (reaction, user) => !user.bot;
-                    const collector = msg.createReactionCollector(filter);
+                    let filter = (reaction, user) => !user.bot;
+                    let collector = msg.createReactionCollector(filter);
+
+                    autoClose = setTimeout(() => {
+                        collector.stop();
+                        msg.clearReactions();
+                        msg.edit({
+                            embed: {
+                                color: config.color_info,
+                                author: {
+                                    name: `${userObject.user.username} (${nickname})`,
+                                    icon_url: userObject.user.displayAvatarURL
+                                },
+                                description: `${userObject.user} joined the guild on ${joined}\n`,
+                                thumbnail: {
+                                    url: userObject.user.displayAvatarURL
+                                },
+                                fields: [
+                                    {
+                                        name: 'Created',
+                                        value: userObject.user.createdAt.toUTCString()
+                                    },
+                                    {
+                                        name: 'ID',
+                                        value: userObject.user.id,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Status',
+                                        value: `${userObject.user.presence.status.toUpperCase()}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Application',
+                                        value: `${app}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'Voice channel',
+                                        value: `${voiceChannel}`,
+                                        inline: true
+                                    },
+                                    {
+                                        name: '**USERCARD CLOSED**',
+                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                    }
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                        userObject = null;
+                        globalUser = null;
+                        collector = null;
+                        filter = null;
+                        msg = null;
+                        guild = null;
+                        connection = null;
+                    }, 300000);
 
                     collector.on('collect', async r => {
                         if (r.emoji.name == '👮') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                userObject = null;
+                                globalUser = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                connection = null;
+                            }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
                                 SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -256,6 +375,65 @@ exports.run = async (client, message, args) => {
                             );
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
 
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                             SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
@@ -399,10 +577,79 @@ exports.run = async (client, message, args) => {
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
-                            msg.delete();
-                            message.delete();
+                            clearTimeout(autoClose);
+                            collector.stop();
+                            msg.delete().catch(console.error);
+                            message.delete().catch(console.error);
+                            collector = null;
+                            filter = null;
+                            msg = null;
+                            guild = null;
+                            userObject = null;
+                            globalUser = null;
+                            connection = null;
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                 async function (err, rows, results) {
                                     if (err) {
@@ -530,6 +777,66 @@ exports.run = async (client, message, args) => {
                             );
                         } else if (r.emoji.name == '🖥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -547,7 +854,7 @@ exports.run = async (client, message, args) => {
                                             extra = rows.length - max;
                                         }
 
-                                        for (var i = 0; i < max; i++) {
+                                        for (let i = 0; i < max; i++) {
                                             const row = rows[i];
                                             await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                             if (i == max - 1 && extra > 0) {
@@ -597,7 +904,7 @@ exports.run = async (client, message, args) => {
                                         extra = rows.length - max;
                                     }
 
-                                    for (var i = 0; i < max; i++) {
+                                    for (let i = 0; i < max; i++) {
                                         const row = rows[i];
                                         await notes.push(`\`${row.identifier}\` 🖥 SYSTEM NOTE on ${row.timestamp.toUTCString()} \n \`\`\`${row.description.replace(/`/g, '')}\`\`\`\n\n`);
                                         if (i == max - 1 && extra > 0) {
@@ -639,6 +946,66 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             if (userObject.voiceChannel) {
                                 voiceChannel = userObject.voiceChannel.name;
                             } else {
@@ -694,6 +1061,66 @@ exports.run = async (client, message, args) => {
                             }).catch(console.error);
                         } else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
@@ -821,6 +1248,66 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_info,
+                                        author: {
+                                            name: `${userObject.user.username} (${nickname})`,
+                                            icon_url: userObject.user.displayAvatarURL
+                                        },
+                                        description: `${userObject.user} joined the guild on ${joined}\n`,
+                                        thumbnail: {
+                                            url: userObject.user.displayAvatarURL
+                                        },
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: userObject.user.createdAt.toUTCString()
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: userObject.user.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Status',
+                                                value: `${userObject.user.presence.status.toUpperCase()}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Application',
+                                                value: `${app}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'Voice channel',
+                                                value: `${voiceChannel}`,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) {
@@ -942,8 +1429,6 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             });
-                        } else {
-                            return;
                         }
                     });
                     await msg.react('👥');
@@ -954,6 +1439,7 @@ exports.run = async (client, message, args) => {
                     await msg.react('📛');
                     await msg.react('📥');
                     await msg.react('❌');
+
                 }).catch(console.error);
             } else if (globalUser) {
                 message.channel.send({
@@ -987,12 +1473,105 @@ exports.run = async (client, message, args) => {
                     }
                 }).then(async msg => {
 
-                    const filter = (reaction, user) => !user.bot;
-                    const collector = msg.createReactionCollector(filter);
+                    let filter = (reaction, user) => !user.bot;
+                    let collector = msg.createReactionCollector(filter);
+
+                    autoClose = setTimeout(() => {
+                        collector.stop();
+                        msg.clearReactions();
+                        msg.edit({
+                            embed: {
+                                color: config.color_caution,
+                                author: {
+                                    name: globalUser.username,
+                                    icon_url: globalUser.displayAvatarURL
+                                },
+                                thumbnail: {
+                                    url: globalUser.displayAvatarURL
+                                },
+                                title: `${globalUser.username}#${globalUser.discriminator}`,
+                                description: `The user you provided is not currently camping in this guild.`,
+                                fields: [
+                                    {
+                                        name: 'Created',
+                                        value: globalUser.createdAt.toUTCString(),
+                                        inline: true
+                                    },
+                                    {
+                                        name: 'ID',
+                                        value: globalUser.id,
+                                        inline: true
+                                    },
+                                    {
+                                        name: '**USERCARD CLOSED**',
+                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                    }
+                                ],
+                                timestamp: new Date(),
+                                footer: {
+                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                }
+                            }
+                        }).catch(console.error);
+                        collector = null;
+                        filter = null;
+                        msg = null;
+                        guild = null;
+                        userObject = null;
+                        globalUser = null;
+                        connection = null;
+                    }, 300000);
 
                     collector.on('collect', async r => {
                         if (r.emoji.name == '👮') {
                             await r.remove(r.users.last());
+
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
 
                             connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted = 0 AND gub.actioner <> '001' UNION ALL
                                 SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -1139,6 +1718,53 @@ exports.run = async (client, message, args) => {
                         } else if (r.emoji.name == '🔈') {
                             await r.remove(r.users.last());
 
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                             SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                             gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -1281,10 +1907,66 @@ exports.run = async (client, message, args) => {
                                 }
                             });
                         } else if (r.emoji.name == '❌') {
-                            msg.delete();
-                            message.delete();
+                            clearTimeout(autoClose);
+                            collector.stop();
+                            msg.delete().catch(console.error);
+                            message.delete().catch(console.error);
+                            collector = null;
+                            filter = null;
+                            msg = null;
+                            guild = null;
+                            userObject = null;
+                            globalUser = null;
+                            connection = null;
                         } else if (r.emoji.name == '✍') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -1410,6 +2092,53 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '🖥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                             async function (err, rows, results) {
                                 if (err) {
@@ -1519,6 +2248,53 @@ exports.run = async (client, message, args) => {
                             });
                         }  else if (r.emoji.name == '📛') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                             SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
@@ -1646,6 +2422,53 @@ exports.run = async (client, message, args) => {
                             });
                         } else if (r.emoji.name == '👥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             msg.edit({
                                 embed: {
                                     color: config.color_caution,
@@ -1678,6 +2501,53 @@ exports.run = async (client, message, args) => {
                             }).catch(console.error);
                         } else if (r.emoji.name == '📥') {
                             await r.remove(r.users.last());
+                            clearTimeout(autoClose);
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: globalUser.username,
+                                            icon_url: globalUser.displayAvatarURL
+                                        },
+                                        thumbnail: {
+                                            url: globalUser.displayAvatarURL
+                                        },
+                                        title: `${globalUser.username}#${globalUser.discriminator}`,
+                                        description: `The user you provided is not currently camping in this guild.`,
+                                        fields: [
+                                            {
+                                                name: 'Created',
+                                                value: globalUser.createdAt.toUTCString(),
+                                                inline: true
+                                            },
+                                            {
+                                                name: 'ID',
+                                                value: globalUser.id,
+                                                inline: true
+                                            },
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
+
                             connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                             [userID, userID], async function (err, rows, results) {
                                 if (err) {
@@ -1835,7 +2705,7 @@ exports.run = async (client, message, args) => {
                                 }).catch(console.error);
                                 return;
                             }
-                            const cardUser = rows[0];
+                            let cardUser = rows[0];
                             message.channel.send({
                                 embed: {
                                     color: config.color_caution,
@@ -1843,7 +2713,7 @@ exports.run = async (client, message, args) => {
                                         name: `${cardUser.username}`,
                                         icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                     },
-                                    title: `${userID}`,
+                                    title: `${cardUser.username} (${cardUser.userID})`,
                                     description: `This user could not be resolved. All data will be taken from the database.`,
                                     timestamp: new Date(),
                                     footer: {
@@ -1852,12 +2722,81 @@ exports.run = async (client, message, args) => {
                                 }
                             }).then(async msg => {
 
-                                const filter = (reaction, user) => !user.bot;
-                                const collector = msg.createReactionCollector(filter);
+                                let filter = (reaction, user) => !user.bot;
+                                let collector = msg.createReactionCollector(filter);
+
+                                autoClose = setTimeout(() => {
+                                    collector.stop();
+                                    msg.clearReactions();
+                                    msg.edit({
+                                        embed: {
+                                            color: config.color_caution,
+                                            author: {
+                                                name: `${cardUser.username}`,
+                                                icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                            },
+                                            title: `${cardUser.username} (${cardUser.userID})`,
+                                            description: `This user could not be resolved. All data will be taken from the database.`,
+                                            fields: [
+                                                {
+                                                    name: '**USERCARD CLOSED**',
+                                                    value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                }
+                                            ],
+                                            timestamp: new Date(),
+                                            footer: {
+                                                text: `Marvin's Little Brother | Current version: ${config.version}`
+                                            }
+                                        }
+                                    }).catch(console.error);
+                                    cardUser = null;
+                                    collector = null;
+                                    filter = null;
+                                    msg = null;
+                                    guild = null;
+                                    userObject = null;
+                                    globalUser = null;
+                                    connection = null;
+                                }, 300000);
 
                                 collector.on('collect', async r => {
                                     if (r.emoji.name == '👮') {
                                         await r.remove(r.users.last());
+
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
 
                                         connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                             SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -2002,6 +2941,41 @@ exports.run = async (client, message, args) => {
                                     } else if (r.emoji.name == '🔈') {
                                         await r.remove(r.users.last());
 
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
+
                                         connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                         SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                         gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2144,10 +3118,54 @@ exports.run = async (client, message, args) => {
                                             }
                                         });
                                     } else if (r.emoji.name == '❌') {
-                                        msg.delete();
-                                        message.delete();
+                                        clearTimeout(autoClose);
+                                        collector.stop();
+                                        msg.delete().catch(console.error);
+                                        message.delete().catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
                                     } else if (r.emoji.name == '✍') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
                                         connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results ) {
                                             if (err) {
@@ -2273,6 +3291,41 @@ exports.run = async (client, message, args) => {
                                         });
                                     } else if (r.emoji.name == '🖥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
+
                                         connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                         async function (err, rows, results) {
                                             if (err) {
@@ -2382,6 +3435,41 @@ exports.run = async (client, message, args) => {
                                         });
                                     }  else if (r.emoji.name == '📛') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
+
                                         connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                                         SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                         [userID, userID], async function (err, rows, results) {
@@ -2507,6 +3595,41 @@ exports.run = async (client, message, args) => {
                                         });
                                     }  else if (r.emoji.name == '👥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
+
                                         await msg.edit({
                                             embed: {
                                                 color: config.color_caution,
@@ -2514,7 +3637,7 @@ exports.run = async (client, message, args) => {
                                                     name: cardUser.username,
                                                     icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                                 },
-                                                title: `${userID}`,
+                                                title: `${cardUser.username} (${cardUser.userID})`,
                                                 description: `This user could not be resolved. All data will be taken from the database.`,
                                                 timestamp: new Date(),
                                                 footer: {
@@ -2524,6 +3647,41 @@ exports.run = async (client, message, args) => {
                                         }).catch(console.error);
                                     } else if (r.emoji.name == '📥') {
                                         await r.remove(r.users.last());
+                                        clearTimeout(autoClose);
+                                        autoClose = setTimeout(() => {
+                                            collector.stop();
+                                            msg.clearReactions();
+                                            msg.edit({
+                                                embed: {
+                                                    color: config.color_caution,
+                                                    author: {
+                                                        name: `${cardUser.username}`,
+                                                        icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                    },
+                                                    title: `${cardUser.username} (${cardUser.userID})`,
+                                                    description: `This user could not be resolved. All data will be taken from the database.`,
+                                                    fields: [
+                                                        {
+                                                            name: '**USERCARD CLOSED**',
+                                                            value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                        }
+                                                    ],
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                    }
+                                                }
+                                            }).catch(console.error);
+                                            cardUser = null;
+                                            collector = null;
+                                            filter = null;
+                                            msg = null;
+                                            guild = null;
+                                            userObject = null;
+                                            globalUser = null;
+                                            connection = null;
+                                        }, 300000);
+
                                         connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                         [userID, userID], async function (err, rows, results) {
                                             if (err) {
@@ -2671,9 +3829,9 @@ exports.run = async (client, message, args) => {
                                     }
                                 }
                             }).catch(console.error);
-                            return;
+                            msg = null;
                         }
-                        const cardUser = rows[0];
+                        let cardUser = rows[0];
                         message.channel.send({
                             embed: {
                                 color: config.color_caution,
@@ -2681,7 +3839,7 @@ exports.run = async (client, message, args) => {
                                     name: `${cardUser.username}`,
                                     icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                 },
-                                title: `${userID}`,
+                                title: `${cardUser.username} (${cardUser.userID})`,
                                 description: `This user could not be resolved. All data will be taken from the database.`,
                                 timestamp: new Date(),
                                 footer: {
@@ -2690,12 +3848,81 @@ exports.run = async (client, message, args) => {
                             }
                         }).then(async msg => {
 
-                            const filter = (reaction, user) => !user.bot;
-                            const collector = msg.createReactionCollector(filter);
+                            let filter = (reaction, user) => !user.bot;
+                            let collector = msg.createReactionCollector(filter);
+
+                            autoClose = setTimeout(() => {
+                                collector.stop();
+                                msg.clearReactions();
+                                msg.edit({
+                                    embed: {
+                                        color: config.color_caution,
+                                        author: {
+                                            name: `${cardUser.username}`,
+                                            icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                        },
+                                        title: `${cardUser.username} (${cardUser.userID})`,
+                                        description: `This user could not be resolved. All data will be taken from the database.`,
+                                        fields: [
+                                            {
+                                                name: '**USERCARD CLOSED**',
+                                                value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                            }
+                                        ],
+                                        timestamp: new Date(),
+                                        footer: {
+                                            text: `Marvin's Little Brother | Current version: ${config.version}`
+                                        }
+                                    }
+                                }).catch(console.error);
+                                cardUser = null;
+                                collector = null;
+                                filter = null;
+                                msg = null;
+                                guild = null;
+                                userObject = null;
+                                globalUser = null;
+                                connection = null;
+                            }, 300000);
 
                             collector.on('collect', async r => {
                                 if (r.emoji.name == '👮') {
                                     await r.remove(r.users.last());
+
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
 
                                     connection.query(`(SELECT 'unban' AS \`type\`, gub.* FROM log_guildunbans gub WHERE gub.userid = ${connection.escape(userID)} AND gub.isDeleted AND gub.actioner <> '001' = 0 UNION ALL
                                         SELECT 'ban' AS \`type\`, gb.* FROM log_guildbans gb WHERE gb.userid = ${connection.escape(userID)} AND gb.isDeleted = 0 AND gb.actioner <> '001' UNION ALL
@@ -2840,6 +4067,41 @@ exports.run = async (client, message, args) => {
                                 } else if (r.emoji.name == '🔈') {
                                     await r.remove(r.users.last());
 
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     connection.query(`(SELECT 'mute' AS \`type\`, gm.* FROM log_mutes gm WHERE gm.userID = ${connection.escape(userID)} AND gm.isDeleted = 0 UNION ALL
                                     SELECT 'unmute' AS \`type\`, gum.ID, gum.userID, gum.actioner, gum.description, NULL AS length, gum.identifier, gum.isDeleted, gum.timestamp,
                                     gum.updated FROM log_unmutes gum WHERE gum.userID = ${connection.escape(userID)} AND gum.isDeleted = 0) ORDER BY timestamp DESC`,
@@ -2982,10 +4244,55 @@ exports.run = async (client, message, args) => {
                                         }
                                     });
                                 } else if (r.emoji.name == '❌') {
-                                    msg.delete();
-                                    message.delete();
+                                    clearTimeout(autoClose);
+                                    collector.stor();
+                                    msg.delete().catch(console.error);
+                                    message.delete().catch(console.error);
+                                    cardUser = null;
+                                    collector = null;
+                                    filter = null;
+                                    msg = null;
+                                    guild = null;
+                                    userObject = null;
+                                    globalUser = null;
+                                    connection = null;
                                 } else if (r.emoji.name == '✍') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     connection.query('SELECT * FROM log_note WHERE userID = ? AND isDeleted = 0 AND actioner <> \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results ) {
                                         if (err) {
@@ -3111,6 +4418,41 @@ exports.run = async (client, message, args) => {
                                     });
                                 } else if (r.emoji.name == '🖥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     connection.query('SELECT * from log_note WHERE userID = ? AND isDeleted = 0 AND actioner = \'001\' ORDER BY timestamp DESC', userID,
                                     async function (err, rows, results) {
                                         if (err) {
@@ -3220,6 +4562,41 @@ exports.run = async (client, message, args) => {
                                     });
                                 }  else if (r.emoji.name == '📛') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     connection.query(`(SELECT 'user' as \`type\`, u.* FROM log_username u WHERE u.userID = ? UNION ALL
                                     SELECT 'nick' as \`type\`, n.* FROM log_nickname n WHERE n.userID = ?) ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
@@ -3345,6 +4722,41 @@ exports.run = async (client, message, args) => {
                                     });
                                 }  else if (r.emoji.name == '👥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     await msg.edit({
                                         embed: {
                                             color: config.color_caution,
@@ -3352,7 +4764,7 @@ exports.run = async (client, message, args) => {
                                                 name: cardUser.username,
                                                 icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
                                             },
-                                            title: `${userID}`,
+                                            title: `${cardUser.username} (${cardUser.userID})`,
                                             description: `This user could not be resolved. All data will be taken from the database.`,
                                             timestamp: new Date(),
                                             footer: {
@@ -3362,6 +4774,41 @@ exports.run = async (client, message, args) => {
                                     }).catch(console.error);
                                 } else if (r.emoji.name == '📥') {
                                     await r.remove(r.users.last());
+                                    clearTimeout(autoClose);
+                                    autoClose = setTimeout(() => {
+                                        collector.stop();
+                                        msg.clearReactions();
+                                        msg.edit({
+                                            embed: {
+                                                color: config.color_caution,
+                                                author: {
+                                                    name: `${cardUser.username}`,
+                                                    icon_url: `https://cdn.discordapp.com/avatars/${cardUser.userID}/${cardUser.avatar}.jpg`
+                                                },
+                                                title: `${cardUser.username} (${cardUser.userID})`,
+                                                description: `This user could not be resolved. All data will be taken from the database.`,
+                                                fields: [
+                                                    {
+                                                        name: '**USERCARD CLOSED**',
+                                                        value: `This usercard was automatically closed after 5m of inactivity. To open it again, run \`${config.prefix}user ${userID}\``
+                                                    }
+                                                ],
+                                                timestamp: new Date(),
+                                                footer: {
+                                                    text: `Marvin's Little Brother | Current version: ${config.version}`
+                                                }
+                                            }
+                                        }).catch(console.error);
+                                        cardUser = null;
+                                        collector = null;
+                                        filter = null;
+                                        msg = null;
+                                        guild = null;
+                                        userObject = null;
+                                        globalUser = null;
+                                        connection = null;
+                                    }, 300000);
+
                                     connection.query(`SELECT Status, timestamp FROM(SELECT *, 'join' AS Status FROM log_guildjoin WHERE userid = ? UNION SELECT *, 'leave' AS Status FROM log_guildleave WHERE userid = ?) a ORDER BY timestamp DESC`,
                                     [userID, userID], async function (err, rows, results) {
                                         if (err) {

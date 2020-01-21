@@ -20,41 +20,45 @@ exports.run = (client, message, args) => {
                     } else {
                         let end = 0;
                         let seconds = 0;
-                        const int = args[1].replace(/[a-zA-Z]$/g, '');
+                        const int = args[1].slice(0, args[1].length - 1);
+                        let duration = '';
 
-                        if (parseInt(int)) {
+                        if (/^[0-9]+$/.test(int)) {
                             switch (args[1] && args[1].toLowerCase().charAt(args[1].length - 1)) {
                                 case 'd':
                                     end = Math.floor(Date.now() / 1000) + int * 24 * 60 * 60;
                                     seconds = int * 24 * 60 * 60;
+                                    duration = `${int} days`;
                                     break;
                                 case 'h':
                                     end = Math.floor(Date.now() / 1000) + int * 60 * 60;
                                     seconds = int * 60 * 60;
+                                    duration = `${int} hours`;
                                     break;
                                 case 'm':
                                     end = Math.floor(Date.now() / 1000) + int * 60;
                                     seconds = int * 60;
+                                    duration = `${int} seconds`;
                                     break;
                                 default:
-                                    end = Math.floor(Date.now() / 1000) + int * 60 * 60;
-                                    seconds = int * 60 * 60;
-                                    break;
+                                    message.channel.send(':x: That duration is invalid.').catch(console.error);
+                                    return;
                             }
 
                             const tail = _.rest(args, 2).join(' ');
 
                             if (tail.length > 0) {
+                                const identifier = cryptoRandomString({ length: 10 });
                                 const reason = `${tail.charAt(0).toUpperCase()}${tail.slice(1)}`
                                 mutedFile.set(`${user}.end`, end);
+                                mutedFile.set(`${user}.start`, Date.now() / 1000);
+                                mutedFile.set(`${user}.duration`, duration);
                                 mutedFile.set(`${user}.actioner`,message.author.id);
-                                mutedFile.set(`${user}.actionee`, user);
                                 mutedFile.set(`${user}.reason`, reason);
-                                mutedFile.set(`${user}.isHelper`, 0);
+                                mutedFile.set(`${user}.identifier`, identifier);
                                 mutedFile.save();
 
                                 const mutedRole = guild.roles.find(val => val.name === 'Muted');
-                                const identifier = cryptoRandomString({ length: 10 });
 
                                 guild.member(user).addRole(mutedRole).then(async member => {
                                     if (member.voiceChannel !== undefined) {
@@ -194,7 +198,7 @@ exports.run = (client, message, args) => {
                                 message.channel.send('Please provide a reason for the mute.');
                             }
                         } else {
-                            message.channel.send( `Hm, that length doesn't seem right? ${int}`);
+                            message.channel.send( `:x: That length could not be parsed. \`${args[1]}\``).catch(console.error);
                             return;
                         }
                     }
