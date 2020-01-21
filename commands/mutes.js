@@ -2,7 +2,7 @@ exports.run = (client, message, args) => {
     if (message.member.roles.some(r => r.name == 'Moderators')) {
         const modulesFile = client.modulesFile;
         const mutes = client.mutedFile.read();
-        if (modulesFile.get('COMMAND_LISTMUTES')) {
+        if (modulesFile.get('COMMAND_MUTES')) {
             if (args.length > 0) {
                 if (args[0] == 'list') {
                     let fields = [];
