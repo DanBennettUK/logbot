@@ -28,7 +28,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -76,7 +76,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -120,7 +120,7 @@ exports.setupTables = function setupTables(client) {
           timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -132,7 +132,7 @@ exports.setupTables = function setupTables(client) {
           timestamp DATETIME
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -151,7 +151,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -170,7 +170,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (ID)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -189,7 +189,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -208,7 +208,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -227,7 +227,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -245,7 +245,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -261,7 +261,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -281,7 +281,7 @@ exports.setupTables = function setupTables(client) {
           PRIMARY KEY (id)
         )
         CHARACTER SET 'utf8mb4'
-        COLLATE 'utf8mb4_0900_ai_ci';`,
+        COLLATE 'utf8mb4_general_ci';`,
         function (err, results) {
             if (err) throw err;
         }
@@ -300,7 +300,7 @@ exports.setupTables = function setupTables(client) {
         PRIMARY KEY (id)
       )
       CHARACTER SET 'utf8mb4'
-      COLLATE 'utf8mb4_0900_ai_ci';`,
+      COLLATE 'utf8mb4_general_ci';`,
       function (err, results) {
           if (err) throw err;
       }
